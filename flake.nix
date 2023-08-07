@@ -19,7 +19,7 @@
       {
         legacyPackages.homeConfigurations."deus" = homeManager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ ./home.nix ./desktop.nix ];
+          modules = [ ./home.nix ];
           extraSpecialArgs = {
             unstable = unstablePkgs;
           };
