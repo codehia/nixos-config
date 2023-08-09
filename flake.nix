@@ -10,7 +10,7 @@
     };
   };
 
-  outputs = { nixpkgs, unstable, homeManager, flakeUtils, ... }:
+  outputs = { self, nixpkgs, unstable, homeManager, flakeUtils, ... }:
     flakeUtils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
