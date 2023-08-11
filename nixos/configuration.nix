@@ -1,13 +1,24 @@
-{ config, lib, pkgs, ... }:
-
-{
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+{ inputs, lib, config, pkgs, ... }: {
+  imports = [ ./hardware-configuration.nix ];
+  networking.hostName = "cognixm";
+  system.stateVersion = "23.05";
+  time.timeZone = "Asia/Kolkata";
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+    };
+  };
+  nix = {
+    settings = {
+      experimental-features = "nix-command flakes";
+      auto-optimise-store = true;
+    };
+  };
   boot = {
     kernelParams = [ "quiet" "rd.systemd.show_status=false" "rd.udev.log_level=3" "udev.log_priority=3" ];
     consoleLogLevel = 0;
     kernelModules = [ "kvm-amd" ];
-    extraModulePackages = [];
+    extraModulePackages = [ ];
     initrd = {
       luks.devices."root".allowDiscards = true;
       verbose = false;
@@ -24,11 +35,11 @@
       timeout = 0;
     };
   };
-  systemd.watchdog.rebootTime = "0";
-  i18n.defaultLocale = "en_US.UTF-8";
-  console = {
-    font = "ter-v32n";
-    keyMap = "us";
-    packages = with pkgs; [ terminus_font ];
+  users.users = {
+    agam = {
+      initialPassword = "password";
+      isNormalUser = true;
+      extraGroups = [ "wheel" "networkmanager" ];
+    };
   };
 }
