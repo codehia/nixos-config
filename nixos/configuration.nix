@@ -10,6 +10,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
   };
   programs.zsh.enable = true;
+  programs.dconf.enable = true;
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -83,9 +84,7 @@
       alsa.support32Bit = true;
       pulse.enable = true;
     };
-    dbus = {
-      enable = true;
-    };
+    dbus = { enable = true; };
     xserver = {
       enable = true;
       libinput = {
@@ -98,21 +97,20 @@
         enableContribAndExtras = true;
       };
     };
-    kanata = 
-    let
-      configFile = builtins.readFile ./conf.kbd;
+    kanata = let
+      configFile = builtins.readFile ./kanata.kbd;
     in {
       enable = true;
       keyboards = {
         keychron = {
           devices =
             [ "/dev/input/by-id/usb-Keychron_Keychron_K8_Pro-if02-event-kbd" ];
-            config = configFile;
-          };
-          default = {
-            devices = ["/dev/input/by-path/platform-i8042-serio-0-event-kbd"];
-            config = configFile;
-          };
+          config = configFile;
+        };
+        thinkpad = {
+          devices = [ "/dev/input/by-path/platform-i8042-serio-0-event-kbd" ];
+          config = configFile;
+        };
       };
     };
   };

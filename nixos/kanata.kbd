@@ -1,9 +1,9 @@
 (defalias
-  escctrl (tap-hold-next-release 200 esc lctl)
-  enterctrl (tap-hold-next-release 200 ret rctl)
-  tabalt (tap-hold-next-release 200 tab lalt)
-  bslashalt (tap-hold-next-release 200 \ ralt)
-  spcnav  (tap-hold-next-release 200 spc (layer-toggle navigation))
+  escctrl (tap-hold 200 200 esc lctl)
+  enterctrl (tap-hold 200 200 ret rctl)
+  tabalt (tap-hold 200 200 tab lalt)
+  bslashalt (tap-hold 200 200 \ ralt)
+  spcnav  (tap-hold 200 200 spc (layer-toggle navigation))
   )
 
 
@@ -29,7 +29,7 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _     _
   _    _    _    _    _    _    _    _    _    _    _    _    _     _
-  _    home    pgup del  end  pgdn  left  down  up  right    _    _          _
+  _    home    pgup del  end  pgdn  left  down  up  rght    _    _          _
   _    _    _    _    _    _    _    _    _    _    _               _
   _    _    _    _              _              _    _    _     _    _    _
 )

@@ -35,7 +35,7 @@ in {
         hp.xmonad
         hp.xmonad-contrib
       ];
-      config = ./temp.hs;
+      config = ./xmonad.hs;
     };
   };
   gtk = {
