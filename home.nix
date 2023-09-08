@@ -16,14 +16,27 @@ in {
       fzf
       ripgrep
       bat
-      exa
       tmux
       lazygit
       xclip
       xsel
       git
       nixfmt
+      eza
     ];
+  };
+  xsession = {
+    enable = true;
+    windowManager.xmonad = {
+      enable = true;
+      enableContribAndExtras = true;
+      extraPackages = hp: [
+        hp.dbus
+        hp.xmonad
+        hp.xmonad-contrib
+      ];
+      config = ./temp.hs;
+    };
   };
   gtk = {
     enable = true;
@@ -40,6 +53,7 @@ in {
   programs = {
     ssh.enable = true;
     home-manager.enable = true;
+    rofi.enable = true;
     git = {
       enable = true;
       diff-so-fancy.enable = true;
@@ -69,7 +83,7 @@ in {
         size = 14.0;
       };
     };
-    exa = {
+    eza = {
       enable = true;
       enableAliases = true;
       icons = true;

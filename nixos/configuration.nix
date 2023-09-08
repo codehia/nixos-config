@@ -10,6 +10,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
   };
   programs.zsh.enable = true;
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -58,44 +59,63 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [ vim_configurable wget git ];
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the Cinnamon Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.desktopManager.cinnamon.enable = true;
-
   # Configure keymap in X11
-  services.xserver = {
-    layout = "us";
-    xkbVariant = "";
-  };
+  # services.xserver = {
+  #   layout = "us";
+  #   xkbVariant = "";
+  # };
 
   # Enable sound with pipewire.
   sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   security.sudo.wheelNeedsPassword = false;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
 
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
+  services = {
+    fstrim.enable = true;
+    openssh = {
+      enable = true;
+      settings.PasswordAuthentication = false;
+    };
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+    };
+    dbus = {
+      enable = true;
+    };
+    xserver = {
+      enable = true;
+      libinput = {
+        enable = true;
+        touchpad.disableWhileTyping = true;
+      };
+      displayManager.defaultSession = "none+xmonad";
+      windowManager.xmonad = {
+        enable = true;
+        enableContribAndExtras = true;
+      };
+    };
+    kanata = 
+    let
+      configFile = builtins.readFile ./conf.kbd;
+    in {
+      enable = true;
+      keyboards = {
+        keychron = {
+          devices =
+            [ "/dev/input/by-id/usb-Keychron_Keychron_K8_Pro-if02-event-kbd" ];
+            config = configFile;
+          };
+          default = {
+            devices = ["/dev/input/by-path/platform-i8042-serio-0-event-kbd"];
+            config = configFile;
+          };
+      };
+    };
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  services.xserver.libinput.enable = true;
-
-  # services.openssh = {
-  #  enable = true;
-  #  settings.PasswordAuthentication = false;
-  # };
-  # services.fstrim.enable = true;
   system.stateVersion = "23.05"; # Did you read the comment?
 }
