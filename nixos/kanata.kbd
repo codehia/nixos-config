@@ -4,6 +4,8 @@
   tabalt (tap-hold 200 200 tab lalt)
   bslashalt (tap-hold 200 200 \ ralt)
   spcnav  (tap-hold 200 200 spc (layer-toggle navigation))
+  altsft (tap-hold 200 200 q (multi lalt lsft))
+  altctl (tap-hold 200 200 ] (multi lctl lalt))
   )
 
 
@@ -19,7 +21,7 @@
 (deflayer custom
   esc  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12  home end  ins  del
   grv  1    2    3    4    5    6    7    8    9    0    -     =    bspc
-  @tabalt  q    w    e    r    t    y    u    i    o    p    [     ]    @bslashalt
+  @tabalt  @altsft    w    e    r    t    y    u    i    o    p    [     @altctl   @bslashalt
   @escctrl a    s    d    f    g    h    j    k    l    ;    '          @enterctrl
   lsft z    x    c    v    b    n    m    ,    .    /               rsft
   lctl wkup lmet lalt           @spcnav            ralt sys  rctl  pgdn up   pgup

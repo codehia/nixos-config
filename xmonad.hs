@@ -191,11 +191,11 @@ myBorderWidth = 4
 myStartupHook :: X ()
 myStartupHook = do
   modify $ \xstate -> xstate {windowset = onlyOnScreen 1 "1_1 " (windowset xstate)}
-  spawnOnce "picom --experimental-backends &"
-  spawnOnce "feh --bg-fill --randomize ~/.wallpapers/* &" -- feh set random wallpaper
+  spawnOnce "feh --bg-fill --randomize /home/deus/Pictures/.wallpapers/* &" -- feh set random wallpaper
   spawn
     "trayer --iconspacing 5 --edge top --align right --widthtype request --heighttype pixel --padding 5 --SetDockType true --SetPartialStrut false --expand true --monitor primary --transparent true --alpha 0 --tint 0x282c34  --height 22"
-  setDefaultCursor xC_left_ptr -- Set cursor theme
+  -- setDefaultCursor xC_left_ptr -- Set cursor theme
+  -- spawnOnce "picom --experimental-backends &"
 
 --------------------------------------
 -- Generating Layouts and Naming Them
@@ -326,7 +326,8 @@ myStatusBarSpawner (S s) = do
   pure $
     statusBarPropTo
       ("_XMONAD_LOG_" ++ show s)
-      ("xmobar -x " ++ show s ++ " ~/.config/xmobar/xmobarrc" ++ show s ++ ".hs")
+      ("xmobar")
+      --("xmobar -x " ++ show s ++ " ./xmobarrc" ++ show s ++ ".hs")
       (pure $ myXmobarPP (S s))
 
 manageZoomHook =
