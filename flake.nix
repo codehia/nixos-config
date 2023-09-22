@@ -1,5 +1,5 @@
 {
-  description = "My basic flake";
+  description = "My Nix config";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
     home-manager = {
