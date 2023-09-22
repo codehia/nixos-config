@@ -12,13 +12,21 @@
     };
   };
   programs = {
+    hyprland.enable = true;
     zsh.enable = true;
     dconf.enable = true;
   };
   boot = {
     consoleLogLevel = 0;
     plymouth.enable = true;
-    kernelParams = [ "quiet" "splash" "rd.systemd.show_status=false" "rd.udev.log_level=3" "udev.log_priority=3" "boot.shell_on_fail" ];
+    kernelParams = [
+      "quiet"
+      "splash"
+      "rd.systemd.show_status=false"
+      "rd.udev.log_level=3"
+      "udev.log_priority=3"
+      "boot.shell_on_fail"
+    ];
     initrd = {
       systemd.enable = true;
       verbose = false;
@@ -67,7 +75,14 @@
       set clipboard=unnamedplus
     '';
     shells = with pkgs; [ zsh ];
-    systemPackages = with pkgs; [ vim_configurable wget git ];
+    systemPackages = with pkgs; [
+      vim_configurable
+      wget
+      git
+      dunst
+      libnotify
+      rofi-wayland
+    ];
   };
 
   # Allow unfree packages
@@ -93,23 +108,21 @@
     };
     dbus = { enable = true; };
     xserver = {
-      videoDrivers = [
-        "amdgpu"
-      ];
+      videoDrivers = [ "amdgpu" ];
       enable = true;
       libinput = {
         enable = true;
         touchpad.disableWhileTyping = true;
       };
       displayManager = {
-        defaultSession = "none+xmonad";
+        defaultSession = "hyprland";
         autoLogin = {
           enable = true;
           user = "deus";
         };
       };
       windowManager.xmonad = {
-        enable = true;
+        enable = false;
         enableContribAndExtras = true;
       };
     };
