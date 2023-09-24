@@ -2,6 +2,7 @@
 let
   username = "deus";
   homeDirectory = "/home/deus";
+  system = "x86_64-linux";
 in {
   home = {
     username = username;
@@ -108,6 +109,35 @@ in {
   in {
     ssh.enable = true;
     home-manager.enable = true;
+    waybar = {
+      enable = true;
+      systemd.enable = true;
+      settings = {
+        mainBar = {
+          layer = "top";
+          position = "top";
+          height = 70;
+          output = [ "eDP-1" ];
+          modules-left =
+            [ "hyprland/workspaces" "hyprland/mode" "wlr/taskbar" ];
+          modules-center = [ "hyprland/window" "custom/hello-from-waybar" ];
+          modules-right = [ "mpd" "custom/mymodule#with-css-id" "temperature" ];
+
+          "hyprland/workspaces" = {
+            disable-scroll = true;
+            all-outputs = true;
+          };
+          "custom/hello-from-waybar" = {
+            format = "hello {}";
+            max-length = 40;
+            interval = "once";
+            exec = pkgs.writeShellScript "hello-from-waybar" ''
+              echo "from within waybar"
+            '';
+          };
+        };
+      };
+    };
     tmux = {
       enable = true;
       clock24 = false;

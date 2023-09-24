@@ -11,7 +11,6 @@
       plugins = list;
     };
   shellAliases = {
-    tree = "tree -a -I .git";
     pbcopy = "xclip -selection clipboard";
     pbpaste = "xclip -selection clipboard -o";
     lst = "eza -T";
@@ -20,7 +19,6 @@
       ' | pbcopy'';
     rebuild =
       "sudo nixos-rebuild switch --flake '.#cognixm' --option eval-cache false";
-
   };
   initExtraFirst = ''
     autoload -Uz compinit && compinit

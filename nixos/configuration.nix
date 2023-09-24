@@ -74,6 +74,7 @@
       set rnu
       set clipboard=unnamedplus
     '';
+    etc."greetd/environments".text = "Hyprland";
     shells = with pkgs; [ zsh ];
     systemPackages = with pkgs; [
       vim_configurable
@@ -107,25 +108,19 @@
       pulse.enable = true;
     };
     dbus = { enable = true; };
-    xserver = {
-      videoDrivers = [ "amdgpu" ];
+    greetd = {
+      vt = 1;
       enable = true;
-      libinput = {
-        enable = true;
-        touchpad.disableWhileTyping = true;
-      };
-      displayManager = {
-        defaultSession = "hyprland";
-        autoLogin = {
-          enable = true;
+      settings = let cmd = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+      in {
+        default_session = {
+          command = cmd;
           user = "deus";
         };
-      };
-      windowManager.xmonad = {
-        enable = false;
-        enableContribAndExtras = true;
+
       };
     };
+
     kanata = let configFile = builtins.readFile ./kanata.kbd;
     in {
       enable = true;
