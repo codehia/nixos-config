@@ -1,7 +1,7 @@
 -- This is XMOBAR CONFIG for monitor 1
 -- If you have more monitors, make separate configs, then call these from xmonad
 -- Font used : Fira Code, CaskaydiaCove Nerd Font for icons
-Config { font    = "xft:JetBrainsMonoMedium Nerd Font:weight=bold:pixelsize=12:antialias=true:hinting=true"
+Config { font    = "xft:JetBrainsMono Nerd Font:weight=bold:pixelsize=12:antialias=true:hinting=true"
        , bgColor = "#11111b"
        , fgColor = "#cdd6f4"
        , alpha = 254

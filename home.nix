@@ -14,7 +14,6 @@ in {
       name = "Catppuccin-Mocha-Dark-Cursors";
     };
     packages = with pkgs; [
-      neovim
       kitty
       brave
       htop
@@ -33,42 +32,7 @@ in {
       trayer
     ];
   };
-  services = let
-    bars = builtins.readFile ./bars.ini;
-    colors = builtins.readFile ./colors.ini;
-    mods1 = builtins.readFile ./modules.ini;
-    mods2 = builtins.readFile ./user_modules.ini;
-    xmonad = ''
-      [module/xmonad]
-      type = custom/script
-      exec = xmonadpropread
-      tail = true
-    '';
-  in {
-    polybar = {
-      enable = false;
-      script = ''
-        polybar top &
-      '';
-      config = {
-        "bar/top" = {
-          monitor = "\${env:MONITOR:eDP}";
-          width = "100%";
-          height = "3%";
-          radius = 0;
-          modules-center = "date";
-        };
-
-        "module/date" = {
-          type = "internal/date";
-          internal = 5;
-          date = "%d.%m.%y";
-          time = "%H:%M";
-          label = "%time%  %date%";
-        };
-      };
-      extraConfig = xmonad;
-    };
+  services = {
     picom = {
       enable = true;
     };
@@ -102,6 +66,9 @@ in {
     home-manager.enable = true;
     feh = {
       enable = false;
+    };
+    neovim-ide = {
+      enable=true;
     };
     xmobar = {
       enable = true;
@@ -268,10 +235,9 @@ in {
         fpath+=($ZDOTDIR/.antidote/plugins/pure)
       '';
       shellAliases = {
-        tree = "tree -a -I .git";
         pbcopy = "xclip -selection clipboard";
         pbpaste = "xclip -selection clipboard -o";
-        lst = "exa -T";
+        lst = "eza -T";
         copy = ''
           pwd | tr -d '
           ' | pbcopy'';
