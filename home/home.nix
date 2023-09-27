@@ -105,7 +105,12 @@ in {
   };
   fonts.fontconfig.enable = true;
   gtk = { font.name = "Noto Color Emoji"; };
-  programs = let zshConfig = import ./programs/zsh.nix;
+  services = {
+    mako = {
+      enable = true;
+    };
+  };
+  programs = let zshConfig = import ./programs/zsh;
   in {
     ssh.enable = true;
     home-manager.enable = true;
