@@ -1,0 +1,170 @@
+{ config, pkgs, inputs, ... }:
+
+{
+  imports =  [
+   ./hyprland
+   ./nvf.nix
+  ];
+  home = {
+    username = "deus";
+    homeDirectory = "/home/deus";
+    # Packages that should be installed to the user profile.
+    packages = with pkgs; [
+      # archives
+      zip
+      xz
+      unzip
+      p7zip
+
+      # utils
+      ripgrep # recursively searches directories for a regex pattern
+      jq # A lightweight and flexible command-line JSON processor
+      yq-go # yaml processor https://github.com/mikefarah/yq
+      eza # A modern replacement for ‘ls’
+      fzf # A command-line fuzzy finder
+
+      # networking tools
+      mtr # A network diagnostic tool
+      iperf3
+      dnsutils # `dig` + `nslookup`
+      ldns # replacement of `dig`, it provide the command `drill`
+      aria2 # A lightweight multi-protocol & multi-source command-line download utility
+      socat # replacement of openbsd-netcat
+      nmap # A utility for network discovery and security auditing
+      ipcalc # it is a calculator for the IPv4/v6 addresses
+
+      # misc
+      cowsay
+      file
+      which
+      tree
+      gnused
+      gnutar
+      gawk
+      zstd
+      gnupg
+
+      # nix related
+      #
+      # it provides the command `nom` works just like `nix`
+      # with more details log output
+      nix-output-monitor
+
+      # productivity
+      hugo # static site generator
+      glow # markdown previewer in terminal
+
+      btop # replacement of htop/nmon
+      iotop # io monitoring
+      iftop # network monitoring
+
+      # system cal?l monitoring
+      strace # system call monitoring
+      ltrace # library call monitoring
+      lsof # list open files
+
+      # system tools
+      sysstat
+      lm_sensors # for `sensors` command
+      ethtool
+      pciutils # lspci
+      usbutils # lsusb
+
+      ghostty # terminal emulator
+      kitty
+      wofi
+
+      fish
+      xfce.thunar
+      xfce.thunar-volman
+      nixfmt
+      just
+    ];
+    stateVersion = "25.05";
+  };
+  catppuccin = {
+    flavor = "mocha";
+    enable = true;
+    starship.enable = true;
+    fish.enable = true;
+    fzf.enable = true;
+    kitty.enable = true;
+    ghostty.enable = true;
+    nvim.enable = true;
+  };
+
+  programs = {
+    zen-browser.enable = true;
+    nix-index = {
+      enable = true;
+      enableFishIntegration = true;
+    };
+    fzf = {
+      enable = true;
+      # custom settings
+      enableFishIntegration = true;
+      tmux.enableShellIntegration = true;
+    };
+    zoxide = {
+      enable = true;
+      enableFishIntegration = true;
+    };
+    fish = {
+      enable = true;
+      interactiveShellInit = ''
+        set -g fish_greeting # Disable greeting message
+      '';
+      shellInit = ''
+        set -U fish_escape_delay_ms 30
+      '';
+      shellAliases = {
+        # Add fish aliases here if needed
+        ll = "eza -l";
+        la = "eza -la";
+        lt = "eza --tree";
+      };
+      plugins = [
+        {
+          name = "plugin-git";
+          src = pkgs.fishPlugins.plugin-git.src;
+        }
+        {
+          name = "fzf-fish";
+          src = pkgs.fishPlugins.fzf-fish.src;
+        }
+        {
+          name = "git-abbr";
+          src = pkgs.fishPlugins.git-abbr.src;
+        }
+        {
+          name = "plugin-sudope";
+          src = pkgs.fishPlugins.plugin-sudope.src;
+        }
+        {
+          name = "z";
+          src = pkgs.fishPlugins.z;
+        }
+        {
+          name = "sponge";
+          src = pkgs.fishPlugins.sponge;
+        }
+      ];
+    };
+
+    starship = {
+      enable = true;
+      enableFishIntegration = true;
+      settings.character = {
+        success_symbol = "[[󰄛](green) ❯](peach)";
+        error_symbol = "[[󰄛](red) ❯](peach)";
+        vimcmd_symbol = "[󰄛 ❮](subtext1)"; # For use with zsh-vi-mode
+
+        # success_symbol = "[󰄾](bold green)";
+      };
+      settings.git_branch = {
+        symbol = "󰊢 ";
+        style = "bold mauve";
+      };
+    };
+  };
+}
