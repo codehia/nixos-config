@@ -1,29 +1,39 @@
 # Nix will match by name and automatically inject the inputs
 # from specialArgs/_module.args into the third parameter of this function
-{ config, lib, pkgs, inputs, ... }:
-
-{
-  imports = [ ./hardware-configuration.nix ./disko-config.nix ];
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+{pkgs, ...}: {
+  imports = [./hardware-configuration.nix ./disko-config.nix ./fonts.nix];
+  nix = {
+    optimise = {
+      automatic = true;
+      dates = ["03:45"];
+    };
+    settings = {
+      experimental-features = ["nix-command" "flakes"];
+      auto-optimise-store = true;
+    };
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 15d";
+    };
+  };
   boot = {
     loader = {
       systemd-boot = {
-	enable = true;
- 	consoleMode = "max";
+        enable = true;
+        consoleMode = "2";
       };
       efi.canTouchEfiVariables = true;
     };
-    consoleLogLevel = 3;
     plymouth = {
       enable = true;
       theme = "connect";
-      themePackages = with pkgs;
-        [
-          # By default we would install all themes
-          (adi1090x-plymouth-themes.override {
-            selected_themes = [ "connect" ];
-          })
-        ];
+      themePackages = with pkgs; [
+        # By default we would install all themes
+        (adi1090x-plymouth-themes.override {
+          selected_themes = ["connect"];
+        })
+      ];
     };
     initrd = {
       verbose = false;
@@ -33,9 +43,11 @@
       "quiet"
       "splash"
       "boot.shell_on_fail"
+      "udev.log_level=3"
       "udev.log_priority=3"
       "rd.systemd.show_status=auto"
     ];
+    consoleLogLevel = 0;
   };
   networking = {
     hostName = "workstation";
@@ -45,18 +57,18 @@
 
   i18n = {
     defaultLocale = "en_US.UTF-8";
-    extraLocales = [ "all" ];
+    extraLocales = ["all"];
   };
 
-  security.sudo = { wheelNeedsPassword = false; };
+  security.sudo = {wheelNeedsPassword = false;};
   users.users.deus = {
     isNormalUser = true;
     description = "Soumyaranjan Acharya";
     initialPassword = "Soumya$321";
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = ["wheel" "networkmanager"];
     shell = pkgs.fish;
   };
-  environment.systemPackages = with pkgs; [ vim wget git fish ];
+  environment.systemPackages = with pkgs; [vim wget git fish];
   programs = {
     fish.enable = true;
     gnupg.agent = {
@@ -69,8 +81,8 @@
     };
   };
   services = {
-   gvfs.enable = true;
-   tailscale.enable = true;
+    gvfs.enable = true;
+    tailscale.enable = true;
     pipewire = {
       enable = true;
       pulse.enable = true;
