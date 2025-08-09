@@ -1,11 +1,7 @@
-{
-  config,
-  pkgs,
-  inputs,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
     ./hyprland
+    ./waybar
     ./nvf.nix
   ];
   home = {

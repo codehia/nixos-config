@@ -4,16 +4,7 @@
   pkgs,
   inputs,
   ...
-}:
-# let
-# inherit
-# (import ../../../hosts/${host}/variables.nix)
-# extraMonitorSettings
-# keyboardLayout
-# stylixImage
-# ;
-# in
-{
+}: {
   home.packages = with pkgs; [
     swww
     grim
@@ -75,7 +66,7 @@
         workspace_swipe_distance = 500;
         workspace_swipe_invert = 1;
         workspace_swipe_min_speed_to_force = 30;
-        workspace_swipe_cancel_ratio = 0.5;
+        workspace_swipe_cancel_ratio = 0.34;
         workspace_swipe_create_new = 1;
         workspace_swipe_forever = 1;
       };
@@ -120,6 +111,7 @@
 
       decoration = {
         rounding = 10;
+        rounding_power = 4.0;
         blur = {
           enabled = true;
           size = 5;
@@ -158,8 +150,8 @@
       master = {
         orientation = "center";
         new_status = "master";
-        mfact = 0.62;
-        slave_count_for_center_master = 0;
+        mfact = 0.55;
+        slave_count_for_center_master = 2;
       };
     };
 
