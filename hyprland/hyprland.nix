@@ -1,6 +1,4 @@
 {
-  host,
-  config,
   pkgs,
   inputs,
   ...
@@ -18,15 +16,6 @@
   systemd.user.targets.hyprland-session.Unit.Wants = [
     "xdg-desktop-autostart.target"
   ];
-  # Place Files Inside Home Directory
-  # home.file = {
-  #   "Pictures/Wallpapers" = {
-  #     source = ../../../wallpapers;
-  #     recursive = true;
-  #   };
-  #   ".face.icon".source = ./face.jpg;
-  #   ".config/face.jpg".source = ./face.jpg;
-  # };
   wayland.windowManager.hyprland = {
     enable = true;
     package =
@@ -42,6 +31,10 @@
       enable = true;
     };
     settings = {
+      env = [
+        "HYPRCURSOR_THEME, MyCursor"
+        "HYPRCURSOR_SIZE, 32"
+      ];
       input = {
         # kb_layout = "${keyboardLayout}";
         kb_options = [
@@ -54,22 +47,23 @@
         float_switch_override_focus = 0;
         sensitivity = 0;
         touchpad = {
-          natural_scroll = true;
+          natural_scroll = false;
           disable_while_typing = true;
           scroll_factor = 0.8;
         };
       };
 
-      gestures = {
-        workspace_swipe = 1;
-        workspace_swipe_fingers = 3;
-        workspace_swipe_distance = 500;
-        workspace_swipe_invert = 1;
-        workspace_swipe_min_speed_to_force = 30;
-        workspace_swipe_cancel_ratio = 0.34;
-        workspace_swipe_create_new = 1;
-        workspace_swipe_forever = 1;
-      };
+      # Keeping it commented in case I change my mind later looks cool, achieves nothing
+      # gestures = {
+      #   workspace_swipe = 1;
+      #   workspace_swipe_fingers = 3;
+      #   workspace_swipe_distance = 500;
+      #   workspace_swipe_invert = 1;
+      #   workspace_swipe_min_speed_to_force = 30;
+      #   workspace_swipe_cancel_ratio = 0.34;
+      #   workspace_swipe_create_new = 1;
+      #   workspace_swipe_forever = 1;
+      # };
 
       general = {
         "$mod" = "SUPER";
@@ -103,14 +97,15 @@
         anr_missed_pings = 15;
       };
 
-      dwindle = {
-        pseudotile = true;
-        preserve_split = true;
-        force_split = 2;
-      };
+      # Not using it now
+      # dwindle = {
+      #   pseudotile = true;
+      #   preserve_split = true;
+      #   force_split = 2;
+      # };
 
       decoration = {
-        rounding = 10;
+        rounding = 7;
         rounding_power = 4.0;
         blur = {
           enabled = true;
@@ -129,7 +124,7 @@
 
       ecosystem = {
         no_donation_nag = true;
-        no_update_news = false;
+        no_update_news = true;
       };
 
       cursor = {
@@ -159,7 +154,6 @@
     extraConfig = "
       monitor=,3440x1440@75.05,auto,1
       # To enable blur on waybar uncomment the line below
-      # Thanks to SchotjeChrisman
       #layerrule = blur,waybar
     ";
   };
