@@ -3,16 +3,10 @@
     "position": "top",
     "spacing": 0,
     "height": 34,
+    "reload_style_on_change": true,
     "modules-left": [ "custom/logo", "hyprland/workspaces" ],
     "modules-center": [ "clock" ],
-    "modules-right": [
-        "tray",
-        "memory",
-        "network",
-        "wireplumber",
-        "battery",
-        "custom/power"
-    ],
+    "modules-right": [ "tray", "memory", "network", "wireplumber", "battery", "custom/power" ],
     "wlr/taskbar": {
         "format": "{icon}",
         "on-click": "activate",
@@ -23,7 +17,8 @@
     },
     "hyprland/workspaces": {
         "on-click": "activate",
-        "format": "{icon}",
+        "format": "{name}: {icon}",
+        "persistent-only": true,
         "format-icons": {
             "default": "",
             "1": "1",
@@ -35,15 +30,11 @@
             "7": "7",
             "8": "8",
             "9": "9",
-            "active": "󱓻",
+            "active": "",
             "urgent": "󱓻"
         },
         "persistent_workspaces": {
-            "1": [],
-            "2": [],
-            "3": [],
-            "4": [],
-            "5": []
+          "*": 5
         }
     },
     "memory": {
@@ -87,7 +78,7 @@
         "scroll-step": 1
     },
     "custom/logo": {
-        "format": "  ",
+        "format": "  ",
         "tooltip": false,
         "on-click": "~/.config/rofi/launchers/misc/launcher.sh &"
     },
