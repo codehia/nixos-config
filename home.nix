@@ -7,6 +7,12 @@
   home = {
     username = "deus";
     homeDirectory = "/home/deus";
+    pointerCursor = {
+      name = "phinger-cursors-dark";
+      package = pkgs.phinger-cursors;
+      size = 32;
+      gtk.enable = true;
+    };
     # Packages that should be installed to the user profile.
     packages = with pkgs; [
       # archives
@@ -90,6 +96,7 @@
     kitty.enable = true;
     ghostty.enable = true;
     nvim.enable = true;
+    hyprland.enable = true;
   };
 
   programs = {
