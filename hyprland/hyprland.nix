@@ -78,7 +78,6 @@
         # "col.active_border" = "rgb(${config.lib.stylix.colors.base08}) rgb(${config.lib.stylix.colors.base0C}) 45deg";
         # "col.inactive_border" = "rgb(${config.lib.stylix.colors.base01})";
       };
-
       misc = {
         layers_hog_keyboard_focus = true;
         initial_workspace_tracking = 0;
@@ -145,9 +144,16 @@
       master = {
         orientation = "center";
         new_status = "master";
-        mfact = 0.55;
+        mfact = 0.34;
         slave_count_for_center_master = 2;
       };
+      workspace = [
+        "1, persistent = true, "
+        "2, persistent = true"
+        "3, persistent = true"
+        "4, persistent = true"
+        "5, persistent = true"
+      ];
     };
 
     # ${extraMonitorSettings}

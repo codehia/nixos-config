@@ -82,7 +82,7 @@
       fish
       xfce.thunar
       xfce.thunar-volman
-      nixfmt
+      nixfmt-classic
       just
     ];
     stateVersion = "25.05";
