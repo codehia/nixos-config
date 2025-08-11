@@ -30,7 +30,13 @@
     xwayland = {
       enable = true;
     };
+    plugins = [
+      pkgs.pyprland
+    ];
     settings = {
+      exec-once = [
+        "pypr &"
+      ];
       env = [
         "HYPRCURSOR_THEME, MyCursor"
         "HYPRCURSOR_SIZE, 32"
@@ -153,7 +159,18 @@
         "3, persistent:true,"
         "4, persistent:true,"
         "5, persistent:true,"
+        "special:minimized, gapsout:100"
+        # "special:scratchpad;float;size 70% 70% ,on-created-empty:kitty"
       ];
+
+      # windowrule = [
+      #   "float, class:^(thunar)$"
+      #   "workspace special:thunar, class:^(thunar)$"
+      #   "size 70% 60%, class:^(thunar)$"
+      #   "center, class:^(thunar)$"
+      #   "float, class:^(kitty)$"
+      #   "size 70% 60%, class:^(kitty)$"
+      # ];
     };
 
     # ${extraMonitorSettings}

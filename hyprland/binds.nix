@@ -1,4 +1,4 @@
-{...}: {
+_: {
   wayland.windowManager.hyprland.settings = {
     bind = [
       "$modifier, Q, exec, ghostty"
@@ -10,7 +10,6 @@
       "$modifier  SHIFT, Return, exec,rofi-launcher"
       "$modifier  SHIFT, W, exec,web-search"
       "$modifier  ALT,W,exec,wallsetter"
-      "$modifier  SHIFT,N,exec,swaync-client -rs"
       "$modifier, W,exec,zen"
       "$modifier, Y,exec,kitty -e yazi"
       "$modifier, E,exec,emopicker9000"
@@ -19,7 +18,7 @@
       "$modifier, O,exec,obs"
       "$modifier, C,exec,hyprpicker -a"
       "$modifier, G,exec,gimp"
-      "$modifier  shift,T,exec,pypr toggle term"
+
       "$modifier, T,exec, thunar"
       "$modifier, M,exec,pavucontrol"
       "$modifier, C,killactive,"
@@ -60,14 +59,23 @@
       "$modifier,3,workspace,3"
       "$modifier,4,workspace,4"
       "$modifier,5,workspace,5"
+
       "$modifier SHIFT,1,movetoworkspace,1"
       "$modifier SHIFT,2,movetoworkspace,2"
       "$modifier SHIFT,3,movetoworkspace,3"
       "$modifier SHIFT,4,movetoworkspace,4"
       "$modifier SHIFT,5,movetoworkspace,5"
 
-      "$modifier SHIFT,SPACE,movetoworkspace,special"
-      "$modifier,SPACE,togglespecialworkspace"
+      "$modifier SHIFT, T, exec, pypr toggle term"
+      "$modifier SHIFT, N, togglespecialworkspace, minimized"
+      "$modifier, N, exec, pypr toggle_special minimized"
+
+      "$modifier, S, togglespecialworkspace, magic"
+      "$modifier, S, movetoworkspace, +0"
+      "$modifier, S, togglespecialworkspace, magic"
+      "$modifier, S, movetoworkspace, special:magic"
+      "$modifier, S, togglespecialworkspace, magic"
+      "$modifier SHIFT, K, togglespecialworkspace, scratchpad"
 
       "$modifier CONTROL,right,workspace,e+1"
       "$modifier CONTROL,left,workspace,e-1"
