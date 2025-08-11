@@ -1,1 +1,1 @@
-{...}: {imports = [./binds.nix ./hyprland.nix];}
+{...}: {imports = [./binds.nix ./hyprland.nix ./pyprland.nix];}
