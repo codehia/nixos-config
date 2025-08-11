@@ -1,0 +1,19 @@
+[pyprland]
+plugins = [ "scratchpads", "toggle_special"]
+
+[scratchpads.term]
+animation = "fromTop"
+command = "kitty --class kitty-dropterm"
+class = "kitty-dropterm"
+size = "70% 70%"
+
+[scratchpads.minimized]
+animation = "fromBottom"
+size = "70% 70%"
+
+[scratchpads.filemanager]
+animation = "fromBottom"
+command = "thunar"
+class = "thunar"
+size = "60% 60%"
+skip_windowrules = ["aspect", "workspace"]
