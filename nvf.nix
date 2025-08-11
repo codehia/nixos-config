@@ -1,14 +1,54 @@
-{
-  inputs,
-  # , config
-  ...
-}: {
+{inputs, ...}: {
   imports = [inputs.nvf.homeManagerModules.default];
 
   programs.nvf = {
     enable = true;
 
     settings.vim = {
+      globals = {
+        mapleader = " ";
+        maplocalleader = " ";
+      };
+      options = {
+        number = true;
+        relativenumber = true;
+        mouse = "";
+        showmode = false;
+        breakindent = true;
+        undofiles = true;
+        ignorecase = true;
+        smartcase = true;
+        signcolumn = "yes";
+        updatetime = 250;
+        timoutlen = 300;
+        splitright = true;
+        splitbelow = true;
+        list = true;
+        # listchars = {
+        #   eol = "↲"; # End of line
+        #   tab = "▏·"; # Tab character (Arrow followed by a dot)
+        #   trail = "·"; # Trailing spaces
+        #   extends = "⟩"; # Character when text extends beyond the window
+        #   precedes = "⟨"; #Character when text precedes the window
+        #   nbsp = "␣"; # Non-breaking space
+        # };
+        tabstop = 4;
+        shiftwidth = 2;
+        wrap = false;
+        inccommand = "split";
+        cursorline = true;
+        hlsearch = true;
+        smoothscroll = true;
+        # fillchars = {
+        #   foldopen = "";
+        #   foldclose = "";
+        #   fold = " ";
+        #   foldsep = " ";
+        #   diff = "╱";
+        #   eob = " ";
+        # };
+      };
+
       lsp.enable = true;
       vimAlias = true;
       viAlias = true;
@@ -16,11 +56,6 @@
       lineNumberMode = "relNumber";
       enableLuaLoader = true;
       preventJunkFiles = true;
-      options = {
-        tabstop = 4;
-        shiftwidth = 2;
-        wrap = false;
-      };
 
       clipboard = {
         enable = true;
@@ -115,42 +150,106 @@
 
       lsp = {
         formatOnSave = true;
-        lspkind.enable = false;
-        lightbulb.enable = false;
-        lspsaga.enable = false;
+        lspkind.enable = true;
+        lightbulb.enable = true;
+        lspsaga.enable = true;
         trouble.enable = true;
-        lspSignature.enable = true;
-        otter-nvim.enable = false;
-        nvim-docs-view.enable = false;
+        lspSignature.enable = false;
+        otter-nvim.enable = false; # lsp features and a code completion source for code embedded in other documents
+        nvim-docs-view.enable = true;
       };
 
       languages = {
         enableFormat = true;
         enableTreesitter = true;
         enableExtraDiagnostics = true;
+
+        # Languages that will be supported in default and maximal configurations.
         nix.enable = true;
-        clang.enable = true;
-        zig.enable = true;
-        python.enable = true;
         markdown.enable = true;
+
+        # Languages that are enabled in the maximal configuration.
+        bash.enable = true;
+        clang.enable = true;
+        css = {
+          enable = true;
+          lsp.enable = true;
+          format.type = "prettierd";
+        };
+        html.enable = true;
+        sql.enable = true;
+        java.enable = false;
+        kotlin.enable = false;
         ts = {
           enable = true;
           lsp.enable = true;
           format.type = "prettierd";
           extensions.ts-error-translator.enable = true;
         };
-        html.enable = true;
+        go.enable = true;
         lua.enable = true;
-        css = {
-          enable = true;
-          format.type = "prettierd";
-        };
-        typst.enable = true;
+        zig.enable = false;
+        python.enable = true;
+        typst.enable = false;
         rust = {
-          enable = true;
-          crates.enable = true;
+          enable = false;
+          crates.enable = false;
         };
+        # Language modules that are not as common.
+        assembly.enable = false;
+        astro.enable = false;
+        nu.enable = false;
+        csharp.enable = false;
+        julia.enable = false;
+        vala.enable = false;
+        scala.enable = false;
+        r.enable = false;
+        gleam.enable = false;
+        dart.enable = false;
+        ocaml.enable = false;
+        elixir.enable = false;
+        haskell.enable = false;
+        ruby.enable = false;
+        fsharp.enable = false;
+
+        tailwind.enable = true;
+        svelte.enable = false;
+
+        # Nim LSP is broken on Darwin and therefore
+        # should be disabled by default. Users may still enable
+        # `vim.languages.vim` to enable it, this does not restrict
+        # that.
+        # See: <https://github.com/PMunch/nimlsp/issues/178#issue-2128106096>
+        nim.enable = false;
       };
+
+      # languages = {
+      #   enableFormat = true;
+      #   enableTreesitter = true;
+      #   enableExtraDiagnostics = true;
+      #   nix.enable = true;
+      #   clang.enable = true;
+      #   zig.enable = true;
+      #   python.enable = true;
+      #   markdown.enable = true;
+      #   ts = {
+      #     enable = true;
+      #     lsp.enable = true;
+      #     format.type = "prettierd";
+      #     extensions.ts-error-translator.enable = true;
+      #   };
+      #   html.enable = true;
+      #   lua.enable = true;
+      #   css = {
+      #     enable = true;
+      #     format.type = "prettierd";
+      #   };
+      #   typst.enable = true;
+      #   rust = {
+      #     enable = true;
+      #     crates.enable = true;
+      #   };
+      # };
       visuals = {
         nvim-web-devicons.enable = true;
         nvim-cursorline.enable = true;
@@ -160,14 +259,32 @@
         indent-blankline.enable = true;
         rainbow-delimiters.enable = true;
       };
-
+      theme = {
+        enable = true;
+        name = "catppuccin";
+        style = "mocha";
+        transparent = false;
+      };
       statusline.lualine = {
         enable = true;
         theme = "base16";
       };
 
       autopairs.nvim-autopairs.enable = true;
-      autocomplete.nvim-cmp.enable = true;
+      autocomplete = {
+blink-cmp = {
+
+enable = true;
+friendly-snippets.enable = true;
+          mappings = {
+            confirm = "<C-y>";
+            next = "<C-n>";
+            previous = "<C-p>";
+            close = "<C-e>";
+          };
+};
+
+      };
       snippets.luasnip.enable = true;
       tabline.nvimBufferline.enable = true;
       treesitter.context.enable = false;
@@ -377,7 +494,7 @@
 #           format.enable = true;
 #         };
 #         nix = {
-#           enable = true;
+#enable = true;
 #           treesitter.enable = true;
 #           lsp = {
 #             enable = true;
