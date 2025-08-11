@@ -148,11 +148,11 @@
         slave_count_for_center_master = 2;
       };
       workspace = [
-        "1, persistent = true, "
-        "2, persistent = true"
-        "3, persistent = true"
-        "4, persistent = true"
-        "5, persistent = true"
+        "1, persistent:true,"
+        "2, persistent:true,"
+        "3, persistent:true,"
+        "4, persistent:true,"
+        "5, persistent:true,"
       ];
     };
 
