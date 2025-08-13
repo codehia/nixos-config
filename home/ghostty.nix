@@ -1,7 +1,6 @@
 _: {
   programs.ghostty = {
     enable = true;
-    clearDefaultKeybinds = true;
     enableFishIntegration = true;
     installBatSyntax = true;
     settings = {
@@ -14,6 +13,7 @@ _: {
       theme = "catppuccin-mocha";
       window-padding-balance = true;
       window-decoration = false;
+      keybind = "ctrl+enter=unbind";
     };
   };
 }
