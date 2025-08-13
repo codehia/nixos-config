@@ -2,7 +2,9 @@
   imports = [
     ./hyprland
     ./waybar
-    ./nvf.nix
+    ./nvf
+    ./ghostty.nix
+    ./kitty.nix
   ];
   home = {
     username = "deus";
@@ -84,6 +86,13 @@
       xfce.thunar-volman
       nixfmt-classic
       just
+      devenv
+
+      # SECRETS
+      age
+      ssh-to-age
+
+      slack
     ];
     stateVersion = "25.05";
   };

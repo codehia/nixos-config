@@ -25,54 +25,54 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     zen-browser = {
-        url = "github:0xc000022070/zen-browser-flake";
-            inputs.nixpkgs.follows = "nixpkgs";
-
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   # `self` is the return value of the current flake's `outputs` function and
   # also the path to the current flake's source code folder (source tree)
-  outputs =
-    inputs@{
-      self,
-      nixpkgs,
-      disko,
-      home-manager,
-      catppuccin,
-      # nvf,
-      zen-browser,
-      hyprland,
-      ...
-    }:
-    {
-      nixosConfigurations.workstation = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit inputs; };
-        system = "x86_64-linux";
-        modules = [
-          ./configuration.nix
-          disko.nixosModules.disko
-          catppuccin.nixosModules.catppuccin
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              users.deus = {
-                imports = [
-                  ./home.nix
-                  catppuccin.homeModules.catppuccin
-                  # nvf.homeManagerModules.default
-                  zen-browser.homeModules.beta
-                ];
-              };
-            backupFileExtension = "backup";
-            extraSpecialArgs = { inherit inputs; };
+  outputs = inputs @ {
+    nixpkgs,
+    disko,
+    home-manager,
+    catppuccin,
+    # nvf,
+    zen-browser,
+    sops-nix,
+    ...
+  }: {
+    nixosConfigurations.workstation = nixpkgs.lib.nixosSystem {
+      specialArgs = {inherit inputs;};
+      system = "x86_64-linux";
+      modules = [
+        ./nixos/configuration.nix
+        disko.nixosModules.disko
+        catppuccin.nixosModules.catppuccin
+        sops-nix.nixosModules.sops
+        home-manager.nixosModules.home-manager
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.deus = {
+              imports = [
+                ./home
+                catppuccin.homeModules.catppuccin
+                zen-browser.homeModules.beta
+                sops-nix.homeManagerModules.sops
+              ];
             };
-            # Optionally, use home-manager.extraSpecialArgs to pass arguments to home.nix
-
-          }
-        ];
-      };
+            backupFileExtension = "backup";
+            extraSpecialArgs = {inherit inputs;};
+          };
+          # Optionally, use home-manager.extraSpecialArgs to pass arguments to home.nix
+        }
+      ];
     };
+  };
 }

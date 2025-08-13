@@ -15,12 +15,12 @@
         mouse = "";
         showmode = false;
         breakindent = true;
-        undofiles = true;
+        undofile = true;
         ignorecase = true;
         smartcase = true;
         signcolumn = "yes";
         updatetime = 250;
-        timoutlen = 300;
+        timeoutlen = 300;
         splitright = true;
         splitbelow = true;
         list = true;
