@@ -1,7 +1,12 @@
 # Nix will match by name and automatically inject the inputs
 # from specialArgs/_module.args into the third parameter of this function
 {pkgs, ...}: {
-  imports = [./hardware-configuration.nix ./disko-config.nix ./fonts.nix];
+  imports = [
+    ./hardware-configuration.nix
+    ./disko-config.nix
+    ./fonts.nix
+  ];
+  nixpkgs.config.allowUnfree = true;
   nix = {
     optimise = {
       automatic = true;
@@ -89,7 +94,7 @@
     };
     openssh = {
       enable = true;
-      settings.PasswordAuthentication = true;
+      # settings.PasswordAuthentication = true;
     };
   };
   system.stateVersion = "25.05";
