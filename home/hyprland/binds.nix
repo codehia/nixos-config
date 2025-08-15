@@ -29,6 +29,7 @@ _: {
 
   wayland.windowManager.hyprland.settings = {
     bind = [
+      "$modifier, P, exec, rofi -show drun"
       "$modifier, Q, exec, ghostty"
       "$modifier, W, exec, zen"
       "$modifier, T, exec, thunar"

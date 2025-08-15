@@ -1,6 +1,12 @@
-{inputs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   imports = [inputs.nvf.homeManagerModules.default];
-
+  home.packages = with pkgs; [
+    neovim
+  ];
   programs.nvf = {
     enable = true;
 
@@ -56,7 +62,6 @@
       lineNumberMode = "relNumber";
       enableLuaLoader = true;
       preventJunkFiles = true;
-
       clipboard = {
         enable = true;
         registers = "unnamedplus";
@@ -65,16 +70,14 @@
           xsel.enable = true;
         };
       };
-
-      maps = {
-        normal = {
-          "<leader>e" = {
-            action = "<CMD>Neotree toggle<CR>";
-            silent = false;
-          };
-        };
-      };
-
+      # maps = {
+      #   normal = {
+      #     "<leader>e" = {
+      #       action = "<CMD>Neotree toggle<CR>";
+      #       silent = false;
+      #     };
+      #   };
+      # };
       diagnostics = {
         enable = true;
         config = {
@@ -82,70 +85,11 @@
           underline = true;
         };
       };
-
-      keymaps = [
-        {
-          key = "jk";
-          mode = ["i"];
-          action = "<ESC>";
-          desc = "Exit insert mode";
-        }
-        {
-          key = "<leader>nh";
-          mode = ["n"];
-          action = ":nohl<CR>";
-          desc = "Clear search highlights";
-        }
-        {
-          key = "<leader>ff";
-          mode = ["n"];
-          action = "<cmd>Telescope find_files<cr>";
-          desc = "Search files by name";
-        }
-        {
-          key = "<leader>lg";
-          mode = ["n"];
-          action = "<cmd>Telescope live_grep<cr>";
-          desc = "Search files by contents";
-        }
-        {
-          key = "<leader>fe";
-          mode = ["n"];
-          action = "<cmd>Neotree toggle<cr>";
-          desc = "File browser toggle";
-        }
-        {
-          key = "<C-h>";
-          mode = ["i"];
-          action = "<Left>";
-          desc = "Move left in insert mode";
-        }
-        {
-          key = "<C-j>";
-          mode = ["i"];
-          action = "<Down>";
-          desc = "Move down in insert mode";
-        }
-        {
-          key = "<C-k>";
-          mode = ["i"];
-          action = "<Up>";
-          desc = "Move up in insert mode";
-        }
-        {
-          key = "<C-l>";
-          mode = ["i"];
-          action = "<Right>";
-          desc = "Move right in insert mode";
-        }
-      ];
-
       telescope.enable = true;
-
       spellcheck = {
         enable = true;
         languages = ["en"];
-        programmingWordlist.enable = false;
+        programmingWordlist.enable = true;
       };
 
       lsp = {
@@ -163,40 +107,37 @@
         enableFormat = true;
         enableTreesitter = true;
         enableExtraDiagnostics = true;
-
-        # Languages that will be supported in default and maximal configurations.
         nix.enable = true;
         markdown.enable = true;
-
-        # Languages that are enabled in the maximal configuration.
         bash.enable = true;
         clang.enable = true;
+        html.enable = true;
+        sql.enable = true;
+        go.enable = true;
+        lua.enable = true;
+        python.enable = true;
+        tailwind.enable = true;
         css = {
           enable = true;
           lsp.enable = true;
           format.type = "prettierd";
         };
-        html.enable = true;
-        sql.enable = true;
-        java.enable = false;
-        kotlin.enable = false;
         ts = {
           enable = true;
           lsp.enable = true;
           format.type = "prettierd";
           extensions.ts-error-translator.enable = true;
         };
-        go.enable = true;
-        lua.enable = true;
-        zig.enable = false;
-        python.enable = true;
-        typst.enable = false;
         rust = {
-          enable = false;
-          crates.enable = false;
+          enable = true;
+          crates.enable = true;
         };
         # Language modules that are not as common.
+        java.enable = false;
+        kotlin.enable = false;
+        zig.enable = false;
         assembly.enable = false;
+        typst.enable = false;
         astro.enable = false;
         nu.enable = false;
         csharp.enable = false;
@@ -212,7 +153,6 @@
         ruby.enable = false;
         fsharp.enable = false;
 
-        tailwind.enable = true;
         svelte.enable = false;
 
         # Nim LSP is broken on Darwin and therefore
@@ -272,18 +212,16 @@
 
       autopairs.nvim-autopairs.enable = true;
       autocomplete = {
-blink-cmp = {
-
-enable = true;
-friendly-snippets.enable = true;
+        blink-cmp = {
+          enable = true;
+          friendly-snippets.enable = true;
           mappings = {
             confirm = "<C-y>";
             next = "<C-n>";
             previous = "<C-p>";
             close = "<C-e>";
           };
-};
-
+        };
       };
       snippets.luasnip.enable = true;
       tabline.nvimBufferline.enable = true;
