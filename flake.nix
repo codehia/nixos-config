@@ -32,6 +32,10 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    stylix = {
+      url = "github:nix-community/stylix/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # `self` is the return value of the current flake's `outputs` function and
@@ -41,9 +45,9 @@
     disko,
     home-manager,
     catppuccin,
-    # nvf,
     zen-browser,
     sops-nix,
+    stylix,
     ...
   }: {
     nixosConfigurations.workstation = nixpkgs.lib.nixosSystem {
@@ -65,6 +69,7 @@
                 catppuccin.homeModules.catppuccin
                 zen-browser.homeModules.beta
                 sops-nix.homeManagerModules.sops
+                stylix.homeModules.stylix
               ];
             };
             backupFileExtension = "backup";

@@ -1,1 +1,1 @@
-{...}: {imports = [./commands.nix ./nvf.nix];}
+{...}: {imports = [./commands.nix ./nvf.nix ./keymaps.nix];}

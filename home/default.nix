@@ -1,11 +1,15 @@
 {pkgs, ...}: {
   imports = [
+    ./stylix.nix
     ./hyprland
     ./waybar
     ./nvf
     ./ghostty.nix
     ./kitty.nix
+    ./rofi.nix
+    ./tmux.nix
   ];
+
   home = {
     username = "deus";
     homeDirectory = "/home/deus";
