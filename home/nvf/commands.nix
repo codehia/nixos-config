@@ -70,6 +70,38 @@ in {
           end
         '';
       }
+      {
+        enable = true;
+        desc = "Resize splits if window got resized";
+        event = ["VimResized"];
+        group = "_nvf";
+        callback = luaInlineFunction ''
+          function()
+            local current_tab = vim.fn.tabpagenr()
+
+            vim.cmd 'tabdo wincmd ='
+            vim.cmd('tabnext' .. current_tab)
+          end
+        '';
+      }
+      {
+        enable = true;
+        desc = "Auto-update programming wordlist on first startup";
+        event = ["VimEnter"];
+        group = "_nvf";
+        callback = luaInlineFunction ''
+          function()
+              -- Check if dirtytalk dict file exists
+              local dict_path = vim.fn.stdpath('data') .. '/site/spell/programming.utf-8.add'
+              if vim.fn.filereadable(dict_path) == 0 then
+                -- Only run if file doesn't exist to avoid repeated downloads
+                vim.schedule(function()
+                   vim.cmd('DirtytalkUpdate')
+                  end)
+              end
+            end
+        '';
+      }
     ];
   };
 }
