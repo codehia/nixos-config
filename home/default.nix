@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   imports = [
     ./stylix.nix
     ./hyprland
@@ -10,6 +14,24 @@
     ./tmux.nix
   ];
 
+  services.hyprsunset = {
+    enable = true;
+    transitions = {
+      sunrise = {
+        calendar = "*-*-* 06:00:00";
+        requests = [
+          ["temperature" "6500"]
+          ["gamma 100"]
+        ];
+      };
+      sunset = {
+        calendar = "*-*-* 19:00:00";
+        requests = [
+          ["temperature" "3000"]
+        ];
+      };
+    };
+  };
   home = {
     username = "deus";
     homeDirectory = "/home/deus";
@@ -97,11 +119,16 @@
       ssh-to-age
 
       slack
+      brave
+      vlc
+
+      qbittorrent
+      brightnessctl
     ];
     stateVersion = "25.05";
   };
   catppuccin = {
-    flavor = "mocha";
+    flavor = "latte";
     enable = true;
     starship.enable = true;
     fish.enable = true;
@@ -110,9 +137,15 @@
     ghostty.enable = true;
     nvim.enable = true;
     hyprland.enable = true;
+    rofi.enable = true;
   };
 
   programs = {
+    direnv = {
+      enable = true;
+      # enableFishIntegration = lib.mkForce true;
+      nix-direnv.enable = true;
+    };
     zen-browser.enable = true;
     nix-index = {
       enable = true;
