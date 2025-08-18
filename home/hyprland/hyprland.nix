@@ -150,7 +150,7 @@
       master = {
         orientation = "center";
         new_status = "master";
-        mfact = 0.34;
+        mfact = 0.62;
         slave_count_for_center_master = 2;
       };
       workspace = [
