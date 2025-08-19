@@ -1,12 +1,6 @@
-{
-  pkgs,
-  inputs,
-  ...
-}: {
-  imports = [inputs.nvf.homeManagerModules.default];
-  home.packages = with pkgs; [
-    neovim
-  ];
+{ pkgs, inputs, ... }: {
+  imports = [ inputs.nvf.homeManagerModules.default ];
+  home.packages = with pkgs; [ neovim ];
   programs.nvf = {
     enable = true;
 
@@ -74,8 +68,8 @@
         nvim-lint = {
           enable = true;
           linters_by_ft = {
-            markdown = ["markdownlint"];
-            python = ["flake8"];
+            markdown = [ "markdownlint" ];
+            python = [ "flake8" ];
           };
         };
       };
@@ -83,15 +77,13 @@
         conform-nvim = {
           enable = true;
           setupOpts = {
-            formatters_by_ft = {
-              python = ["isort" "autopep8"];
-            };
+            formatters_by_ft = { python = [ "isort" "autopep8" ]; };
           };
         };
       };
       spellcheck = {
         enable = true;
-        languages = ["en"];
+        languages = [ "en" ];
         programmingWordlist.enable = true;
       };
 
@@ -102,7 +94,8 @@
         lspsaga.enable = true;
         trouble.enable = true;
         lspSignature.enable = false;
-        otter-nvim.enable = false; # lsp features and a code completion source for code embedded in other documents
+        otter-nvim.enable =
+          false; # lsp features and a code completion source for code embedded in other documents
         nvim-docs-view.enable = true;
       };
 
@@ -208,10 +201,7 @@
         style = "mocha";
         transparent = false;
       };
-      statusline.lualine = {
-        enable = true;
-        theme = "base16";
-      };
+      statusline.lualine = { enable = true; };
 
       autopairs.nvim-autopairs.enable = true;
       autocomplete = {
@@ -227,7 +217,7 @@
         };
       };
       snippets.luasnip.enable = true;
-      tabline.nvimBufferline.enable = true;
+      # tabline.nvimBufferline.enable = true;
       treesitter.context.enable = false;
       binds = {
         whichKey.enable = true;
@@ -238,8 +228,8 @@
         gitsigns.enable = true;
         gitsigns.codeActions.enable = false;
       };
-      projects.project-nvim.enable = true;
-      dashboard.dashboard-nvim.enable = true;
+      # projects.project-nvim.enable = true;
+      # dashboard.dashboard-nvim.enable = true;
       notify = {
         nvim-notify.enable = true;
         # nvim-notify.setupOpts.background_colour = "#${config.lib.stylix.colors.base01}";
@@ -256,9 +246,7 @@
           leap.enable = true;
           precognition.enable = false;
         };
-        images = {
-          image-nvim.enable = false;
-        };
+        images = { image-nvim.enable = false; };
       };
       ui = {
         borders.enable = true;
@@ -269,18 +257,12 @@
           enable = true;
           navbuddy.enable = false;
         };
-        smartcolumn = {
-          enable = true;
-        };
+        smartcolumn = { enable = true; };
         fastaction.enable = true;
       };
 
-      session = {
-        nvim-session-manager.enable = false;
-      };
-      comments = {
-        comment-nvim.enable = true;
-      };
+      session = { nvim-session-manager.enable = false; };
+      comments = { comment-nvim.enable = true; };
     };
   };
 }
