@@ -1,8 +1,4 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
+{ pkgs, lib, ... }: {
   imports = [
     ./stylix.nix
     ./hyprland
@@ -21,16 +17,11 @@
       transitions = {
         sunrise = {
           calendar = "*-*-* 06:00:00";
-          requests = [
-            ["temperature" "6500"]
-            ["gamma 100"]
-          ];
+          requests = [ [ "temperature" "6500" ] [ "gamma 100" ] ];
         };
         sunset = {
           calendar = "*-*-* 19:00:00";
-          requests = [
-            ["temperature" "3000"]
-          ];
+          requests = [[ "temperature" "3000" ]];
         };
       };
     };
@@ -217,16 +208,58 @@
     starship = {
       enable = true;
       enableFishIntegration = true;
-      settings.character = {
-        success_symbol = "[[󰄛](green) ❯](peach)";
-        error_symbol = "[[󰄛](red) ❯](peach)";
-        vimcmd_symbol = "[󰄛 ❮](subtext1)"; # For use with zsh-vi-mode
+      settings = {
+        directory.style = "blue";
+        format = lib.concatStrings [
+          "$username"
+          "$hostname"
+          "$directory"
+          "$git_branch"
+          "$git_state"
+          "$git_status"
+          "$cmd_duration"
+          "$line_break"
+          "$python"
+          "$character"
+        ];
+        character = {
+          success_symbol = "[❯](purple)";
+          error_symbol = "[❯](red)";
+          vimcmd_symbol = "[❮](green)";
 
-        # success_symbol = "[󰄾](bold green)";
-      };
-      settings.git_branch = {
-        symbol = "󰊢 ";
-        style = "bold mauve";
+        };
+        git_branch = {
+          format = "[$branch]($style)";
+          # style = "bright-black";
+          symbol = "󰊢 ";
+          style = "bold mauve";
+        };
+        git_status = {
+          format =
+            "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)";
+          style = "cyan";
+          conflicted = "​";
+          untracked = "​";
+          modified = "​";
+          staged = "​";
+          renamed = "​";
+          deleted = "​";
+          stashed = "≡";
+        };
+
+        git_state = {
+          format = "([$state( $progress_current/$progress_total)]($style)) ";
+          style = "bright-black";
+        };
+        cmd_duration = {
+          format = "[$duration]($style) ";
+          style = "yellow";
+        };
+
+        python = {
+          format = "[$virtualenv]($style) ";
+          style = "bright-black";
+        };
       };
     };
   };
