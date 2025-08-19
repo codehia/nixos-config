@@ -70,22 +70,25 @@
           xsel.enable = true;
         };
       };
-      # maps = {
-      #   normal = {
-      #     "<leader>e" = {
-      #       action = "<CMD>Neotree toggle<CR>";
-      #       silent = false;
-      #     };
-      #   };
-      # };
       diagnostics = {
-        enable = true;
-        config = {
-          virtual_lines.enable = true;
-          underline = true;
+        nvim-lint = {
+          enable = true;
+          linters_by_ft = {
+            markdown = ["markdownlint"];
+            python = ["flake8"];
+          };
         };
       };
-      telescope.enable = true;
+      formatter = {
+        conform-nvim = {
+          enable = true;
+          setupOpts = {
+            formatters_by_ft = {
+              python = ["isort" "autopep8"];
+            };
+          };
+        };
+      };
       spellcheck = {
         enable = true;
         languages = ["en"];
@@ -104,7 +107,7 @@
       };
 
       languages = {
-        enableFormat = true;
+        # enableFormat = true;
         enableTreesitter = true;
         enableExtraDiagnostics = true;
         nix.enable = true;
@@ -237,7 +240,6 @@
       };
       projects.project-nvim.enable = true;
       dashboard.dashboard-nvim.enable = true;
-      filetree.neo-tree.enable = true;
       notify = {
         nvim-notify.enable = true;
         # nvim-notify.setupOpts.background_colour = "#${config.lib.stylix.colors.base01}";
@@ -264,7 +266,7 @@
         colorizer.enable = true;
         illuminate.enable = true;
         breadcrumbs = {
-          enable = false;
+          enable = true;
           navbuddy.enable = false;
         };
         smartcolumn = {
