@@ -41,6 +41,7 @@
   # `self` is the return value of the current flake's `outputs` function and
   # also the path to the current flake's source code folder (source tree)
   outputs = inputs @ {
+    self,
     nixpkgs,
     disko,
     home-manager,
@@ -50,14 +51,13 @@
     stylix,
     ...
   }: {
-    nixosConfigurations.workstation = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.thinkpad = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
       system = "x86_64-linux";
       modules = [
         ./nixos/configuration.nix
         disko.nixosModules.disko
         catppuccin.nixosModules.catppuccin
-        sops-nix.nixosModules.sops
         home-manager.nixosModules.home-manager
         {
           home-manager = {
