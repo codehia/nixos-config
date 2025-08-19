@@ -58,106 +58,132 @@ _: {
       {
         key = "<C-h>";
         mode = ["n"];
-        action = "'<C-w><C-h>'";
+        action = "<C-w><C-h>";
         desc = "Move focus to left window";
       }
       {
         key = "<C-l>";
         mode = ["n"];
-        action = "'<C-w><C-l>'";
+        action = "<C-w><C-l>";
         desc = "Move focus to right window";
       }
       {
         key = "<C-j>";
         mode = ["n"];
-        action = "'<C-w><C-j>'";
+        action = "<C-w><C-j>";
         desc = "Move focus to lower window";
       }
       {
         key = "<C-k>";
         mode = ["n"];
-        action = "'<C-w><C-k>'";
+        action = "<C-w><C-k>";
         desc = "Move focus to upper window";
       }
-      /*
-
-      vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-      vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-      vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-      vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-      -- Diagnostic keymaps
-      vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
-      vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
-      vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
-      vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-
-      -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
-      -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
-      -- is not what someone will guess without a bit more experience.
-      -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
-      -- or just use <C-\><C-n> to exit terminal mode
-      vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-
-      -- TIP: Disable arrow keys in normal mode
-      vim.keymap.set({ 'n', 'i', 'v' }, '<left>', '<cmd>echo "Use h to move!!"<CR>')
-      vim.keymap.set({ 'n', 'i', 'v' }, '<right>', '<cmd>echo "Use l to move!!"<CR>')
-      vim.keymap.set({ 'n', 'i', 'v' }, '<up>', '<cmd>echo "Use k to move!!"<CR>')
-      vim.keymap.set({ 'n', 'i', 'v' }, '<down>', '<cmd>echo "Use j to move!!"<CR>')
-
-      -- Keybinds to make split navigation easier.
-      --  Use CTRL+<hjkl> to switch between windows
-      --  See `:help wincmd` for a list of all window commands
-      vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-      vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-      vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-      vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
-      vim.keymap.set('i', '<C-CR>', '<Plug>(copilot-suggest)')
-
-      vim.keymap.set('n', '<S-h>', ':bprevious<CR>')
-      vim.keymap.set('n', '<S-l>', ':bnext<CR>')
-      */
       {
-        key = "<leader>ff";
+        key = "<S-h>";
+        mode = ["n"];
+        action = ":bprevious<CR>";
+        desc = "Focus previous buffer";
+      }
+      {
+        key = "<S-l>";
+        mode = ["n"];
+        action = ":bnext<CR>";
+        desc = "Focus next buffer";
+      }
+      # Telescope keymaps
+      {
+        key = "<leader>sh";
+        mode = ["n"];
+        action = "<cmd>Telescope help_tags<cr>";
+        desc = "[S]earch [H]elp";
+      }
+      {
+        key = "<leader>sk";
+        mode = ["n"];
+        action = "<cmd>Telescope keymaps<cr>";
+        desc = "[S]earch [K]eymaps";
+      }
+      {
+        key = "<leader>sf";
         mode = ["n"];
         action = "<cmd>Telescope find_files<cr>";
-        desc = "Search files by name";
+        desc = "[S]earch [F]iles";
       }
       {
-        key = "<leader>lg";
+        key = "<leader>ss";
+        mode = ["n"];
+        action = "<cmd>Telescope builtin<cr>";
+        desc = "[S]earch [S]elect Telescope";
+      }
+      {
+        key = "<leader>sw";
+        mode = ["n"];
+        action = "<cmd>Telescope grep_string<cr>";
+        desc = "[S]earch current [W]ord";
+      }
+      {
+        key = "<leader>sg";
         mode = ["n"];
         action = "<cmd>Telescope live_grep<cr>";
-        desc = "Search files by contents";
+        desc = "[S]earch by [G]rep";
       }
       {
-        key = "<leader>fe";
+        key = "<leader>sd";
         mode = ["n"];
-        action = "<cmd>Neotree toggle<cr>";
-        desc = "File browser toggle";
+        action = "<cmd>Telescope diagnostics<cr>";
+        desc = "[S]earch [D]iagnostics";
       }
       {
-        key = "<C-h>";
-        mode = ["i"];
-        action = "<Left>";
-        desc = "Move left in insert mode";
+        key = "<leader>sr";
+        mode = ["n"];
+        action = "<cmd>Telescope resume<cr>";
+        desc = "[S]earch [R]esume";
       }
       {
-        key = "<C-j>";
-        mode = ["i"];
-        action = "<Down>";
-        desc = "Move down in insert mode";
+        key = "<leader>s.";
+        mode = ["n"];
+        action = "<cmd>Telescope oldfiles<cr>";
+        desc = "[S]earch Recent Files ('.' for repeat)";
       }
       {
-        key = "<C-k>";
-        mode = ["i"];
-        action = "<Up>";
-        desc = "Move up in insert mode";
+        key = "<leader>sm";
+        mode = ["n"];
+        action = "<cmd>Telescope marks<cr>";
+        desc = "[S]earch [M]arks";
       }
       {
-        key = "<C-l>";
-        mode = ["i"];
-        action = "<Right>";
-        desc = "Move right in insert mode";
+        key = "<leader><leader>";
+        mode = ["n"];
+        action = "<cmd>Telescope buffers<cr>";
+        desc = "[] Find existing buffers";
+      }
+      {
+        key = "<leader>/";
+        mode = ["n"];
+        action = ''
+          function()
+            local builtin = require 'telescope.builtin'
+            builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown { winblend = 10, previewer = false, })
+          end
+        '';
+        lua = true;
+        desc = "[/] Fuzzily search in current buffer";
+      }
+      {
+        key = "<leader>s/";
+        mode = ["n"];
+        action = ''
+          function()
+            local builtin = require 'telescope.builtin'
+            builtin.live_grep {
+               grep_open_files = true,
+               prompt_title = 'Live Grep in Open Files',
+            }
+          end
+        '';
+        lua = true;
+        desc = "[S]earch in  [/] Open Files";
       }
     ];
   };
