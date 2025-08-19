@@ -1,8 +1,4 @@
-{
-  pkgs,
-  inputs,
-  ...
-}: {
+{ pkgs, inputs, ... }: {
   home.packages = with pkgs; [
     swww
     grim
@@ -13,9 +9,8 @@
     hyprpolkitagent
     hyprland-qtutils # needed for banners and ANR messages
   ];
-  systemd.user.targets.hyprland-session.Unit.Wants = [
-    "xdg-desktop-autostart.target"
-  ];
+  systemd.user.targets.hyprland-session.Unit.Wants =
+    [ "xdg-desktop-autostart.target" ];
   wayland.windowManager.hyprland = {
     enable = true;
     package =
@@ -25,28 +20,16 @@
     systemd = {
       enable = true;
       enableXdgAutostart = true;
-      variables = ["--all"];
+      variables = [ "--all" ];
     };
-    xwayland = {
-      enable = true;
-    };
-    plugins = [
-      pkgs.pyprland
-    ];
+    xwayland = { enable = true; };
+    plugins = [ pkgs.pyprland ];
     settings = {
-      exec-once = [
-        "pypr &"
-      ];
-      env = [
-        "HYPRCURSOR_THEME, MyCursor"
-        "HYPRCURSOR_SIZE, 32"
-      ];
+      exec-once = [ "pypr &" ];
+      env = [ "HYPRCURSOR_THEME, MyCursor" "HYPRCURSOR_SIZE, 32" ];
       input = {
         # kb_layout = "${keyboardLayout}";
-        kb_options = [
-          "grp:alt_caps_toggle"
-          "caps:super"
-        ];
+        kb_options = [ "grp:alt_caps_toggle" "caps:super" ];
         numlock_by_default = false;
         repeat_delay = 300;
         follow_mouse = 0;
@@ -93,7 +76,8 @@
         disable_splash_rendering = true;
         enable_swallow = true;
         vfr = true; # Variable Frame Rate
-        vrr = 2; #Variable Refresh Rate  Might need to set to 0 for NVIDIA/AQ_DRM_DEVICES
+        vrr =
+          2; # Variable Refresh Rate  Might need to set to 0 for NVIDIA/AQ_DRM_DEVICES
         # Screen flashing to black momentarily or going black when app is fullscreen
         # Try setting vrr to 0
 
@@ -174,10 +158,7 @@
     };
 
     # ${extraMonitorSettings}
-    extraConfig = "
-      monitor=,3440x1440@75.05,auto,1
-      # To enable blur on waybar uncomment the line below
-      #layerrule = blur,waybar
-    ";
+    extraConfig =
+      "\n      monitor=,3440x1440@75.05,auto,1\n      # To enable blur on waybar uncomment the line below\n      #layerrule = blur,waybar\n    ";
   };
 }

@@ -1,13 +1,13 @@
-{lib, ...}: let
-  luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
+{ lib, ... }:
+let luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
 in {
   programs.nvf.settings.vim = {
-    augroups = [{name = "_nvf";}];
+    augroups = [{ name = "_nvf"; }];
     autocmds = [
       {
         enable = true;
         desc = "Highlight when yanking (copying) text";
-        event = ["TextYankPost"];
+        event = [ "TextYankPost" ];
         group = "_nvf";
         callback = luaInlineFunction ''
           function()
@@ -18,7 +18,7 @@ in {
       {
         enable = true;
         desc = "Check if we need to reload the file when it changes";
-        event = ["FocusGained" "TermClose" "TermLeave"];
+        event = [ "FocusGained" "TermClose" "TermLeave" ];
         group = "_nvf";
         callback = luaInlineFunction ''
           function ()
@@ -31,7 +31,7 @@ in {
       {
         enable = true;
         desc = "Resize splits if window got resized";
-        event = ["VimResized"];
+        event = [ "VimResized" ];
         group = "_nvf";
         callback = luaInlineFunction ''
           function()
@@ -45,7 +45,7 @@ in {
       {
         enable = true;
         desc = "Allow some special buffers/filetypes by q";
-        event = ["FileType"];
+        event = [ "FileType" ];
         group = "_nvf";
         pattern = [
           "PlenaryTestPopup"
@@ -73,7 +73,7 @@ in {
       {
         enable = true;
         desc = "Resize splits if window got resized";
-        event = ["VimResized"];
+        event = [ "VimResized" ];
         group = "_nvf";
         callback = luaInlineFunction ''
           function()
@@ -87,7 +87,7 @@ in {
       {
         enable = true;
         desc = "Auto-update programming wordlist on first startup";
-        event = ["VimEnter"];
+        event = [ "VimEnter" ];
         group = "_nvf";
         callback = luaInlineFunction ''
           function()
