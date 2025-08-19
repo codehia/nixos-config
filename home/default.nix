@@ -131,7 +131,7 @@
     stateVersion = "25.05";
   };
   catppuccin = {
-    flavor = "latte";
+    flavor = "mocha";
     enable = true;
     starship.enable = true;
     fish.enable = true;
@@ -141,6 +141,7 @@
     nvim.enable = true;
     hyprland.enable = true;
     rofi.enable = true;
+    tmux.enable = false;
   };
 
   programs = {
