@@ -37,6 +37,8 @@
     };
     # Packages that should be installed to the user profile.
     packages = with pkgs; [
+      cowsay
+      fortune
       # archives
       zip
       xz
