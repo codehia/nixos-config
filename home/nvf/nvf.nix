@@ -1,12 +1,12 @@
-{ pkgs, inputs, lib, ... }:
+{  inputs, lib, ... }:
 
-let luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
+let
+  luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
 in {
   imports = [ inputs.nvf.homeManagerModules.default ];
-  home.packages = with pkgs; [ neovim ];
+  # home.packages = with pkgs; [ neovim ];
   programs.nvf = {
     enable = true;
-
     settings.vim = {
       mini = {
         animate.enable = true;
@@ -19,16 +19,6 @@ in {
         starter = {
           enable = true;
           setupOpts = {
-            items = [
-              "sections.recent_files(5, true, false),"
-              "sections.builtin_actions()"
-            ];
-            content_hooks = [
-              "gen_hook.adding_bullet(),"
-              "gen_hook.aligning('center', 'center'),"
-              "gen_hook.indexing('all', { 'Builtin actions' }),"
-              "gen_hook.padding(3, 2)"
-            ];
             header = luaInlineFunction ''
               function()
                 local handle = assert(io.popen('fortune -s | cowsay', 'r'))
@@ -36,8 +26,48 @@ in {
                 handle:close()
                 return output
               end'';
+            items = luaInlineFunction ''
+              {
+                require("mini.starter").sections.recent_files(5, true, false),
+                require("mini.starter").sections.builtin_actions(),
+              }'';
+            content_hooks = luaInlineFunction ''
+              {
+                require("mini.starter").gen_hook.adding_bullet(),
+                require("mini.starter").gen_hook.aligning('center', 'center'),
+                require("mini.starter").gen_hook.indexing('all', { 'Builtin actions' }),
+                require("mini.starter").gen_hook.padding(3, 2),
+              }'';
             footer = "";
           };
+        };
+        statusline = {
+          enable = true;
+	#          setupOpts = {
+	#            active = luaInlineFunction ''
+	#           function()
+	#       local mode, mode_hl = statusline.section_mode { trunc_width = 20000 }
+	#       local git = statusline.section_git { trunc_width = 40 }
+	#       local filename = statusline.section_filename { trunc_width = 20000 }
+	#       local fileinfo = statusline.section_fileinfo { trunc_width = 20000 }
+	#       local location = statusline.section_location()
+	#       -- Check why the LSP is showing ++ and add to fileinfo
+	#       -- local lsp = statusline.section_lsp { trunc_width = 20, icon = '󰿘 ' }
+	#       return statusline.combine_groups {
+	# 	{ hl = mode_hl, strings = { mode } },
+	# 	{ hl = 'MiniStatuslineDevinfo', strings = { git } },
+	# 	'%<', -- Mark general truncate point
+	# 	{ hl = 'MiniStatuslineFilename', strings = { filename } },
+	# 	'%=', -- End left alignment
+	# 	{ hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+	# 	{ hl = mode_hl, strings = { location } },
+	#       }
+	#     end
+	#     statusline.section_location = function()
+	#       return '%2l:%-2v'
+	#     end
+	# end'';
+	#          };
         };
 
       };
@@ -89,7 +119,7 @@ in {
       vimAlias = true;
       viAlias = true;
       withNodeJs = true;
-      lineNumberMode = "relNumber";
+      # lineNumberMode = "relNumber";
       enableLuaLoader = true;
       preventJunkFiles = true;
       clipboard = {
@@ -117,11 +147,11 @@ in {
           };
         };
       };
-      spellcheck = {
-        enable = true;
-        languages = [ "en" ];
-        programmingWordlist.enable = true;
-      };
+      # spellcheck = {
+      #   enable = false;
+      #   languages = [ "en" ];
+      #   programmingWordlist.enable = true;
+      # };
 
       lsp = {
         formatOnSave = true;
@@ -130,8 +160,7 @@ in {
         lspsaga.enable = true;
         trouble.enable = true;
         lspSignature.enable = false;
-        otter-nvim.enable =
-          false; # lsp features and a code completion source for code embedded in other documents
+        otter-nvim.enable = false; # lsp features and a code completion source for code embedded in other documents
         nvim-docs-view.enable = true;
       };
 
@@ -229,7 +258,7 @@ in {
         fidget-nvim.enable = true;
         highlight-undo.enable = true;
         indent-blankline.enable = true;
-        rainbow-delimiters.enable = true;
+        rainbow-delimiters.enable = false;
       };
       theme = {
         enable = true;
@@ -237,10 +266,10 @@ in {
         style = "mocha";
         transparent = false;
       };
-      statusline.lualine = {
-        enable = true;
-        # theme = "base16";
-      };
+      # statusline.lualine = {
+      #   enable = true;
+      #   # theme = "base16";
+      # };
 
       autopairs.nvim-autopairs = {
         enable = true;
@@ -275,7 +304,7 @@ in {
       # projects.project-nvim.enable = true;
       # dashboard.dashboard-nvim.enable = true;
       notify = {
-        nvim-notify.enable = true;
+        nvim-notify.enable = false;
         # nvim-notify.setupOpts.background_colour = "#${config.lib.stylix.colors.base01}";
       };
       utility = {
@@ -293,16 +322,17 @@ in {
         images = { image-nvim.enable = false; };
       };
       ui = {
-        borders.enable = true;
-        noice.enable = true;
-        colorizer.enable = true;
-        illuminate.enable = true;
-        # breadcrumbs = {
-        #   enable = true;
-        #   navbuddy.enable = false;
-        # };
-        smartcolumn = { enable = true; };
-        fastaction.enable = true;
+        # borders.enable = true;
+        # noice.enable = true;
+        # colorizer.enable = true;
+        # illuminate.enable = true;
+        # # breadcrumbs = {
+        # #   enable = true;
+        # #   navbuddy.enable = false;
+        # #   lualine.winbar.enable = false;
+        # # };
+        # smartcolumn = { enable = true; };
+        # fastaction.enable = true;
       };
 
       # session = {
@@ -312,190 +342,3 @@ in {
     };
   };
 }
-# nvf = {
-#   enable = true;
-#   settings = {
-#     vim = {
-#       preventJunkFiles = false;
-#       options = {
-#         mouse = "";
-#         winborder = "rounded";
-#         timeoutlen = 600;
-#         smartcase = true;
-#         relativenumber = true;
-#         number = true;
-#         wrap = false;
-#         expandtab = true;
-#         # scrolloff
-#         # exrc
-#         # linebreak
-#       };
-#       globals = {
-#         mapleader = " ";
-#         maplocalleader = " ";
-#       };
-#       treesitter = {
-#         enable = true;
-#         autotagHtml = true;
-#         incrementalSelection.enable = false;
-#         addDefaultGrammars = false; # true maybe?
-#         indent.disable = [ "nix" ];
-#       };
-#
-#       viAlias = true;
-#       lsp = {
-#         enable = true;
-#         lspkind.enable = true;
-#         lspsaga.enable = true;
-#       };
-#       enableLuaLoader = true;
-#       autocomplete = {
-#         nvim-cmp = {
-#           enable = true;
-#           mappings = {
-#             confirm = "<C-y>";
-#             next = "<C-n>";
-#             previous = "<C-p>";
-#             close = "<C-e>";
-#
-#           };
-#         };
-#       };
-#       languages = {
-#         python = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#           format.enable = true;
-#         };
-#         nix = {
-#           enable = true;
-#           treesitter.enable = true;
-#           lsp = {
-#             enable = true;
-#             server = "nil";
-#           };
-#           format = {
-#             enable = true;
-#             package = pkgs.nixfmt-rfc-style;
-#             type = "nixfmt";
-#           };
-#         };
-#         lua = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#         };
-#         ts = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#         };
-#         go = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#         };
-#         rust = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#         };
-#       };
-#     };
-#   };
-# };
-# nvf = {
-#   enable = true;
-#   settings = {
-#     vim = {
-#       preventJunkFiles = false;
-#       options = {
-#         mouse = "";
-#         winborder = "rounded";
-#         timeoutlen = 600;
-#         smartcase = true;
-#         relativenumber = true;
-#         number = true;
-#         wrap = false;
-#         expandtab = true;
-#         # scrolloff
-#         # exrc
-#         # linebreak
-#       };
-#       globals = {
-#         mapleader = " ";
-#         maplocalleader = " ";
-#       };
-#       treesitter = {
-#         enable = true;
-#         autotagHtml = true;
-#         incrementalSelection.enable = false;
-#         addDefaultGrammars = false; # true maybe?
-#         indent.disable = [ "nix" ];
-#       };
-#
-#       viAlias = true;
-#       lsp = {
-#         enable = true;
-#         lspkind.enable = true;
-#         lspsaga.enable = true;
-#       };
-#       enableLuaLoader = true;
-#       autocomplete = {
-#         nvim-cmp = {
-#           enable = true;
-#           mappings = {
-#             confirm = "<C-y>";
-#             next = "<C-n>";
-#             previous = "<C-p>";
-#             close = "<C-e>";
-#
-#           };
-#         };
-#       };
-#       languages = {
-#         python = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#           format.enable = true;
-#         };
-#         nix = {
-#enable = true;
-#           treesitter.enable = true;
-#           lsp = {
-#             enable = true;
-#             server = "nil";
-#           };
-#           format = {
-#             enable = true;
-#             package = pkgs.nixfmt-rfc-style;
-#             type = "nixfmt";
-#           };
-#         };
-#         lua = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#         };
-#         ts = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#         };
-#         go = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#         };
-#         rust = {
-#           enable = true;
-#           lsp.enable = true;
-#           treesitter.enable = true;
-#         };
-#       };
-#     };
-#   };
-# };
-
