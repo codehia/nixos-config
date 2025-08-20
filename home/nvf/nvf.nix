@@ -1,10 +1,46 @@
-{ pkgs, inputs, ... }: {
+{ pkgs, inputs, lib, ... }:
+
+let luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
+in {
   imports = [ inputs.nvf.homeManagerModules.default ];
   home.packages = with pkgs; [ neovim ];
   programs.nvf = {
     enable = true;
 
     settings.vim = {
+      mini = {
+        animate.enable = true;
+        ai = {
+          enable = true;
+          setupOpts = { n_lines = 500; };
+        };
+        # TODO: Check how to enable treesitter config
+        surround = { enable = true; };
+        starter = {
+          enable = true;
+          setupOpts = {
+            items = [
+              "sections.recent_files(5, true, false),"
+              "sections.builtin_actions()"
+            ];
+            content_hooks = [
+              "gen_hook.adding_bullet(),"
+              "gen_hook.aligning('center', 'center'),"
+              "gen_hook.indexing('all', { 'Builtin actions' }),"
+              "gen_hook.padding(3, 2)"
+            ];
+            header = luaInlineFunction ''
+              function()
+                local handle = assert(io.popen('fortune -s | cowsay', 'r'))
+                local output = handle:read '*all'
+                handle:close()
+                return output
+              end'';
+            footer = "";
+          };
+        };
+
+      };
       globals = {
         mapleader = " ";
         maplocalleader = " ";
@@ -201,9 +237,17 @@
         style = "mocha";
         transparent = false;
       };
-      statusline.lualine = { enable = true; };
+      statusline.lualine = {
+        enable = true;
+        # theme = "base16";
+      };
 
-      autopairs.nvim-autopairs.enable = true;
+      autopairs.nvim-autopairs = {
+        enable = true;
+        # TODO: Check if the () after selecting a function doesn't show and update setupOpts accordingly
+        # setupOpts = {};
+      };
+      # TODO: Add better quick fix: nvim-bqf
       autocomplete = {
         blink-cmp = {
           enable = true;
@@ -239,7 +283,7 @@
         ccc.enable = false;
         vim-wakatime.enable = false;
         icon-picker.enable = true;
-        surround.enable = true;
+        # surround.enable = true;
         diffview-nvim.enable = true;
         motion = {
           hop.enable = true;
@@ -253,15 +297,17 @@
         noice.enable = true;
         colorizer.enable = true;
         illuminate.enable = true;
-        breadcrumbs = {
-          enable = true;
-          navbuddy.enable = false;
-        };
+        # breadcrumbs = {
+        #   enable = true;
+        #   navbuddy.enable = false;
+        # };
         smartcolumn = { enable = true; };
         fastaction.enable = true;
       };
 
-      session = { nvim-session-manager.enable = false; };
+      # session = {
+      #   nvim-session-manager.enable = false;
+      # };
       comments = { comment-nvim.enable = true; };
     };
   };
