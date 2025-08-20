@@ -71,21 +71,8 @@ in {
         '';
       }
       {
-        enable = true;
-        desc = "Resize splits if window got resized";
-        event = [ "VimResized" ];
-        group = "_nvf";
-        callback = luaInlineFunction ''
-          function()
-            local current_tab = vim.fn.tabpagenr()
-
-            vim.cmd 'tabdo wincmd ='
-            vim.cmd('tabnext' .. current_tab)
-          end
-        '';
-      }
-      {
-        enable = true;
+        # enable with spellcheck
+        enable = false;
         desc = "Auto-update programming wordlist on first startup";
         event = [ "VimEnter" ];
         group = "_nvf";
