@@ -8,6 +8,8 @@
     ./kitty.nix
     ./rofi.nix
     ./tmux.nix
+    ./lazygit.nix
+    ./git.nix
   ];
 
   services = {
@@ -134,7 +136,8 @@
     nvim.enable = true;
     hyprland.enable = true;
     rofi.enable = true;
-    tmux.enable = false;
+    tmux.enable = true;
+    lazygit.enable = true;
   };
 
   programs = {

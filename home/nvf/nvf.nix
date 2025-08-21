@@ -1,7 +1,6 @@
-{  inputs, lib, ... }:
+{ inputs, lib, ... }:
 
-let
-  luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
+let luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
 in {
   imports = [ inputs.nvf.homeManagerModules.default ];
   # home.packages = with pkgs; [ neovim ];
@@ -43,31 +42,31 @@ in {
         };
         statusline = {
           enable = true;
-	#          setupOpts = {
-	#            active = luaInlineFunction ''
-	#           function()
-	#       local mode, mode_hl = statusline.section_mode { trunc_width = 20000 }
-	#       local git = statusline.section_git { trunc_width = 40 }
-	#       local filename = statusline.section_filename { trunc_width = 20000 }
-	#       local fileinfo = statusline.section_fileinfo { trunc_width = 20000 }
-	#       local location = statusline.section_location()
-	#       -- Check why the LSP is showing ++ and add to fileinfo
-	#       -- local lsp = statusline.section_lsp { trunc_width = 20, icon = '󰿘 ' }
-	#       return statusline.combine_groups {
-	# 	{ hl = mode_hl, strings = { mode } },
-	# 	{ hl = 'MiniStatuslineDevinfo', strings = { git } },
-	# 	'%<', -- Mark general truncate point
-	# 	{ hl = 'MiniStatuslineFilename', strings = { filename } },
-	# 	'%=', -- End left alignment
-	# 	{ hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
-	# 	{ hl = mode_hl, strings = { location } },
-	#       }
-	#     end
-	#     statusline.section_location = function()
-	#       return '%2l:%-2v'
-	#     end
-	# end'';
-	#          };
+          #          setupOpts = {
+          #            active = luaInlineFunction ''
+          #           function()
+          #       local mode, mode_hl = statusline.section_mode { trunc_width = 20000 }
+          #       local git = statusline.section_git { trunc_width = 40 }
+          #       local filename = statusline.section_filename { trunc_width = 20000 }
+          #       local fileinfo = statusline.section_fileinfo { trunc_width = 20000 }
+          #       local location = statusline.section_location()
+          #       -- Check why the LSP is showing ++ and add to fileinfo
+          #       -- local lsp = statusline.section_lsp { trunc_width = 20, icon = '󰿘 ' }
+          #       return statusline.combine_groups {
+          # 	{ hl = mode_hl, strings = { mode } },
+          # 	{ hl = 'MiniStatuslineDevinfo', strings = { git } },
+          # 	'%<', -- Mark general truncate point
+          # 	{ hl = 'MiniStatuslineFilename', strings = { filename } },
+          # 	'%=', -- End left alignment
+          # 	{ hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+          # 	{ hl = mode_hl, strings = { location } },
+          #       }
+          #     end
+          #     statusline.section_location = function()
+          #       return '%2l:%-2v'
+          #     end
+          # end'';
+          #          };
         };
 
       };
@@ -160,7 +159,8 @@ in {
         lspsaga.enable = true;
         trouble.enable = true;
         lspSignature.enable = false;
-        otter-nvim.enable = false; # lsp features and a code completion source for code embedded in other documents
+        otter-nvim.enable =
+          false; # lsp features and a code completion source for code embedded in other documents
         nvim-docs-view.enable = true;
       };
 
