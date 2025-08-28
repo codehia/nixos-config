@@ -141,6 +141,7 @@
   };
 
   programs = {
+    gh.enable = true;
     direnv = {
       enable = true;
       # enableFishIntegration = lib.mkForce true;
@@ -174,31 +175,32 @@
         ll = "eza -l";
         la = "eza -la";
         lt = "eza --tree";
+        fbf = "tmuxp load fj";
       };
-      plugins = [
+      plugins = with pkgs.fishPlugins; [
         {
           name = "plugin-git";
-          src = pkgs.fishPlugins.plugin-git.src;
+          src = plugin-git.src;
         }
         {
           name = "fzf-fish";
-          src = pkgs.fishPlugins.fzf-fish.src;
+          src = fzf-fish.src;
         }
         {
           name = "git-abbr";
-          src = pkgs.fishPlugins.git-abbr.src;
+          src = git-abbr.src;
         }
         {
           name = "plugin-sudope";
-          src = pkgs.fishPlugins.plugin-sudope.src;
+          src = plugin-sudope.src;
         }
         {
           name = "z";
-          src = pkgs.fishPlugins.z;
+          src = z;
         }
         {
           name = "sponge";
-          src = pkgs.fishPlugins.sponge;
+          src = sponge;
         }
       ];
       functions = {

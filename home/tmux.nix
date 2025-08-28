@@ -21,6 +21,7 @@ in {
     prefix = "C-a";
     baseIndex = 1;
     newSession = true;
+    tmuxp.enable = true;
     plugins = with pkgs; [ dotbar tmuxPlugins.sensible ];
     extraConfig = ''
 
@@ -59,6 +60,9 @@ in {
       bind-key m  set-option -g mouse \; display-message 'Mouse #{?mouse,on,off}'
 
       # -- display -------------------------------------------------------------------
+      set -g pane-active-border-style "bg=default,fg=colour166"
+      set -g pane-border-style "bg=default,fg=colour245"
+      set -g pane-border-lines "double"
 
       set -g base-index 1           # start windows numbering at 1
       setw -g pane-base-index 1     # make pane numbering consistent with windows
