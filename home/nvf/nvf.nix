@@ -5,7 +5,7 @@
 }: let
   luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
 in {
-  imports = [inputs.nvf.homeManagerModules.default];
+  imports = [ inputs.nvf.homeManagerModules.default ];
   # home.packages = with pkgs; [ neovim ];
   programs.nvf = {
     enable = true;
@@ -45,31 +45,39 @@ in {
         };
         statusline = {
           enable = true;
-          #          setupOpts = {
-          #            active = luaInlineFunction ''
-          #           function()
-          #       local mode, mode_hl = statusline.section_mode { trunc_width = 20000 }
-          #       local git = statusline.section_git { trunc_width = 40 }
-          #       local filename = statusline.section_filename { trunc_width = 20000 }
-          #       local fileinfo = statusline.section_fileinfo { trunc_width = 20000 }
-          #       local location = statusline.section_location()
-          #       -- Check why the LSP is showing ++ and add to fileinfo
-          #       -- local lsp = statusline.section_lsp { trunc_width = 20, icon = '󰿘 ' }
-          #       return statusline.combine_groups {
-          # 	{ hl = mode_hl, strings = { mode } },
-          # 	{ hl = 'MiniStatuslineDevinfo', strings = { git } },
-          # 	'%<', -- Mark general truncate point
-          # 	{ hl = 'MiniStatuslineFilename', strings = { filename } },
-          # 	'%=', -- End left alignment
-          # 	{ hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
-          # 	{ hl = mode_hl, strings = { location } },
-          #       }
-          #     end
-          #     statusline.section_location = function()
-          #       return '%2l:%-2v'
-          #     end
-          # end'';
-          #          };
+          setupOpts.content = {
+            active = luaInlineFunction ''
+              function()
+                local statusline = require("mini.statusline")
+
+                local mode, mode_hl = statusline.section_mode { trunc_width = 20000 }
+                local git = statusline.section_git { trunc_width = 40 }
+                local filename = statusline.section_filename { trunc_width = 20000 }
+                local fileinfo = statusline.section_fileinfo { trunc_width = 20000 }
+                local location = function() return '%2l:%-2v' end
+                local diff = statusline.section_diff({trunc_width = 55})
+                local diagnostics = statusline.section_diagnostics({trunc_width = 55})
+                local search = statusline.section_searchcount({trunc_width = 55})
+
+                local has_diagnostics = diagnostics and diagnostics ~= ""
+                local git_hl= has_diagnostics and "MiniStatuslineInfoBg2" or "MiniStatuslineInfoBg1"
+
+                return statusline.combine_groups({
+                  { hl = mode_hl, strings = { mode } },
+                  { hl = 'MiniStatuslineDevinfo', strings = { git } },
+                  '%<', -- Mark general truncate point
+                  {hl = "MiniStatusLineInfoBg0"},
+                  { hl = 'MiniStatuslineFilename', strings = { filename } },
+                  '%=', -- End left alignment
+                  { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+                  {hl = "MiniStatuslineInfoBg1", strings = {diagnostics}},
+                  {hl = git_hl, strings = {git}},
+                  {hl = git_hl, strings = {diff}},
+                  { hl = mode_hl, strings = { location } },
+                })
+              end
+            '';
+          };
         };
       };
       globals = {
@@ -90,15 +98,8 @@ in {
         timeoutlen = 300;
         splitright = true;
         splitbelow = true;
+        listchars = "eol:↲,tab:▏·,trail:·,extends:⟩,precedes:⟨,nbsp:␣";
         list = true;
-        # listchars = {
-        #   eol = "↲"; # End of line
-        #   tab = "▏·"; # Tab character (Arrow followed by a dot)
-        #   trail = "·"; # Trailing spaces
-        #   extends = "⟩"; # Character when text extends beyond the window
-        #   precedes = "⟨"; #Character when text precedes the window
-        #   nbsp = "␣"; # Non-breaking space
-        # };
         tabstop = 4;
         shiftwidth = 2;
         wrap = false;
@@ -106,21 +107,20 @@ in {
         cursorline = true;
         hlsearch = true;
         smoothscroll = true;
-        # fillchars = {
-        #   foldopen = "";
-        #   foldclose = "";
-        #   fold = " ";
-        #   foldsep = " ";
-        #   diff = "╱";
-        #   eob = " ";
-        # };
+        fillchars = "foldopen:,foldclose:,fold:.,foldsep: ,diff:╱,eob: ";
+        foldcolumn = "0";
+        foldmethod = "expr";
+        foldexpr = "v:lua.vim.treesitter.foldexpr()";
+        foldtext = "";
+        foldnestmax = 3;
+        foldlevel = 99;
+        foldlevelstart = 99;
       };
 
       lsp.enable = true;
       vimAlias = true;
       viAlias = true;
       withNodeJs = true;
-      # lineNumberMode = "relNumber";
       enableLuaLoader = true;
       preventJunkFiles = true;
       clipboard = {
@@ -148,14 +148,9 @@ in {
           };
         };
       };
-      # spellcheck = {
-      #   enable = false;
-      #   languages = [ "en" ];
-      #   programmingWordlist.enable = true;
-      # };
 
       lsp = {
-        formatOnSave = false;
+        formatOnSave = true;
         lspkind.enable = true;
         lightbulb.enable = true;
         lspsaga.enable = true;
@@ -268,11 +263,6 @@ in {
         style = "mocha";
         transparent = false;
       };
-      # statusline.lualine = {
-      #   enable = true;
-      #   # theme = "base16";
-      # };
-
       autopairs.nvim-autopairs = {
         enable = true;
         # TODO: Check if the () after selecting a function doesn't show and update setupOpts accordingly
@@ -292,8 +282,16 @@ in {
         };
       };
       snippets.luasnip.enable = true;
-      # tabline.nvimBufferline.enable = true;
-      treesitter.context.enable = false;
+      treesitter = {
+        context.enable = false;
+        textObjects = {
+          enable = true;
+          setupOpts = {
+
+          };
+
+        };
+      };
       binds = {
         whichKey.enable = true;
         cheatsheet.enable = true;
@@ -303,8 +301,6 @@ in {
         gitsigns.enable = true;
         gitsigns.codeActions.enable = false;
       };
-      # projects.project-nvim.enable = true;
-      # dashboard.dashboard-nvim.enable = true;
       notify = {
         nvim-notify.enable = false;
         # nvim-notify.setupOpts.background_colour = "#${config.lib.stylix.colors.base01}";
@@ -324,7 +320,7 @@ in {
         images = {image-nvim.enable = false;};
       };
       ui = {
-        # borders.enable = true;
+        borders.enable = true;
         # noice.enable = true;
         # colorizer.enable = true;
         # illuminate.enable = true;
