@@ -185,6 +185,28 @@ _: {
         lua = true;
         desc = "[S]earch in  [/] Open Files";
       }
+      {
+        key = "<leader>zs";
+        mode = [ "n" ];
+        action = ''
+          function ()
+            vim.api.nvim_exec2('%foldc!', { output = false })
+          end
+        '';
+        lua = true;
+        desc = "[S]hut all  [F]olds";
+      }
+      {
+        key = "<leader>zo";
+        mode = [ "n" ];
+        action = ''
+          function ()
+            vim.api.nvim_exec2('%foldo!', { output = false })
+          end
+        '';
+        lua = true;
+        desc = "[O]open all  [F]olds";
+      }
     ];
   };
 }

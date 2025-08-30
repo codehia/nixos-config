@@ -13,6 +13,34 @@
   ];
 
   services = {
+    kanshi = {
+      enable = true;
+      systemdTarget = "hyprland-session.target";
+      profiles = {
+        undocked = {
+          outputs = [{
+            criteria = "eDP-1";
+            mode = "1920x1080@60.03300";
+            scale = 1.0;
+            position = "0,0";
+            status = "enable";
+          }];
+        };
+        docked = {
+          outputs = [
+            {
+              criteria = "LG Electronics LG HDR WQHD 0x0001991D";
+              mode = "3440x1440@75.05Hz";
+            }
+            {
+              criteria = "eDP-1";
+              status = "disable";
+            }
+          ];
+
+        };
+      };
+    };
     dunst.enable = true;
     hyprsunset = {
       enable = true;
