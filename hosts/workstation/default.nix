@@ -1,6 +1,11 @@
 # Nix will match by name and automatically inject the inputs
 # from specialArgs/_module.args into the third parameter of this function
-{ pkgs, inputs, ... }: {
+{ pkgs, ... }:
+let
+  tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
+  session = "${pkgs.hyprland}/bin/Hyprland";
+  username = "deus";
+in {
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
@@ -58,7 +63,7 @@
     consoleLogLevel = 0;
   };
   networking = {
-    hostName = "workstation";
+    hostName = "thinkpad";
     networkmanager.enable = true;
   };
   time.timeZone = "Asia/Kolkata";
@@ -89,6 +94,20 @@
     };
   };
   services = {
+    greetd = {
+      enable = true;
+      settings = {
+        initial_session = {
+          command = "${session}";
+          user = "${username}";
+        };
+        default_session = {
+          command =
+            "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time -cmd ${session}";
+          user = "greeter";
+        };
+      };
+    };
     gvfs.enable = true;
     tailscale.enable = true;
     pipewire = {
@@ -99,6 +118,15 @@
       enable = true;
       # settings.PasswordAuthentication = true;
     };
+    libinput = {
+      enable = true;
+      touchpad = { accelSpeed = "0.5"; };
+    };
+  };
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = { General = { Experimental = true; }; };
   };
   system.stateVersion = "25.05";
 }

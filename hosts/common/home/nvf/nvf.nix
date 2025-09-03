@@ -1,9 +1,5 @@
-{
-  inputs,
-  lib,
-  ...
-}: let
-  luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
+{ inputs, lib, ... }:
+let luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
 in {
   imports = [ inputs.nvf.homeManagerModules.default ];
   # home.packages = with pkgs; [ neovim ];
@@ -14,10 +10,10 @@ in {
         animate.enable = true;
         ai = {
           enable = true;
-          setupOpts = {n_lines = 500;};
+          setupOpts = { n_lines = 500; };
         };
         # TODO: Check how to enable treesitter config
-        surround = {enable = true;};
+        surround = { enable = true; };
         starter = {
           enable = true;
           setupOpts = {
@@ -135,8 +131,8 @@ in {
         nvim-lint = {
           enable = true;
           linters_by_ft = {
-            markdown = ["markdownlint"];
-            python = ["flake8"];
+            markdown = [ "markdownlint" ];
+            python = [ "flake8" ];
           };
         };
       };
@@ -144,7 +140,7 @@ in {
         conform-nvim = {
           enable = true;
           setupOpts = {
-            formatters_by_ft = {python = ["isort" "autopep8"];};
+            formatters_by_ft = { python = [ "isort" "autopep8" ]; };
           };
         };
       };
@@ -282,16 +278,16 @@ in {
         };
       };
       snippets.luasnip.enable = true;
-      treesitter = {
-        context.enable = false;
-        textObjects = {
-          enable = true;
-          setupOpts = {
-
-          };
-
-        };
-      };
+      # treesitter = {
+      #   context.enable = false;
+      #   textObjects = {
+      #     enable = true;
+      #     setupOpts = {
+      #
+      #     };
+      #
+      #   };
+      # };
       binds = {
         whichKey.enable = true;
         cheatsheet.enable = true;
@@ -317,7 +313,7 @@ in {
           leap.enable = true;
           precognition.enable = false;
         };
-        images = {image-nvim.enable = false;};
+        images = { image-nvim.enable = false; };
       };
       ui = {
         borders.enable = true;
@@ -336,7 +332,7 @@ in {
       # session = {
       #   nvim-session-manager.enable = false;
       # };
-      comments = {comment-nvim.enable = true;};
+      comments = { comment-nvim.enable = true; };
     };
   };
 }
