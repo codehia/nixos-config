@@ -1,21 +1,21 @@
 # Nix will match by name and automatically inject the inputs
 # from specialArgs/_module.args into the third parameter of this function
-{pkgs, ...}: {
+{ pkgs, inputs, ... }: {
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
-    ./fonts.nix
+    ../common/nixos/fonts.nix
   ];
   nixpkgs.config.allowUnfree = true;
   nix = {
     optimise = {
       automatic = true;
-      dates = ["03:45"];
+      dates = [ "03:45" ];
     };
     settings = {
-      experimental-features = ["nix-command" "flakes"];
+      experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store = true;
-      trusted-users = ["root" "deus"];
+      trusted-users = [ "root" "deus" ];
     };
     gc = {
       automatic = true;
@@ -34,16 +34,18 @@
     plymouth = {
       enable = true;
       theme = "connect";
-      themePackages = with pkgs; [
-        # By default we would install all themes
-        (adi1090x-plymouth-themes.override {
-          selected_themes = ["connect"];
-        })
-      ];
+      themePackages = with pkgs;
+        [
+          # By default we would install all themes
+          (adi1090x-plymouth-themes.override {
+            selected_themes = [ "connect" ];
+          })
+        ];
     };
     initrd = {
       verbose = false;
       systemd.enable = true;
+      kernelModules = [ "amdgpu" ];
     };
     kernelParams = [
       "quiet"
@@ -63,18 +65,18 @@
 
   i18n = {
     defaultLocale = "en_US.UTF-8";
-    extraLocales = ["all"];
+    extraLocales = [ "all" ];
   };
 
-  security.sudo = {wheelNeedsPassword = false;};
+  security.sudo = { wheelNeedsPassword = false; };
   users.users.deus = {
     isNormalUser = true;
     description = "Soumyaranjan Acharya";
     initialPassword = "REDACTED";
-    extraGroups = ["wheel" "networkmanager"];
+    extraGroups = [ "wheel" "networkmanager" ];
     shell = pkgs.fish;
   };
-  environment.systemPackages = with pkgs; [vim wget git fish];
+  environment.systemPackages = with pkgs; [ vim wget git fish ];
   programs = {
     fish.enable = true;
     gnupg.agent = {
