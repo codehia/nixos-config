@@ -153,6 +153,42 @@ _: {
         desc = "[S]earch [M]arks";
       }
       {
+        key = "<leader>gd";
+        mode = [ "n" ];
+        action = "<cmd>Telescope lsp_definitions<cr>";
+        desc = "[G]oto [D]efinition";
+      }
+      {
+        key = "<leader>gr";
+        mode = [ "n" ];
+        action = "<cmd>Telescope lsp_references<cr>";
+        desc = "[G]oto [R]eferences";
+      }
+      {
+        key = "<leader>gI";
+        mode = [ "n" ];
+        action = "<cmd>Telescope lsp_implementations<cr>";
+        desc = "[G]oto [I]mplementation";
+      }
+      {
+        key = "<leader>D";
+        mode = [ "n" ];
+        action = "<cmd>Telescope lsp_type_definitions<cr>";
+        desc = "Type [D]efinition";
+      }
+      {
+        key = "<leader>ds";
+        mode = [ "n" ];
+        action = "<cmd>Telescope lsp_document_symbols<cr>";
+        desc = "[D]ocument [S]ymbols";
+      }
+      {
+        key = "<leader>ws";
+        mode = [ "n" ];
+        action = "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>";
+        desc = "[W]orkspace [S]ymbols";
+      }
+      {
         key = "<leader><leader>";
         mode = [ "n" ];
         action = "<cmd>Telescope buffers<cr>";
