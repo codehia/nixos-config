@@ -40,7 +40,6 @@
         foldlevelstart = 99;
       };
 
-      lsp.enable = true;
       vimAlias = true;
       viAlias = true;
       withNodeJs = true;
@@ -71,19 +70,6 @@
           };
         };
       };
-
-      lsp = {
-        formatOnSave = true;
-        lspkind.enable = true;
-        lightbulb.enable = true;
-        lspsaga.enable = true;
-        trouble.enable = true;
-        lspSignature.enable = false;
-        otter-nvim.enable =
-          false; # lsp features and a code completion source for code embedded in other documents
-        nvim-docs-view.enable = true;
-      };
-
       languages = {
         enableFormat = false;
         enableTreesitter = true;
@@ -221,10 +207,6 @@
         # smartcolumn = { enable = true; };
         # fastaction.enable = true;
       };
-
-      # session = {
-      #   nvim-session-manager.enable = false;
-      # };
       comments = { comment-nvim.enable = true; };
     };
   };

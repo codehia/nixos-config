@@ -1,1 +1,1 @@
-{ ... }: { imports = [ ./telescope.nix ./mini.nix ]; }
+{ ... }: { imports = [ ./telescope.nix ./mini.nix ./lsp.nix ]; }
