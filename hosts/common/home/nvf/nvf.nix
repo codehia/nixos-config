@@ -1,81 +1,8 @@
-{ inputs, lib, ... }:
-let luaInlineFunction = luaFunction: lib.generators.mkLuaInline luaFunction;
-in {
+{ inputs, ... }: {
   imports = [ inputs.nvf.homeManagerModules.default ];
-  # home.packages = with pkgs; [ neovim ];
   programs.nvf = {
     enable = true;
     settings.vim = {
-      mini = {
-        animate.enable = true;
-        ai = {
-          enable = true;
-          setupOpts = { n_lines = 500; };
-        };
-        # TODO: Check how to enable treesitter config
-        surround = { enable = true; };
-        starter = {
-          enable = true;
-          setupOpts = {
-            header = luaInlineFunction ''
-              function()
-                local handle = assert(io.popen('fortune -s | cowsay', 'r'))
-                local output = handle:read '*all'
-                handle:close()
-                return output
-              end'';
-            items = luaInlineFunction ''
-              {
-                require("mini.starter").sections.recent_files(5, true, false),
-                require("mini.starter").sections.builtin_actions(),
-              }'';
-            content_hooks = luaInlineFunction ''
-              {
-                require("mini.starter").gen_hook.adding_bullet(),
-                require("mini.starter").gen_hook.aligning('center', 'center'),
-                require("mini.starter").gen_hook.indexing('all', { 'Builtin actions' }),
-                require("mini.starter").gen_hook.padding(3, 2),
-              }'';
-            footer = "";
-          };
-        };
-        statusline = {
-          enable = true;
-          setupOpts.content = {
-            active = luaInlineFunction ''
-              function()
-                local statusline = require("mini.statusline")
-
-                local mode, mode_hl = statusline.section_mode { trunc_width = 20000 }
-                local git = statusline.section_git { trunc_width = 40 }
-                local filename = statusline.section_filename { trunc_width = 20000 }
-                local fileinfo = statusline.section_fileinfo { trunc_width = 20000 }
-                local location = function() return '%2l:%-2v' end
-                local diff = statusline.section_diff({trunc_width = 55})
-                local diagnostics = statusline.section_diagnostics({trunc_width = 55})
-                local search = statusline.section_searchcount({trunc_width = 55})
-
-                local has_diagnostics = diagnostics and diagnostics ~= ""
-                local git_hl= has_diagnostics and "MiniStatuslineInfoBg2" or "MiniStatuslineInfoBg1"
-
-                return statusline.combine_groups({
-                  { hl = mode_hl, strings = { mode } },
-                  { hl = 'MiniStatuslineDevinfo', strings = { git } },
-                  '%<', -- Mark general truncate point
-                  {hl = "MiniStatusLineInfoBg0"},
-                  { hl = 'MiniStatuslineFilename', strings = { filename } },
-                  '%=', -- End left alignment
-                  { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
-                  {hl = "MiniStatuslineInfoBg1", strings = {diagnostics}},
-                  {hl = git_hl, strings = {git}},
-                  {hl = git_hl, strings = {diff}},
-                  { hl = mode_hl, strings = { location } },
-                })
-              end
-            '';
-          };
-        };
-      };
       globals = {
         mapleader = " ";
         maplocalleader = " ";
@@ -206,44 +133,10 @@ in {
         haskell.enable = false;
         ruby.enable = false;
         fsharp.enable = false;
-
         svelte.enable = false;
-
-        # Nim LSP is broken on Darwin and therefore
-        # should be disabled by default. Users may still enable
-        # `vim.languages.vim` to enable it, this does not restrict
-        # that.
-        # See: <https://github.com/PMunch/nimlsp/issues/178#issue-2128106096>
         nim.enable = false;
       };
 
-      # languages = {
-      #   enableFormat = true;
-      #   enableTreesitter = true;
-      #   enableExtraDiagnostics = true;
-      #   nix.enable = true;
-      #   clang.enable = true;
-      #   zig.enable = true;
-      #   python.enable = true;
-      #   markdown.enable = true;
-      #   ts = {
-      #     enable = true;
-      #     lsp.enable = true;
-      #     format.type = "prettierd";
-      #     extensions.ts-error-translator.enable = true;
-      #   };
-      #   html.enable = true;
-      #   lua.enable = true;
-      #   css = {
-      #     enable = true;
-      #     format.type = "prettierd";
-      #   };
-      #   typst.enable = true;
-      #   rust = {
-      #     enable = true;
-      #     crates.enable = true;
-      #   };
-      # };
       visuals = {
         nvim-web-devicons.enable = true;
         nvim-cursorline.enable = true;
