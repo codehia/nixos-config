@@ -38,7 +38,6 @@
               status = "disable";
             }
           ];
-
         };
       };
     };
