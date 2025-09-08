@@ -8,12 +8,12 @@ _: {
     lspSignature.enable = false;
     nvim-docs-view.enable = true;
     # lsp features and a code completion source for code embedded in other documents
-    otter-nvim.enable = false; 
+    otter-nvim.enable = false;
     mappings = {
       renameSymbol = "<leader>rn";
-      openDiagnosticFloat  = "<leader>e";
+      openDiagnosticFloat = "<leader>e";
       hover = "K";
-      goToDeclaration  = "gD";
+      goToDeclaration = "gD";
       codeAction = "<leader>ca";
     };
   };
