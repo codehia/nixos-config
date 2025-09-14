@@ -2,7 +2,7 @@
   description = "Soumya's Multi-Machine NixOS Configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     disko = {
       url = "github:nix-community/disko";
