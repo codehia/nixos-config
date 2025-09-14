@@ -60,6 +60,7 @@ in {
       "udev.log_priority=3"
       "rd.systemd.show_status=auto"
     ];
+    kernelModules = ["uinput"];
     consoleLogLevel = 0;
   };
   networking = {
@@ -108,25 +109,35 @@ in {
         };
       };
     };
-    gvfs.enable = true;
-    tailscale.enable = true;
     pipewire = {
       enable = true;
       pulse.enable = true;
-    };
-    openssh = {
-      enable = true;
-      # settings.PasswordAuthentication = true;
     };
     libinput = {
       enable = true;
       touchpad = { accelSpeed = "0.5"; };
     };
+    udev.extraRules = ''
+      KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
+    '';
+
+    gvfs.enable = true;
+    tailscale.enable = true;
+    openssh.enable = true;
   };
-  hardware.bluetooth = {
+  hardware = {
+    uinput.enable = true;
+    bluetooth = {
     enable = true;
     powerOnBoot = true;
     settings = { General = { Experimental = true; }; };
+  };
+};
+  systemd.services.kanata-internalKeyboard.serviceConfig = {
+    SupplementaryGroups = [
+      "input"
+      "uinput"
+    ];
   };
   system.stateVersion = "25.05";
 }
