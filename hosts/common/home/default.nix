@@ -27,6 +27,30 @@
             status = "enable";
           }];
         };
+        azanDocked = {
+          outputs = [
+            {
+              criteria = "BNQ BenQ GW2480 BCP0111201Q";
+              mode = "1920x1080@60.00Hz";
+            }
+            {
+              criteria = "eDP-1";
+              status = "disable";
+            }
+          ];
+        };
+        miniDocked = {
+          outputs = [
+            {
+              criteria = "Samsung Electric Company LF24T35 HNAR101094";
+              mode = "1920x1080@74.97300";
+            }
+            {
+              criteria = "eDP-1";
+              status = "disable";
+            }
+          ];
+        };
         docked = {
           outputs = [
             {
