@@ -162,10 +162,6 @@ in {
     };
   };
   systemd.services.kanata-internalKeyboard.serviceConfig = {
-    SupplementaryGroups = [ "input" "uinput" ];
-  };
-};
-  systemd.services.kanata-internalKeyboard.serviceConfig = {
     SupplementaryGroups = [
       "input"
       "uinput"
