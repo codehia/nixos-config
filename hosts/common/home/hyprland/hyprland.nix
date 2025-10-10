@@ -25,7 +25,7 @@
     xwayland = { enable = true; };
     plugins = [ pkgs.pyprland ];
     settings = {
-      exec-once = [ "pypr &" ];
+      exec-once = [ "pypr &" "1password --silent &" "spotify &" "mullvad-gui &" "enteauth &"];
       env = [ "HYPRCURSOR_THEME, MyCursor" "HYPRCURSOR_SIZE, 32" ];
       input = {
         kb_options = [ "grp:alt_caps_toggle" "caps:super" ];
@@ -41,18 +41,6 @@
         };
       };
 
-      # Keeping it commented in case I change my mind later looks cool, achieves nothing
-      # gestures = {
-      #   workspace_swipe = 1;
-      #   workspace_swipe_fingers = 3;
-      #   workspace_swipe_distance = 500;
-      #   workspace_swipe_invert = 1;
-      #   workspace_swipe_min_speed_to_force = 30;
-      #   workspace_swipe_cancel_ratio = 0.34;
-      #   workspace_swipe_create_new = 1;
-      #   workspace_swipe_forever = 1;
-      # };
-
       general = {
         "$mod" = "SUPER";
         layout = "master";
@@ -62,13 +50,11 @@
         resize_on_border = true;
         "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
         "col.inactive_border" = "rgba(595959aa)";
-
-        # "col.active_border" = "rgb(${config.lib.stylix.colors.base08}) rgb(${config.lib.stylix.colors.base0C}) 45deg";
-        # "col.inactive_border" = "rgb(${config.lib.stylix.colors.base01})";
       };
+
       misc = {
         layers_hog_keyboard_focus = true;
-        initial_workspace_tracking = 0;
+        initial_workspace_tracking = 1;
         mouse_move_enables_dpms = true;
         key_press_enables_dpms = false;
         disable_hyprland_logo = true;
@@ -84,13 +70,6 @@
         enable_anr_dialog = true;
         anr_missed_pings = 15;
       };
-
-      # Not using it now
-      # dwindle = {
-      #   pseudotile = true;
-      #   preserve_split = true;
-      #   force_split = 2;
-      # };
 
       decoration = {
         rounding = 7;
@@ -118,8 +97,8 @@
       cursor = {
         sync_gsettings_theme = true;
         no_hardware_cursors = 2; # change to 1 if want to disable
-        enable_hyprcursor = false;
-        warp_on_change_workspace = 2;
+        enable_hyprcursor = true;
+        warp_on_change_workspace = 0;
         no_warps = true;
       };
 
