@@ -65,6 +65,10 @@ _: {
       "$modifier SHIFT, K, exec, pypr toggle term"
       "$modifier SHIFT, T, exec, pypr toggle filemanager"
       "$modifier SHIFT, N, togglespecialworkspace, minimized"
+      "$modifier SHIFT, O, togglespecialworkspace, drop-1pw"
+      "$modifier SHIFT, M, togglespecialworkspace, drop-spotify"
+      "$modifier SHIFT, S, togglespecialworkspace, drop-slack"
+      "$modifier SHIFT, E, togglespecialworkspace, drop-ente"
       "$modifier, N, exec, pypr toggle_special minimized"
 
       "ALT,Tab,cyclenext"
