@@ -74,7 +74,14 @@ in {
     extraLocales = [ "all" ];
   };
 
-  security.sudo = { wheelNeedsPassword = false; };
+  security = {
+    sudo = { wheelNeedsPassword = false; };
+    pam.services = {
+      greetd.enableGnomeKeyring = true;
+      greetd-password.enableGnomeKeyring = true;
+      login.enableGnomeKeyring = true;
+    };
+  };
   users.users.deus = {
     isNormalUser = true;
     description = "Soumyaranjan Acharya";
@@ -103,11 +110,13 @@ in {
     };
   };
   services = {
+    dbus.packages = with pkgs; [gnome-keyring gcr];
     usbmuxd.enable = true;
     flatpak.enable = true;
     gvfs.enable = true;
     tailscale.enable = true;
     openssh.enable = true;
+    gnome.gnome-keyring.enable = true;
     mullvad-vpn = {
       enable = true;
       package = pkgs.mullvad-vpn;
