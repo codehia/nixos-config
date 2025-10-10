@@ -3,13 +3,13 @@
     ./stylix.nix
     ./hyprland
     ./waybar
-    ./nvf
     ./ghostty.nix
     ./kitty.nix
     ./rofi.nix
     ./tmux.nix
     ./lazygit.nix
     ./git.nix
+    ./nixCats
   ];
 
   services = {

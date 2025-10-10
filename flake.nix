@@ -36,10 +36,13 @@
       url = "github:nix-community/stylix/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixCats = {
+      url = "github:BirdeeHub/nixCats-nvim";
+    };
   };
 
   outputs = { self, nixpkgs, disko, home-manager, catppuccin, zen-browser
-    , sops-nix, stylix, ... }@inputs: {
+    , sops-nix, stylix, nixCats, ... }@inputs: {
       nixosConfigurations = {
         thinkpad = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
