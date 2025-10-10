@@ -28,7 +28,6 @@
       exec-once = [ "pypr &" ];
       env = [ "HYPRCURSOR_THEME, MyCursor" "HYPRCURSOR_SIZE, 32" ];
       input = {
-        # kb_layout = "${keyboardLayout}";
         kb_options = [ "grp:alt_caps_toggle" "caps:super" ];
         numlock_by_default = false;
         repeat_delay = 300;
@@ -144,17 +143,32 @@
         "4, persistent:true,"
         "5, persistent:true,"
         "special:minimized, gapsout:100"
-        # "special:scratchpad;float;size 70% 70% ,on-created-empty:kitty"
       ];
 
-      # windowrule = [
-      #   "float, class:^(thunar)$"
-      #   "workspace special:thunar, class:^(thunar)$"
-      #   "size 70% 60%, class:^(thunar)$"
-      #   "center, class:^(thunar)$"
-      #   "float, class:^(kitty)$"
-      #   "size 70% 60%, class:^(kitty)$"
-      # ];
+      windowrulev2 = [
+        # 1Password
+        "float,           class:^(1Password)$"
+        "size 30% 50%,    class:^(1Password)$"
+        "move 100%-w-40 5%,     class:^(1Password)$"
+        "workspace special:drop-1pw, class:^(1Password)$"
+
+        # Spotify
+        "float,           class:^(Spotify)$"
+        "size 40% 60%,    class:^(Spotify)$"
+        "move 100%-w-40 5%,     class:^(Spotify)$"
+        "workspace special:drop-spotify, class:^(Spotify)$"
+
+        # Ente (add ente-auth if you see it)
+        "float,           class:^(io.ente.auth)$"
+        "size 10% 80%,    class:^(io.ente.auth)$"
+        "move 100%-w-40 5%,     class:^(io.ente.auth)$"
+        "workspace special:drop-ente, class:^(io.ente.auth)$"
+
+        # Slack
+        "float,           class:^(Slack)$"
+        "size 70% 70%,    class:^(Slack)$"
+        "workspace special:drop-slack, class:^(Slack)$"
+      ];
     };
 
     # ${extraMonitorSettings}
