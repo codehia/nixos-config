@@ -60,7 +60,7 @@ in {
       "udev.log_priority=3"
       "rd.systemd.show_status=auto"
     ];
-    kernelModules = ["uinput"];
+    kernelModules = [ "uinput" ];
     consoleLogLevel = 0;
   };
   networking = {
@@ -82,7 +82,15 @@ in {
     extraGroups = [ "wheel" "networkmanager" ];
     shell = pkgs.fish;
   };
-  environment.systemPackages = with pkgs; [ vim wget git fish libimobiledevice ifuse idevicerestore];
+  environment.systemPackages = with pkgs; [
+    vim
+    wget
+    git
+    fish
+    libimobiledevice
+    ifuse
+    idevicerestore
+  ];
   programs = {
     fish.enable = true;
     gnupg.agent = {
@@ -139,16 +147,13 @@ in {
   hardware = {
     uinput.enable = true;
     bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = { General = { Experimental = true; }; };
+      enable = true;
+      powerOnBoot = true;
+      settings = { General = { Experimental = true; }; };
+    };
   };
-};
   systemd.services.kanata-internalKeyboard.serviceConfig = {
-    SupplementaryGroups = [
-      "input"
-      "uinput"
-    ];
+    SupplementaryGroups = [ "input" "uinput" ];
   };
   system.stateVersion = "25.05";
 }

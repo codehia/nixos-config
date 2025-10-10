@@ -182,6 +182,7 @@
 
       pulsemixer
       bluetui
+      spotify
     ];
     stateVersion = "25.05";
   };

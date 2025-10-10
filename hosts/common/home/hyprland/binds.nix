@@ -1,31 +1,4 @@
 _: {
-  /* "$modifier  SHIFT, W, exec,web-search"
-     "$modifier  SHIFT, Return, exec,rofi-launcher"
-     "$modifier  ALT,W,exec,wallsetter"
-     "$modifier, Y,exec,kitty -e yazi"
-     "$modifier, E,exec,emopicker9000"
-     "$modifier, S,exec,screenshootin"
-     "$modifier, D,exec,discord"
-     "$modifier, O,exec,obs"
-     "$modifier, C,exec,hyprpicker -a"
-     "$modifier, G,exec,gimp"
-     "$modifier, K, exec, list-keybinds"
-     "$modifier, M,exec,pavucontrol"
-     "$modifier, P,pseudo,"
-     "$modifier, V,exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy"
-     "$modifier SHIFT,I,togglesplit,"
-     "$modifier ALT,F,workspaceopt, allfloat"
-     ",XF86AudioRaiseVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
-     ",XF86AudioLowerVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-     ",XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-     ",XF86AudioPlay, exec, playerctl play-pause"
-     ",XF86AudioPause, exec, playerctl play-pause"
-     ",XF86AudioNext, exec, playerctl next"
-     ",XF86AudioPrev, exec, playerctl previous"
-     ",XF86MonBrightnessDown,exec,brightnessctl set 5%-"
-     ",XF86MonBrightnessUp,exec,brightnessctl set +5%"
-  */
-
   wayland.windowManager.hyprland.settings = {
     bind = [
       "$modifier, P, exec, rofi -show drun"
@@ -95,17 +68,6 @@ _: {
       "$modifier, N, exec, pypr toggle_special minimized"
 
       "ALT,Tab,cyclenext"
-
-      # SUBMAPS
-      # "ALT, R, submap, resize"
-      # "ALT, escape, submap, reset"
     ];
-    # submap = ["resize" "reset"];
-    # binde = [
-    #   ", l, resizeactive, 10 0"
-    #   ", h, resizeactive, -10 0"
-    #   ", k, resizeactive, 0 -10"
-    #   ", j, resizeactive, 0 10"
-    # ];
   };
 }
