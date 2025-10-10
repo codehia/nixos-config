@@ -60,7 +60,7 @@ in {
       "udev.log_priority=3"
       "rd.systemd.show_status=auto"
     ];
-    kernelModules = ["uinput"];
+    kernelModules = [ "uinput" ];
     consoleLogLevel = 0;
   };
   networking = {
@@ -82,7 +82,15 @@ in {
     extraGroups = [ "wheel" "networkmanager" ];
     shell = pkgs.fish;
   };
-  environment.systemPackages = with pkgs; [ vim wget git fish ];
+  environment.systemPackages = with pkgs; [
+    vim
+    wget
+    git
+    fish
+    libimobiledevice
+    ifuse
+    idevicerestore
+  ];
   programs = {
     fish.enable = true;
     gnupg.agent = {
@@ -95,6 +103,21 @@ in {
     };
   };
   services = {
+    usbmuxd.enable = true;
+    flatpak.enable = true;
+    gvfs.enable = true;
+    tailscale.enable = true;
+    openssh.enable = true;
+    mullvad-vpn = {
+      enable = true;
+      package = pkgs.mullvad-vpn;
+    };
+    avahi = {
+      enable = true;
+      nssmdns4 = true;
+      nssmdns6 = true;
+      openFirewall = true;
+    };
     greetd = {
       enable = true;
       settings = {
@@ -120,17 +143,17 @@ in {
     udev.extraRules = ''
       KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
     '';
-
-    gvfs.enable = true;
-    tailscale.enable = true;
-    openssh.enable = true;
   };
   hardware = {
     uinput.enable = true;
     bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = { General = { Experimental = true; }; };
+      enable = true;
+      powerOnBoot = true;
+      settings = { General = { Experimental = true; }; };
+    };
+  };
+  systemd.services.kanata-internalKeyboard.serviceConfig = {
+    SupplementaryGroups = [ "input" "uinput" ];
   };
 };
   systemd.services.kanata-internalKeyboard.serviceConfig = {
