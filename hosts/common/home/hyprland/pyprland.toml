@@ -16,9 +16,3 @@ animation = "fromBottom"
 command = "thunar"
 class = "thunar"
 size = "70% 70%"
-
-[scratchpads.filemanager]
-animation = "fromBottom"
-command = "thunar"
-class = "thunar"
-size = "70% 70%"
