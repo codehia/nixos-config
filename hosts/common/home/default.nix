@@ -9,7 +9,7 @@
     ./tmux.nix
     ./lazygit.nix
     ./git.nix
-    ./nixCats
+    ./nvim
   ];
 
   services = {

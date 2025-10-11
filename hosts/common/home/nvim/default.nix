@@ -38,6 +38,8 @@ in {
         lspsAndRuntimeDeps = {
           general = with pkgs; [
             lazygit
+            fortune
+            cowsay
           ];
           lua = with pkgs; [
             lua-language-server
@@ -55,6 +57,11 @@ in {
             gotools
             go-tools
             go
+          ];
+          python = with pkgs; [
+            basedpyright
+            flake8
+            autopep8
           ];
         };
 
@@ -96,6 +103,10 @@ in {
             nvim-dap-ui
             nvim-dap-virtual-text
             catppuccin-nvim
+            oil-nvim
+            indent-blankline-nvim
+            # Additional plugins from reference config
+            vim-sleuth
           ];
         };
 
