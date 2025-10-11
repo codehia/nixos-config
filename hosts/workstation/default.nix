@@ -1,21 +1,26 @@
 # Nix will match by name and automatically inject the inputs
 # from specialArgs/_module.args into the third parameter of this function
-{pkgs, ...}: {
+{ pkgs, ... }:
+let
+  tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
+  session = "${pkgs.hyprland}/bin/Hyprland";
+  username = "deus";
+in {
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
-    ./fonts.nix
+    ../common/nixos/fonts.nix
   ];
   nixpkgs.config.allowUnfree = true;
   nix = {
     optimise = {
       automatic = true;
-      dates = ["03:45"];
+      dates = [ "03:45" ];
     };
     settings = {
-      experimental-features = ["nix-command" "flakes"];
+      experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store = true;
-      trusted-users = ["root" "deus"];
+      trusted-users = [ "root" "deus" ];
     };
     gc = {
       automatic = true;
@@ -34,16 +39,18 @@
     plymouth = {
       enable = true;
       theme = "connect";
-      themePackages = with pkgs; [
-        # By default we would install all themes
-        (adi1090x-plymouth-themes.override {
-          selected_themes = ["connect"];
-        })
-      ];
+      themePackages = with pkgs;
+        [
+          # By default we would install all themes
+          (adi1090x-plymouth-themes.override {
+            selected_themes = [ "connect" ];
+          })
+        ];
     };
     initrd = {
       verbose = false;
       systemd.enable = true;
+      kernelModules = [ "amdgpu" ];
     };
     kernelParams = [
       "quiet"
@@ -56,25 +63,25 @@
     consoleLogLevel = 0;
   };
   networking = {
-    hostName = "workstation";
+    hostName = "thinkpad";
     networkmanager.enable = true;
   };
   time.timeZone = "Asia/Kolkata";
 
   i18n = {
     defaultLocale = "en_US.UTF-8";
-    extraLocales = ["all"];
+    extraLocales = [ "all" ];
   };
 
-  security.sudo = {wheelNeedsPassword = false;};
+  security.sudo = { wheelNeedsPassword = false; };
   users.users.deus = {
     isNormalUser = true;
     description = "Soumyaranjan Acharya";
     initialPassword = "REDACTED";
-    extraGroups = ["wheel" "networkmanager"];
+    extraGroups = [ "wheel" "networkmanager" ];
     shell = pkgs.fish;
   };
-  environment.systemPackages = with pkgs; [vim wget git fish];
+  environment.systemPackages = with pkgs; [ vim wget git fish ];
   programs = {
     fish.enable = true;
     gnupg.agent = {
@@ -87,6 +94,20 @@
     };
   };
   services = {
+    greetd = {
+      enable = true;
+      settings = {
+        initial_session = {
+          command = "${session}";
+          user = "${username}";
+        };
+        default_session = {
+          command =
+            "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time -cmd ${session}";
+          user = "greeter";
+        };
+      };
+    };
     gvfs.enable = true;
     tailscale.enable = true;
     pipewire = {
@@ -97,6 +118,15 @@
       enable = true;
       # settings.PasswordAuthentication = true;
     };
+    libinput = {
+      enable = true;
+      touchpad = { accelSpeed = "0.5"; };
+    };
+  };
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = { General = { Experimental = true; }; };
   };
   system.stateVersion = "25.05";
 }
