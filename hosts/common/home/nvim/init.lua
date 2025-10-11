@@ -1,49 +1,34 @@
--- NOTE: These 2 need to be set up before any plugins are loaded.
+-- =============================================================================
+-- nixCats-nvim Configuration
+-- =============================================================================
+
+-- Set mapleader before any keymaps are loaded
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- [[ Setting options ]]
--- See `:help vim.o`
--- NOTE: You can change these options as you wish!
-
--- Sets how neovim will display certain whitespace characters in the editor.
---  See `:help 'list'`
---  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
--- Set highlight on search
-vim.opt.hlsearch = true
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
--- Preview substitutions live, as you type!
-vim.opt.inccommand = 'split'
-
--- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+-- =============================================================================
+-- OPTIONS
+-- =============================================================================
 
 -- Make line numbers default with relative numbers
 vim.wo.number = true
 vim.wo.relativenumber = true
 
--- Enable mouse mode and improve UI
-vim.o.mouse = 'a'
+-- Disable mouse (matching reference config)
+vim.o.mouse = ''
 vim.o.showmode = false  -- Don't show mode since we have statusline
+
+-- Clipboard integration
+vim.opt.clipboard = 'unnamedplus'
+
+-- Window splits
 vim.o.splitright = true
 vim.o.splitbelow = true
 vim.o.cursorline = true
 
--- Indent
--- vim.o.smarttab = true
+-- Indent and wrapping
 vim.opt.cpoptions:append('I')
 vim.o.expandtab = true
--- vim.o.smartindent = true
--- vim.o.autoindent = true
--- vim.o.tabstop = 4
--- vim.o.softtabstop = 4
--- vim.o.shiftwidth = 4
-
--- stops line wrapping from being confusing
 vim.o.breakindent = true
 
 -- Save undo history
@@ -55,7 +40,6 @@ vim.o.smartcase = true
 
 -- Keep signcolumn on by default
 vim.wo.signcolumn = 'yes'
-vim.wo.relativenumber = true
 
 -- Decrease update time
 vim.o.updatetime = 250
@@ -64,35 +48,63 @@ vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menu,preview,noselect'
 
+-- Enhanced list characters (matching reference config)
+vim.opt.list = true
+vim.opt.listchars = {
+  eol = '↲',     -- End of line
+  tab = '▏·',    -- Tab character
+  trail = '·',   -- Trailing spaces
+  extends = '⟩', -- Character when text extends beyond window
+  precedes = '⟨', -- Character when text precedes window
+  nbsp = '␣',    -- Non-breaking space
+}
+
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = 'split'
+
+-- Set highlight on search
+vim.opt.hlsearch = true
+
+-- Scrolling and display
+vim.opt.scrolloff = 10
+vim.opt.laststatus = 3
+vim.opt.splitkeep = 'screen'
+vim.opt.smoothscroll = true
+
+-- Fill characters for folds and diffs
+vim.opt.fillchars = {
+  foldopen = '▾',
+  foldclose = '▸',
+  fold = ' ',
+  foldsep = ' ',
+  diff = '╱',
+  eob = ' ',
+}
+
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
--- [[ Disable auto comment on enter ]]
--- See :help formatoptions
-vim.api.nvim_create_autocmd("FileType", {
-  desc = "remove formatoptions",
-  callback = function()
-    vim.opt.formatoptions:remove({ "c", "r", "o" })
-  end,
-})
-
--- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-  group = highlight_group,
-  pattern = '*',
-})
-
+-- Disable netrw
 vim.g.netrw_liststyle=0
 vim.g.netrw_banner=0
--- [[ Basic Keymaps ]]
+
+-- Disable wrapping by default
+vim.wo.wrap = false
+
+-- Fold settings (matching reference config)
+vim.opt.foldcolumn = '0'
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.opt.foldtext = ''
+vim.opt.foldnestmax = 3
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+
+-- =============================================================================
+-- KEYMAPS
+-- =============================================================================
 
 -- Keymaps for better default experience
--- See `:help vim.keymap.set()`
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = 'Moves Line Down' })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = 'Moves Line Up' })
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = 'Scroll Down' })
@@ -117,7 +129,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- Window navigation improvements
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })  
+vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
@@ -125,60 +137,118 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', '<S-h>', ':bprevious<CR>', { desc = 'Previous buffer', silent = true })
 vim.keymap.set('n', '<S-l>', ':bnext<CR>', { desc = 'Next buffer', silent = true })
 
--- kickstart.nvim starts you with this. 
--- But it constantly clobbers your system clipboard whenever you delete anything.
-
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
--- vim.o.clipboard = 'unnamedplus'
-
--- You should instead use these keybindings so that they are still easy to use, but dont conflict
+-- Clipboard keybindings
 vim.keymap.set({"v", "x", "n"}, '<leader>y', '"+y', { noremap = true, silent = true, desc = 'Yank to clipboard' })
 vim.keymap.set({"n", "v", "x"}, '<leader>Y', '"+yy', { noremap = true, silent = true, desc = 'Yank line to clipboard' })
 vim.keymap.set({'n', 'v', 'x'}, '<leader>p', '"+p', { noremap = true, silent = true, desc = 'Paste from clipboard' })
 vim.keymap.set('i', '<C-p>', '<C-r><C-p>+', { noremap = true, silent = true, desc = 'Paste from clipboard from within insert mode' })
 vim.keymap.set("x", "<leader>P", '"_dP', { noremap = true, silent = true, desc = 'Paste over selection without erasing unnamed register' })
 
+-- Clear search highlight
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+-- Exit terminal mode easier
+vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+
+-- Arrow key warnings (matching reference config)
+vim.keymap.set({ 'n', 'i', 'v' }, '<left>', '<cmd>echo "Use h to move!!"<CR>')
+vim.keymap.set({ 'n', 'i', 'v' }, '<right>', '<cmd>echo "Use l to move!!"<CR>')
+vim.keymap.set({ 'n', 'i', 'v' }, '<up>', '<cmd>echo "Use k to move!!"<CR>')
+vim.keymap.set({ 'n', 'i', 'v' }, '<down>', '<cmd>echo "Use j to move!!"<CR>')
+
+-- Fold keymaps (matching reference config)
+local function close_all_folds()
+  vim.api.nvim_exec2('%foldc!', { output = false })
+end
+
+local function open_all_folds()
+  vim.api.nvim_exec2('%foldo!', { output = false })
+end
+
+vim.keymap.set('n', '<leader>zs', close_all_folds, { desc = '[s]hut all folds' })
+vim.keymap.set('n', '<leader>zo', open_all_folds, { desc = '[o]pen all folds' })
+
+-- =============================================================================
+-- AUTOCOMMANDS
+-- =============================================================================
+
+-- Disable auto comment on enter
+vim.api.nvim_create_autocmd("FileType", {
+  desc = "remove formatoptions",
+  callback = function()
+    vim.opt.formatoptions:remove({ "c", "r", "o" })
+  end,
+})
+
+-- Highlight on yank
+local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
+vim.api.nvim_create_autocmd('TextYankPost', {
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+  group = highlight_group,
+  pattern = '*',
+})
+
+
+
+-- =============================================================================
+-- PLUGINS
+-- =============================================================================
+
 -- Load catppuccin colorscheme with lze
 require('lze').load {
   {
     "catppuccin-nvim",
     enabled = nixCats('general') or false,
-    
-    -- Load immediately since it's a colorscheme    
-    after = function(plugin)
+    lazy = false, -- Load immediately since it's a colorscheme
+    priority = 1000, -- High priority for colorscheme
+    after = function()
       require("catppuccin").setup({
         flavour = "mocha", -- latte, frappe, macchiato, mocha
-        background = { 
+        background = { -- :h background
           light = "latte",
           dark = "mocha",
         },
-        transparent_background = false,
-        show_end_of_buffer = false,
-        term_colors = false,
+        transparent_background = false, -- disables setting the background color
+        show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
+        term_colors = false, -- sets terminal colors (e.g. `g:terminal_color_0`)
         dim_inactive = {
-          enabled = false,
-          shade = "dark", 
-          percentage = 0.15,
+          enabled = false, -- dims the background color of inactive window
+          shade = "dark",
+          percentage = 0.15, -- percentage of the shade to apply to the inactive window
         },
-        no_italic = false,
-        no_bold = false,
-        no_underline = false,
-        styles = {
-          comments = { "italic" },
+        no_italic = false, -- Force no italic
+        no_bold = false, -- Force no bold
+        no_underline = false, -- Force no underline
+        styles = { -- Handles the styles of general hi groups (see `:h highlight-args`):
+          comments = { "italic" }, -- Change the style of comments
           conditionals = { "italic" },
+          loops = {},
+          functions = {},
+          keywords = {},
+          strings = {},
+          variables = {},
+          numbers = {},
+          booleans = {},
+          properties = {},
+          types = {},
+          operators = {},
         },
+        color_overrides = {},
+        custom_highlights = {},
         default_integrations = true,
         integrations = {
           cmp = true,
           gitsigns = true,
-          nvimtree = false,
+          nvimtree = false, -- We use snacks explorer instead
           treesitter = true,
           notify = false,
           mini = {
             enabled = true,
+            indentscope_color = "",
           },
+          -- Native LSP integration
           native_lsp = {
             enabled = true,
             virtual_text = {
@@ -197,6 +267,9 @@ require('lze').load {
               background = true,
             },
           },
+          -- Integration with other plugins we have
+          lsp_trouble = false,
+          telescope = false, -- We use snacks picker
           which_key = true,
         },
       })
@@ -204,7 +277,7 @@ require('lze').load {
       -- Set the colorscheme
       vim.cmd.colorscheme("catppuccin")
       
-      -- Add keymaps for switching flavours
+      -- Optional: Add keymaps for switching flavours
       vim.keymap.set('n', '<leader>cm', function()
         vim.cmd.colorscheme("catppuccin-mocha")
       end, { desc = 'Catppuccin Mocha' })
@@ -224,19 +297,23 @@ require('lze').load {
   }
 }
 
-
+-- Setup snacks.nvim
 require("snacks").setup({
   explorer = {},
   picker = {},
-  bigfile = {},
+  bigfile = { enabled = true },
   image = {},
-  lazygit = {},
+  lazygit = { enabled = true },
   terminal = {},
   rename = {},
   notifier = {},
   indent = {},
   gitbrowse = {},
   scope = {},
+  quickfile = { enabled = true },
+  dashboard = {
+    enabled = false,  -- Disabled in favor of mini.starter
+  },
 })
 vim.keymap.set("n", "-", function() Snacks.explorer.open() end, { desc = 'Snacks Explorer' })
 vim.keymap.set("n", "<c-\\>", function() Snacks.terminal.open() end, { desc = 'Snacks Terminal' })
@@ -264,7 +341,24 @@ vim.keymap.set('n', "<leader>sM", function() Snacks.picker.man() end, { desc = "
 vim.keymap.set('n', "<leader>sq", function() Snacks.picker.qflist() end, { desc = "Quickfix List" })
 vim.keymap.set('n', "<leader>sR", function() Snacks.picker.resume() end, { desc = "Resume" })
 vim.keymap.set('n', "<leader>su", function() Snacks.picker.undo() end, { desc = "Undo History" })
+-- Git keymaps (matching reference config)
+vim.keymap.set('n', '<leader>gb', function() Snacks.picker.git_branches() end, { desc = 'Git Branches' })
+vim.keymap.set('n', '<leader>gl', function() Snacks.picker.git_log() end, { desc = 'Git Log' })
+vim.keymap.set('n', '<leader>gL', function() Snacks.picker.git_log_line() end, { desc = 'Git Log Line' })
+vim.keymap.set('n', '<leader>gs', function() Snacks.picker.git_status() end, { desc = 'Git Status' })
+vim.keymap.set('n', '<leader>gS', function() Snacks.picker.git_stash() end, { desc = 'Git Stash' })
+vim.keymap.set({'n', 'v'}, '<leader>gB', function() Snacks.gitbrowse() end, { desc = 'Git Browse' })
+vim.keymap.set('n', '<leader>gg', function() Snacks.lazygit() end, { desc = 'Lazygit' })
+vim.keymap.set('n', '<leader>gf', function() Snacks.picker.git_log_file() end, { desc = 'Git Log File' })
+
+-- Load other plugins with lze
 require('lze').load {
+  -- Basic plugins from reference config
+  {
+    "vim-sleuth",
+    enabled = nixCats('general') or false,
+    event = "DeferredUIEnter",
+  },
   {
     "blink.cmp",
     enabled = nixCats('general') or false,
@@ -272,8 +366,6 @@ require('lze').load {
     on_require = "blink",
     after = function (plugin)
       require("blink.cmp").setup({
-        -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
-        -- See :h blink-cmp-config-keymap for configuring keymaps
         keymap = { preset = 'default' },
         appearance = {
           nerd_font_variant = 'mono'
@@ -288,18 +380,12 @@ require('lze').load {
   {
     "nvim-treesitter",
     enabled = nixCats('general') or false,
-    -- cmd = { "" },
     event = "DeferredUIEnter",
-    -- ft = "",
-    -- keys = "",
-    -- colorscheme = "",
     load = function (name)
         vim.cmd.packadd(name)
         vim.cmd.packadd("nvim-treesitter-textobjects")
     end,
     after = function (plugin)
-      -- [[ Configure Treesitter ]]
-      -- See `:help nvim-treesitter`
       require('nvim-treesitter.configs').setup {
         highlight = { enable = true, },
         indent = { enable = false, },
@@ -315,9 +401,8 @@ require('lze').load {
         textobjects = {
           select = {
             enable = true,
-            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+            lookahead = true,
             keymaps = {
-              -- You can use the capture groups defined in textobjects.scm
               ['aa'] = '@parameter.outer',
               ['ia'] = '@parameter.inner',
               ['af'] = '@function.outer',
@@ -328,7 +413,7 @@ require('lze').load {
           },
           move = {
             enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
+            set_jumps = true,
             goto_next_start = {
               [']m'] = '@function.outer',
               [']]'] = '@class.outer',
@@ -362,11 +447,94 @@ require('lze').load {
   {
     "mini.nvim",
     enabled = nixCats('general') or false,
-    event = "DeferredUIEnter",
+    lazy = false,  -- Load immediately for starter
+    priority = 1000,
     after = function (plugin)
+      -- Better Around/Inside textobjects
+      require('mini.ai').setup({ n_lines = 500 })
+      
+      -- Add/delete/replace surroundings (brackets, quotes, etc.)
+      require('mini.surround').setup()
+      
+      -- Auto pairs
       require('mini.pairs').setup()
+      
+      -- Icons
       require('mini.icons').setup()
-      require('mini.ai').setup()
+      
+      -- Animate (optional)
+      local has_animate, animate = pcall(require, 'mini.animate')
+      if has_animate then
+        animate.setup()
+      end
+      
+      -- Starter (start page)
+      local has_starter, starter = pcall(require, 'mini.starter')
+      if has_starter then
+        starter.setup({
+          items = {
+            starter.sections.recent_files(5, true, false),
+            starter.sections.builtin_actions(),
+          },
+          content_hooks = {
+            starter.gen_hook.adding_bullet(),
+            starter.gen_hook.aligning('center', 'center'),
+            starter.gen_hook.indexing('all', { 'Builtin actions' }),
+            starter.gen_hook.padding(3, 2),
+          },
+          header = function()
+            local handle = io.popen('fortune -s | cowsay', 'r')
+            if handle then
+              local output = handle:read('*all')
+              handle:close()
+              return output
+            else
+              -- Fallback if fortune/cowsay not available
+              return table.concat({
+                "██╗   ██╗██╗██╗  ██╗ ██████╗ █████╗ ████████╗███████╗",
+                "██║   ██║██║╚██╗██╔╝██╔════╝██╔══██╗╚══██╔══╝██╔════╝",
+                "██║   ██║██║ ╚███╔╝ ██║     ███████║   ██║   ███████╗",
+                "██║   ██║██║ ██╔██╗ ██║     ██╔══██║   ██║   ╚════██║",
+                "╚██████╔╝██║██╔╝ ██╗╚██████╗██║  ██║   ██║   ███████║",
+                " ╚═════╝ ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝",
+                "",
+                "                  Powered by nixCats",
+              }, "\n")
+            end
+          end,
+          footer = '',
+        })
+      end
+      
+      -- Simple and easy statusline (replacing lualine)
+      local has_statusline, statusline = pcall(require, 'mini.statusline')
+      if has_statusline then
+        statusline.setup({ use_icons = vim.g.have_nerd_font })
+        
+        -- Custom statusline active function
+        statusline.active = function()
+          local mode, mode_hl = statusline.section_mode({ trunc_width = 20000 })
+          local git = statusline.section_git({ trunc_width = 40 })
+          local filename = statusline.section_filename({ trunc_width = 20000 })
+          local fileinfo = statusline.section_fileinfo({ trunc_width = 20000 })
+          local location = statusline.section_location()
+          
+          return statusline.combine_groups({
+            { hl = mode_hl, strings = { mode } },
+            { hl = 'MiniStatuslineDevinfo', strings = { git } },
+            '%<', -- Mark general truncate point
+            { hl = 'MiniStatuslineFilename', strings = { filename } },
+            '%=', -- End left alignment
+            { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+            { hl = mode_hl, strings = { location } },
+          })
+        end
+        
+        -- Custom location format
+        statusline.section_location = function()
+          return '%2l:%-2v'
+        end
+      end
     end,
   },
   {
@@ -379,61 +547,17 @@ require('lze').load {
       vim.g.startuptime_exe_path = nixCats.packageBinPath
     end,
   },
-  {
-    "lualine.nvim",
-    enabled = nixCats('general') or false,
-    -- cmd = { "" },
-    event = "DeferredUIEnter",
-    -- ft = "",
-    -- keys = "",
-    -- colorscheme = "",
-    load = function (name)
-      vim.cmd.packadd(name)
-      vim.cmd.packadd("lualine-lsp-progress")
-    end,
-    after = function (plugin)
-
-      require('lualine').setup({
-        options = {
-          icons_enabled = false,
-          theme = 'onedark',
-          component_separators = '|',
-          section_separators = '',
-        },
-        sections = {
-          lualine_c = {
-            {
-              'filename', path = 1, status = true,
-            },
-          },
-        },
-        inactive_sections = {
-          lualine_b = {
-            {
-              'filename', path = 3, status = true,
-            },
-          },
-          lualine_x = {'filetype'},
-        },
-        tabline = {
-          lualine_a = { 'buffers' },
-          lualine_b = { 'lsp_progress', },
-          lualine_z = { 'tabs' }
-        },
-      })
-    end,
-  },
+  -- lualine.nvim disabled in favor of mini.statusline
+  -- {
+  --   "lualine.nvim",
+  --   enabled = false,  -- Disabled in favor of mini.statusline
+  -- },
   {
     "gitsigns.nvim",
     enabled = nixCats('general') or false,
     event = "DeferredUIEnter",
-    -- cmd = { "" },
-    -- ft = "",
-    -- keys = "",
-    -- colorscheme = "",
     after = function (plugin)
       require('gitsigns').setup({
-        -- See `:help gitsigns.txt`
         signs = {
           add = { text = '+' },
           change = { text = '~' },
@@ -472,14 +596,12 @@ require('lze').load {
           end, { expr = true, desc = 'Jump to previous hunk' })
 
           -- Actions
-          -- visual mode
           map('v', '<leader>hs', function()
             gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
           end, { desc = 'stage git hunk' })
           map('v', '<leader>hr', function()
             gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
           end, { desc = 'reset git hunk' })
-          -- normal mode
           map('n', '<leader>gs', gs.stage_hunk, { desc = 'git stage hunk' })
           map('n', '<leader>gr', gs.reset_hunk, { desc = 'git reset hunk' })
           map('n', '<leader>gS', gs.stage_buffer, { desc = 'git Stage buffer' })
@@ -541,11 +663,6 @@ require('lze').load {
     event = "FileType",
     after = function (plugin)
       require('lint').linters_by_ft = {
-        -- NOTE: download some linters in lspsAndRuntimeDeps
-        -- and configure them here
-        -- markdown = {'vale',},
-        -- javascript = { 'eslint' },
-        -- typescript = { 'eslint' },
         go = nixCats('go') and { 'golangcilint' } or nil,
       }
 
@@ -562,21 +679,13 @@ require('lze').load {
     keys = {
       { "<leader>FF", desc = "[F]ormat [F]ile" },
     },
-    -- colorscheme = "",
     after = function (plugin)
       local conform = require("conform")
 
       conform.setup({
         formatters_by_ft = {
-          -- NOTE: download some formatters in lspsAndRuntimeDeps
-          -- and configure them here
           lua = nixCats('lua') and { "stylua" } or nil,
           go = nixCats('go') and { "gofmt", "golint" } or nil,
-          -- templ = { "templ" },
-          -- Conform will run multiple formatters sequentially
-          -- python = { "isort", "black" },
-          -- Use a sub-list to run only the first available formatter
-          -- javascript = { { "prettierd", "prettier" } },
         },
       })
 
@@ -592,9 +701,6 @@ require('lze').load {
   {
     "nvim-dap",
     enabled = nixCats('general') or false,
-    -- cmd = { "" },
-    -- event = "",
-    -- ft = "",
     keys = {
       { "<F5>", desc = "Debug: Start/Continue" },
       { "<F1>", desc = "Debug: Step Into" },
@@ -604,7 +710,6 @@ require('lze').load {
       { "<leader>B", desc = "Debug: Set Breakpoint" },
       { "<F7>", desc = "Debug: See last session result." },
     },
-    -- colorscheme = "",
     load = function(name)
       vim.cmd.packadd(name)
       vim.cmd.packadd("nvim-dap-ui")
@@ -614,7 +719,7 @@ require('lze').load {
       local dap = require 'dap'
       local dapui = require 'dapui'
 
-      -- Basic debugging keymaps, feel free to change to your liking!
+      -- Basic debugging keymaps
       vim.keymap.set('n', '<F5>', dap.continue, { desc = 'Debug: Start/Continue' })
       vim.keymap.set('n', '<F1>', dap.step_into, { desc = 'Debug: Step Into' })
       vim.keymap.set('n', '<F2>', dap.step_over, { desc = 'Debug: Step Over' })
@@ -624,19 +729,13 @@ require('lze').load {
         dap.set_breakpoint(vim.fn.input 'Breakpoint condition: ')
       end, { desc = 'Debug: Set Breakpoint' })
 
-      -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
       vim.keymap.set('n', '<F7>', dapui.toggle, { desc = 'Debug: See last session result.' })
 
       dap.listeners.after.event_initialized['dapui_config'] = dapui.open
       dap.listeners.before.event_terminated['dapui_config'] = dapui.close
       dap.listeners.before.event_exited['dapui_config'] = dapui.close
 
-      -- Dap UI setup
-      -- For more information, see |:help nvim-dap-ui|
       dapui.setup {
-        -- Set icons to characters that are more likely to work in every terminal.
-        --    Feel free to remove or use ones that you like more! :)
-        --    Don't feel like these are good choices.
         icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
         controls = {
           icons = {
@@ -654,22 +753,15 @@ require('lze').load {
       }
 
       require("nvim-dap-virtual-text").setup {
-        enabled = true,                       -- enable this plugin (the default)
-        enabled_commands = true,              -- create commands DapVirtualTextEnable, DapVirtualTextDisable, DapVirtualTextToggle, (DapVirtualTextForceRefresh for refreshing when debug adapter did not notify its termination)
-        highlight_changed_variables = true,   -- highlight changed values with NvimDapVirtualTextChanged, else always NvimDapVirtualText
-        highlight_new_as_changed = false,     -- highlight new variables in the same way as changed variables (if highlight_changed_variables)
-        show_stop_reason = true,              -- show stop reason when stopped for exceptions
-        commented = false,                    -- prefix virtual text with comment string
-        only_first_definition = true,         -- only show virtual text at first definition (if there are multiple)
-        all_references = false,               -- show virtual text on all all references of the variable (not only definitions)
-        clear_on_continue = false,            -- clear virtual text on "continue" (might cause flickering when stepping)
-        --- A callback that determines how a variable is displayed or whether it should be omitted
-        --- variable Variable https://microsoft.github.io/debug-adapter-protocol/specification#Types_Variable
-        --- buf number
-        --- stackframe dap.StackFrame https://microsoft.github.io/debug-adapter-protocol/specification#Types_StackFrame
-        --- node userdata tree-sitter node identified as variable definition of reference (see `:h tsnode`)
-        --- options nvim_dap_virtual_text_options Current options for nvim-dap-virtual-text
-        --- string|nil A text how the virtual text should be displayed or nil, if this variable shouldn't be displayed
+        enabled = true,
+        enabled_commands = true,
+        highlight_changed_variables = true,
+        highlight_new_as_changed = false,
+        show_stop_reason = true,
+        commented = false,
+        only_first_definition = true,
+        all_references = false,
+        clear_on_continue = false,
         display_callback = function(variable, buf, stackframe, node, options)
           if options.virt_text_pos == 'inline' then
             return ' = ' .. variable.value
@@ -677,18 +769,11 @@ require('lze').load {
             return variable.name .. ' = ' .. variable.value
           end
         end,
-        -- position of virtual text, see `:h nvim_buf_set_extmark()`, default tries to inline the virtual text. Use 'eol' to set to end of line
         virt_text_pos = vim.fn.has 'nvim-0.10' == 1 and 'inline' or 'eol',
-
-        -- experimental features:
-        all_frames = false,       -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
-        virt_lines = false,       -- show virtual lines instead of virtual text (will flicker!)
-        virt_text_win_col = nil   -- position the virtual text at a fixed window column (starting from the first text column) ,
-        -- e.g. 80 to position at column 80, see `:h nvim_buf_set_extmark()`
+        all_frames = false,
+        virt_lines = false,
+        virt_text_win_col = nil,
       }
-
-      -- NOTE: Install lang specific config
-      -- either in here, or in a separate plugin spec as demonstrated for go below.
     end,
   },
   {
@@ -700,7 +785,6 @@ require('lze').load {
     end,
   },
   {
-    -- lazydev makes your lsp way better in your config without needing extra lsp configuration.
     "lazydev.nvim",
     enabled = nixCats('lua') or false,
     cmd = { "LazyDev" },
@@ -713,12 +797,66 @@ require('lze').load {
       })
     end,
   },
+  {
+    "oil-nvim",
+    enabled = nixCats('general') or false,
+    keys = {
+      { "<leader>-", desc = "Open parent directory" },
+    },
+    after = function()
+      require("oil").setup({
+        default_file_explorer = true,
+        columns = {
+          "icon",
+        },
+        view_options = {
+          show_hidden = true,
+        },
+      })
+
+      vim.keymap.set("n", "<leader>-", "<CMD>oil<CR>", { desc = "Open parent directory with oil.nvim" })
+    end,
+  },
+  {
+    "indent-blankline.nvim",
+    enabled = nixCats('general') or false,
+    event = "DeferredUIEnter",
+    after = function()
+      require("ibl").setup({
+        indent = {
+          char = "│",
+          tab_char = "│",
+        },
+        scope = { 
+          enabled = true,
+          show_start = false, 
+          show_end = false 
+        },
+        exclude = {
+          filetypes = {
+            "help",
+            "alpha",
+            "dashboard",
+            "neo-tree",
+            "Trouble",
+            "trouble",
+            "lazy",
+            "mason",
+            "notify",
+            "toggleterm",
+            "lazyterm",
+          },
+        },
+      })
+    end,
+  },
 }
 
-local function lsp_on_attach(_, bufnr)
-  -- we create a function that lets us more easily define mappings specific
-  -- for LSP related items. It sets the mode, buffer and description for us each time.
+-- =============================================================================
+-- LSP CONFIGURATION
+-- =============================================================================
 
+local function lsp_on_attach(_, bufnr)
   local nmap = function(keys, func, desc)
     if desc then
       desc = 'LSP: ' .. desc
@@ -728,7 +866,6 @@ local function lsp_on_attach(_, bufnr)
 
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-
   nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
 
   if nixCats('general') then
@@ -739,12 +876,8 @@ local function lsp_on_attach(_, bufnr)
   end
 
   nmap('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
-
-  -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
   nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
-
-  -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
   nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
   nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
@@ -752,32 +885,22 @@ local function lsp_on_attach(_, bufnr)
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
 
-  -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
-
 end
 
--- NOTE: Register a handler from lzextras. This one makes it so that
--- you can set up lsps within lze specs,
--- and trigger vim.lsp.enable and the rtp config collection only on the correct filetypes
--- it adds the lsp field used below
--- (and must be registered before any load calls that use it!)
+-- Register LSP handler from lzextras
 require('lze').register_handlers(require('lzextras').lsp)
--- also replace the fallback filetype list retrieval function with a slightly faster one
 require('lze').h.lsp.set_ft_fallback(function(name)
   return dofile(nixCats.pawsible({ "allPlugins", "opt", "nvim-lspconfig" }) .. "/lsp/" .. name .. ".lua").filetypes or {}
 end)
+
 require('lze').load {
   {
     "nvim-lspconfig",
     enabled = nixCats("general") or false,
-    -- the on require handler will be needed here if you want to use the
-    -- fallback method of getting filetypes if you don't provide any
     on_require = { "lspconfig" },
-    -- define a function to run over all type(plugin.lsp) == table
-    -- when their filetype trigger loads them
     lsp = function(plugin)
       vim.lsp.config(plugin.name, plugin.lsp or {})
       vim.lsp.enable(plugin.name)
@@ -789,14 +912,9 @@ require('lze').load {
     end,
   },
   {
-    -- name of the lsp
     "lua_ls",
     enabled = nixCats('lua') or false,
-    -- provide a table containing filetypes,
-    -- and then whatever your functions defined in the function type specs expect.
-    -- in our case, it just expects the normal lspconfig setup options.
     lsp = {
-      -- if you provide the filetypes it doesn't ask lspconfig for the filetypes
       filetypes = { 'lua' },
       settings = {
         Lua = {
@@ -813,15 +931,11 @@ require('lze').load {
         },
       },
     },
-    -- also these are regular specs and you can use before and after and all the other normal fields
   },
   {
     "gopls",
     enabled = nixCats("go") or false,
-    -- if you don't provide the filetypes it asks lspconfig for them using the function we set above
-    lsp = {
-      -- filetypes = { "go", "gomod", "gowork", "gotmpl" },
-    },
+    lsp = {},
   },
   {
     "nixd",
@@ -830,23 +944,14 @@ require('lze').load {
       filetypes = { 'nix' },
       settings = {
         nixd = {
-          -- nixd requires some configuration.
-          -- luckily, the nixCats plugin is here to pass whatever we need!
-          -- we passed this in via the `extra` table in our packageDefinitions
-          -- for additional configuration options, refer to:
-          -- https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md
           nixpkgs = {
-            -- in the extras set of your package definition:
-            -- nixdExtras.nixpkgs = ''import ${pkgs.path} {}''
             expr = nixCats.extra("nixdExtras.nixpkgs") or [[import <nixpkgs> {}]],
           },
           options = {
             nixos = {
-              -- nixdExtras.nixos_options = ''(builtins.getFlake "path:${builtins.toString inputs.self.outPath}").nixosConfigurations.configname.options''
               expr = nixCats.extra("nixdExtras.nixos_options")
             },
             ["home-manager"] = {
-              -- nixdExtras.home_manager_options = ''(builtins.getFlake "path:${builtins.toString inputs.self.outPath}").homeConfigurations.configname.options''
               expr = nixCats.extra("nixdExtras.home_manager_options")
             }
           },
