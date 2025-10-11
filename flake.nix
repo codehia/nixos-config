@@ -1,8 +1,8 @@
 {
-  description = "Soumya's Flake configuration";
+  description = "Soumya's Multi-Machine NixOS Configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     disko = {
       url = "github:nix-community/disko";
@@ -36,48 +36,69 @@
       url = "github:nix-community/stylix/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-  };
-
-  # `self` is the return value of the current flake's `outputs` function and
-  # also the path to the current flake's source code folder (source tree)
-  outputs = inputs @ {
-    self,
-    nixpkgs,
-    disko,
-    home-manager,
-    catppuccin,
-    zen-browser,
-    sops-nix,
-    stylix,
-    ...
-  }: {
-    nixosConfigurations.thinkpad = nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
-      system = "x86_64-linux";
-      modules = [
-        ./nixos/configuration.nix
-        disko.nixosModules.disko
-        catppuccin.nixosModules.catppuccin
-        home-manager.nixosModules.home-manager
-        {
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            users.deus = {
-              imports = [
-                ./home
-                catppuccin.homeModules.catppuccin
-                zen-browser.homeModules.beta
-                sops-nix.homeManagerModules.sops
-                stylix.homeModules.stylix
-              ];
-            };
-            backupFileExtension = "backup";
-            extraSpecialArgs = {inherit inputs;};
-          };
-          # Optionally, use home-manager.extraSpecialArgs to pass arguments to home.nix
-        }
-      ];
+    nixCats = {
+      url = "github:BirdeeHub/nixCats-nvim";
     };
   };
+
+  outputs = { self, nixpkgs, disko, home-manager, catppuccin, zen-browser
+    , sops-nix, stylix, nixCats, ... }@inputs: {
+      nixosConfigurations = {
+        thinkpad = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            ./hosts/thinkpad
+            disko.nixosModules.disko
+            catppuccin.nixosModules.catppuccin
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                users.deus = {
+                  imports = [
+                    ./hosts/common/home
+                    catppuccin.homeModules.catppuccin
+                    zen-browser.homeModules.beta
+                    sops-nix.homeManagerModules.sops
+                    stylix.homeModules.stylix
+                  ];
+                };
+                backupFileExtension = "backup";
+                extraSpecialArgs = { inherit inputs; };
+              };
+            }
+          ];
+        };
+
+        workstation = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            ./hosts/workstation
+            disko.nixosModules.disko
+            catppuccin.nixosModules.catppuccin
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                users.deus = {
+                  imports = [
+                    ./hosts/common/home
+                    catppuccin.homeModules.catppuccin
+                    zen-browser.homeModules.beta
+                    sops-nix.homeManagerModules.sops
+                    stylix.homeModules.stylix
+                  ];
+                };
+                backupFileExtension = "backup";
+                extraSpecialArgs = { inherit inputs; };
+              };
+            }
+          ];
+        };
+      };
+    };
 }

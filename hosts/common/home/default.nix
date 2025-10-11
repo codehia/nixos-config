@@ -3,16 +3,17 @@
     ./stylix.nix
     ./hyprland
     ./waybar
-    ./nvf
     ./ghostty.nix
     ./kitty.nix
     ./rofi.nix
     ./tmux.nix
     ./lazygit.nix
     ./git.nix
+    ./nvim
   ];
 
   services = {
+    gnome-keyring.enable = true;
     kanshi = {
       enable = true;
       systemdTarget = "hyprland-session.target";
@@ -26,6 +27,30 @@
             status = "enable";
           }];
         };
+        azanDocked = {
+          outputs = [
+            {
+              criteria = "BNQ BenQ GW2480 BCP0111201Q";
+              mode = "1920x1080@60.00Hz";
+            }
+            {
+              criteria = "eDP-1";
+              status = "disable";
+            }
+          ];
+        };
+        miniDocked = {
+          outputs = [
+            {
+              criteria = "Samsung Electric Company LF24T35 HNAR101094";
+              mode = "1920x1080@74.97300";
+            }
+            {
+              criteria = "eDP-1";
+              status = "disable";
+            }
+          ];
+        };
         docked = {
           outputs = [
             {
@@ -37,7 +62,6 @@
               status = "disable";
             }
           ];
-
         };
       };
     };
@@ -60,9 +84,9 @@
     username = "deus";
     homeDirectory = "/home/deus";
     pointerCursor = {
-      name = "phinger-cursors-dark";
+      name = "phinger-cursors-light";
       package = pkgs.phinger-cursors;
-      size = 32;
+      size = 35;
       gtk.enable = true;
     };
     # Packages that should be installed to the user profile.
@@ -113,6 +137,7 @@
       hugo # static site generator
       glow # markdown previewer in terminal
 
+      htop
       btop # replacement of htop/nmon
       iotop # io monitoring
       iftop # network monitoring
@@ -150,6 +175,14 @@
 
       qbittorrent
       brightnessctl
+      fastfetch
+      ente-auth
+      _1password-gui
+      _1password-cli
+
+      pulsemixer
+      bluetui
+      spotify
     ];
     stateVersion = "25.05";
   };
@@ -235,7 +268,6 @@
         fish_command_not_found = {
           body = "__fish_default_command_not_found_handler $argv[1]";
         };
-
         gitignore = "curl -sL https://www.gitignore.io/api/$argv";
       };
     };
