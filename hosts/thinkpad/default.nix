@@ -160,6 +160,10 @@ in {
       powerOnBoot = true;
       settings = { General = { Experimental = true; }; };
     };
+    opengl = {
+      enable = true;
+      extraPackages = with pkgs; [ mesa.drivers rocmPackages.clr.icd ];
+    };
   };
   systemd.services.kanata-internalKeyboard.serviceConfig = {
     SupplementaryGroups = [

@@ -1,9 +1,7 @@
-{ config, lib, inputs, ... }: let
+{ inputs, ... }: let
   utils = inputs.nixCats.utils;
 in {
-  imports = [
-    inputs.nixCats.homeModule
-  ];
+  imports = [ inputs.nixCats.homeModule ];
   config = {
     # this value, nixCats is the defaultPackageName you pass to mkNixosModules
     # it will be the namespace for your options.
@@ -37,9 +35,23 @@ in {
         # this includes LSPs
         lspsAndRuntimeDeps = {
           general = with pkgs; [
+            # Git tools
             lazygit
+            git
+            
+            # Search and navigation
+            ripgrep
+            fd
+            fzf
+            
+            # Fun tools for starter
             fortune
             cowsay
+            
+            # Development tools
+            universal-ctags
+            gnumake
+            gcc
           ];
           lua = with pkgs; [
             lua-language-server
@@ -59,22 +71,33 @@ in {
             go
           ];
           python = with pkgs; [
+            # LSP
             basedpyright
-            flake8
-            autopep8
+            # Linting (prefer flake8 if available locally, fallback to ruff)
+            python3Packages.flake8
+            ruff
+            # Formatting (prefer autopep8 if available locally, fallback to black)
+            python3Packages.autopep8
+            black
+            isort
+          ];
+          typescript = with pkgs; [
+            # LSP
+            typescript-language-server
+            # Formatting
+            nodePackages.prettier
+            # Linting
+            eslint_d
           ];
         };
 
         # This is for plugins that will load at startup without using packadd:
         startupPlugins = {
           general = with pkgs.vimPlugins; [
-            # lazy loading isnt required with a config this small
-            # but as a demo, we do it anyway.
+            # Core plugins needed at startup
             lze
             lzextras
             snacks-nvim
-            onedark-nvim
-            vim-sleuth
           ];
         };
 
@@ -88,25 +111,51 @@ in {
             lazydev-nvim
           ];
           general = with pkgs.vimPlugins; [
+            # Core functionality
             mini-nvim
+            vim-sleuth
+            
+            # LSP and completion
             nvim-lspconfig
-            vim-startuptime
             blink-cmp
+            
+            # Syntax and treesitter
             nvim-treesitter.withAllGrammars
-            lualine-nvim
-            lualine-lsp-progress
+            nvim-treesitter-textobjects
+            
+            # UI and statusline (lualine disabled in favor of mini.statusline)
+            # lualine-nvim
+            # lualine-lsp-progress
+            catppuccin-nvim
+            indent-blankline-nvim
+            dressing-nvim
+            nvim-ufo
+            
+            # Git integration
             gitsigns-nvim
+            
+            # Navigation and editing
             which-key-nvim
+            oil-nvim
+            telescope-nvim
+            telescope-fzf-native-nvim
+            telescope-ui-select-nvim
+            
+            # Formatting and linting
             nvim-lint
             conform-nvim
+            
+            # Debugging
             nvim-dap
             nvim-dap-ui
             nvim-dap-virtual-text
-            catppuccin-nvim
-            oil-nvim
-            indent-blankline-nvim
-            # Additional plugins from reference config
-            vim-sleuth
+            
+            # GitHub Copilot (disabled by default)
+            copilot-vim
+            CopilotChat-nvim
+            
+            # Utilities
+            vim-startuptime
           ];
         };
 
@@ -151,7 +200,7 @@ in {
             suffix-path = true;
             suffix-LD = true;
             wrapRc = true;
-            # unwrappedCfgPath = "/path/to/here";
+            # unwrappedCfgPath = ./.;
             # IMPORTANT:
             # your alias may not conflict with your other packages.
             aliases = [ "vim" "nvim" "homeVim" ];
@@ -167,6 +216,8 @@ in {
             general = true;
             lua = true;
             nix = true;
+            python = true;
+            typescript = true;
             go = false;
           };
           # anything else to pass and grab in lua with `nixCats.extra`
