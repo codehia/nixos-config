@@ -7,7 +7,7 @@ _: {
         "~/Downloads/sekiro-shadows-die-twice-2019-4k-5b-3440x1440.jpg"
       ];
       wallpaper = [
-      "DP-2, ~/Downloads/sekiro-shadows-die-twice-2019-4k-5b-3440x1440.jpg"
+        "DP-2, ~/Downloads/sekiro-shadows-die-twice-2019-4k-5b-3440x1440.jpg"
       ];
     };
   };
