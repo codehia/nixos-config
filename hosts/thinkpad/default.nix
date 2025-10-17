@@ -110,7 +110,7 @@ in {
     };
   };
   services = {
-    dbus.packages = with pkgs; [gnome-keyring gcr];
+    dbus.packages = with pkgs; [ gnome-keyring gcr ];
     usbmuxd.enable = true;
     flatpak.enable = true;
     gvfs.enable = true;
@@ -166,10 +166,7 @@ in {
     };
   };
   systemd.services.kanata-internalKeyboard.serviceConfig = {
-    SupplementaryGroups = [
-      "input"
-      "uinput"
-    ];
+    SupplementaryGroups = [ "input" "uinput" ];
   };
   system.stateVersion = "25.05";
 }
