@@ -63,7 +63,7 @@ in {
     consoleLogLevel = 0;
   };
   networking = {
-    hostName = "thinkpad";
+    hostName = "workstation";
     networkmanager.enable = true;
   };
   time.timeZone = "Asia/Kolkata";
@@ -114,9 +114,7 @@ in {
       enable = true;
       pulse.enable = true;
     };
-    openssh = {
-      enable = true;
-    };
+    openssh = { enable = true; };
     libinput = {
       enable = true;
       touchpad = { accelSpeed = "0.5"; };
