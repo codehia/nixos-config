@@ -36,9 +36,7 @@
       url = "github:nix-community/stylix/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixCats = {
-      url = "github:BirdeeHub/nixCats-nvim";
-    };
+    nixCats = { url = "github:BirdeeHub/nixCats-nvim"; };
   };
 
   outputs = { self, nixpkgs, disko, home-manager, catppuccin, zen-browser
