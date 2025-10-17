@@ -25,7 +25,13 @@
     xwayland = { enable = true; };
     plugins = [ pkgs.pyprland ];
     settings = {
-      exec-once = [ "pypr &" "1password --silent &" "spotify &" "mullvad-gui &" "enteauth &"];
+      exec-once = [
+        "pypr &"
+        "1password --silent &"
+        "spotify &"
+        "mullvad-gui &"
+        "enteauth &"
+      ];
       env = [ "HYPRCURSOR_THEME, MyCursor" "HYPRCURSOR_SIZE, 32" ];
       input = {
         kb_options = [ "grp:alt_caps_toggle" "caps:super" ];
@@ -151,7 +157,6 @@
     };
 
     # ${extraMonitorSettings}
-    extraConfig =
-      "\n      monitor=,3440x1440@75.05,auto,1\n      # To enable blur on waybar uncomment the line below\n      #layerrule = blur,waybar\n    ";
+    extraConfig = "layerrule = blur,waybar";
   };
 }

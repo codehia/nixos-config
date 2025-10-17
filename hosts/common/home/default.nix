@@ -183,6 +183,11 @@
       pulsemixer
       bluetui
       spotify
+      ncdu
+
+      libglvnd
+      libglibutil
+      zoom-us
     ];
     stateVersion = "25.05";
   };
