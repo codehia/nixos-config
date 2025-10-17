@@ -640,10 +640,14 @@ require('lze').load {
         { "<leader><leader>_", hidden = true },
         { "<leader>c", group = "[c]ode" },
         { "<leader>c_", hidden = true },
+        { "<leader>cc", group = "[c]opilot [c]hat" },
+        { "<leader>cc_", hidden = true },
         { "<leader>d", group = "[d]ocument" },
         { "<leader>d_", hidden = true },
         { "<leader>g", group = "[g]it" },
         { "<leader>g_", hidden = true },
+        { "<leader>gt", group = "[g]it [t]oggle" },
+        { "<leader>gt_", hidden = true },
         { "<leader>r", group = "[r]ename" },
         { "<leader>r_", hidden = true },
         { "<leader>f", group = "[f]ind" },
@@ -966,5 +970,120 @@ require('lze').load {
         }
       },
     },
+  },
+  {
+    "basedpyright",
+    enabled = nixCats('python') or false,
+    lsp = {
+      cmd = { 'basedpyright-langserver', '--stdio' },
+      filetypes = { 'python' },
+      root_markers = {
+        'pyproject.toml',
+        'setup.py',
+        'setup.cfg',
+        'requirements.txt',
+        'Pipfile',
+        'pyrightconfig.json',
+        '.git',
+      },
+      settings = {
+        basedpyright = {
+          analysis = {
+            typeCheckingMode = "basic",
+            autoSearchPaths = true,
+            useLibraryCodeForTypes = true,
+            diagnosticMode = "openFilesOnly",
+          }
+        }
+      },
+      on_attach = function(client, bufnr)
+        lsp_on_attach(client, bufnr)
+        
+        vim.api.nvim_buf_create_user_command(bufnr, 'LspPyrightOrganizeImports', function()
+          client:exec_cmd({
+            command = 'basedpyright.organizeimports',
+            arguments = { vim.uri_from_bufnr(bufnr) },
+          })
+        end, {
+          desc = 'Organize Imports',
+        })
+      end,
+    },
+  },
+  {
+    "ts_ls",
+    enabled = nixCats('typescript') or false,
+    lsp = {
+      filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+    },
+  },
+  
+  -- =============================================================================
+  -- GITHUB COPILOT (Disabled by default - Press <leader>tc to enable)
+  -- =============================================================================
+  {
+    "copilot-vim",
+    enabled = nixCats('general') or false,
+    event = "InsertEnter",
+    load = function(name)
+      vim.g.copilot_enabled = false
+      vim.cmd.packadd(name)
+      
+      vim.g.copilot_no_tab_map = true
+      vim.g.copilot_assume_mapped = true
+      
+      vim.keymap.set('i', '<C-l>', 'copilot#Accept("\\<CR>")', {
+        expr = true,
+        replace_keycodes = false,
+        desc = 'Accept Copilot suggestion',
+      })
+      
+      vim.keymap.set('i', '<C-j>', '<Plug>(copilot-next)', { desc = 'Next Copilot suggestion' })
+      vim.keymap.set('i', '<C-k>', '<Plug>(copilot-previous)', { desc = 'Previous Copilot suggestion' })
+      vim.keymap.set('i', '<C-h>', '<Plug>(copilot-dismiss)', { desc = 'Dismiss Copilot suggestion' })
+      
+      vim.keymap.set('n', '<leader>tc', function()
+        if vim.g.copilot_enabled then
+          vim.cmd('Copilot disable')
+          vim.g.copilot_enabled = false
+          vim.notify('Copilot disabled', vim.log.levels.INFO)
+        else
+          vim.cmd('Copilot enable')
+          vim.g.copilot_enabled = true
+          vim.notify('Copilot enabled! Use <C-l> to accept suggestions', vim.log.levels.INFO)
+        end
+      end, { desc = '[T]oggle [C]opilot' })
+    end,
+  },
+  {
+    "CopilotChat-nvim",
+    enabled = nixCats('general') or false,
+    cmd = { "CopilotChat", "CopilotChatOpen", "CopilotChatToggle" },
+    after = function()
+      require('CopilotChat').setup({
+        debug = false,
+        show_help = 'yes',
+        auto_insert_mode = false,
+        window = {
+          layout = 'vertical',
+          width = 0.4,
+        },
+      })
+
+      vim.keymap.set('n', '<leader>tC', '<cmd>CopilotChatToggle<cr>', { desc = '[T]oggle [C]opilot Chat' })
+      vim.keymap.set('n', '<leader>ccq', function()
+        local input = vim.fn.input('Quick Chat: ')
+        if input ~= '' then
+          require('CopilotChat').ask(input)
+        end
+      end, { desc = '[C]opilot [Q]uick chat' })
+      
+      vim.keymap.set('v', '<leader>cce', '<cmd>CopilotChatExplain<cr>', { desc = '[C]opilot [E]xplain' })
+      vim.keymap.set('v', '<leader>ccr', '<cmd>CopilotChatReview<cr>', { desc = '[C]opilot [R]eview' })
+      vim.keymap.set('v', '<leader>ccf', '<cmd>CopilotChatFix<cr>', { desc = '[C]opilot [F]ix' })
+      vim.keymap.set('v', '<leader>cco', '<cmd>CopilotChatRefactor<cr>', { desc = '[C]opilot Refact[o]r' })
+      vim.keymap.set('v', '<leader>cct', '<cmd>CopilotChatTests<cr>', { desc = '[C]opilot [T]ests' })
+      vim.keymap.set('v', '<leader>ccd', '<cmd>CopilotChatDocs<cr>', { desc = '[C]opilot [D]ocs' })
+    end,
   },
 }

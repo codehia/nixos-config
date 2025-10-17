@@ -50,7 +50,7 @@ in {
     initrd = {
       verbose = false;
       systemd.enable = true;
-      kernelModules = [ "amdgpu" ];
+      kernelModules = [ ];
     };
     kernelParams = [
       "quiet"
@@ -116,7 +116,6 @@ in {
     };
     openssh = {
       enable = true;
-      # settings.PasswordAuthentication = true;
     };
     libinput = {
       enable = true;
