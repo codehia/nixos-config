@@ -2,7 +2,6 @@ window#waybar {
   background-color: #181825;
   transition-property: background-color;
   transition-duration: 0.5s;
-  opacity: 0.7;
 }
 
 * {
