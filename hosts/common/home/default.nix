@@ -203,6 +203,9 @@
       zoom-us
 
       libreoffice-still
+
+      telegram-desktop
+      signal-desktop-bin
     ];
     stateVersion = "25.05";
   };
