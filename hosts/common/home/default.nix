@@ -206,6 +206,8 @@
 
       telegram-desktop
       signal-desktop-bin
+
+      httpie-desktop
     ];
     stateVersion = "25.05";
   };
