@@ -35,11 +35,15 @@
     nixCats = { url = "github:BirdeeHub/nixCats-nvim"; };
   };
 
-  outputs = { self, nixpkgs, disko, home-manager, catppuccin, zen-browser
-    , sops-nix, stylix, nixCats, ... }@inputs: {
+  outputs = { self, nixpkgs, nixpkgs-unstable, disko, home-manager, catppuccin
+    , zen-browser, sops-nix, stylix, nixCats, ... }@inputs:
+    let
+      system = "x86_64-linux";
+      pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
+    in {
       nixosConfigurations = {
         thinkpad = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+          inherit system;
           specialArgs = { inherit inputs; };
           modules = [
             ./hosts/thinkpad
@@ -59,15 +63,18 @@
                     stylix.homeModules.stylix
                   ];
                 };
-                backupFileExtension = "backup";
-                extraSpecialArgs = { inherit inputs; };
+                backupFileExtension = "hm-backup";
+                extraSpecialArgs = {
+                  inherit inputs;
+                  inherit pkgs-unstable;
+                };
               };
             }
           ];
         };
 
         workstation = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+          inherit system;
           specialArgs = { inherit inputs; };
           modules = [
             ./hosts/workstation
