@@ -222,7 +222,7 @@
     nvim.enable = true;
     hyprland.enable = true;
     rofi.enable = true;
-    tmux.enable = true;
+    tmux.enable = false;
     lazygit.enable = true;
   };
 
@@ -230,8 +230,8 @@
     gh.enable = true;
     direnv = {
       enable = true;
-      # enableFishIntegration = lib.mkForce true;
       nix-direnv.enable = true;
+      silent = true;
     };
     zen-browser.enable = true;
     nix-index = {
