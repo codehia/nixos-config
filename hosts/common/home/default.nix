@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }: {
+{ pkgs, pkgs-unstable, lib, ... }: {
   imports = [
     ./stylix.nix
     ./hyprland
@@ -103,7 +103,7 @@
       gtk.enable = true;
     };
     # Packages that should be installed to the user profile.
-    packages = with pkgs; [
+    packages = (with pkgs; [
       cowsay
       fortune
       # archives
@@ -167,7 +167,6 @@
       pciutils # lspci
       usbutils # lsusb
 
-      ghostty # terminal emulator
       kitty
       wofi
 
@@ -208,7 +207,7 @@
       signal-desktop-bin
 
       httpie-desktop
-    ];
+    ]) ++ (with pkgs-unstable; [ ghostty ]);
     stateVersion = "25.05";
   };
   catppuccin = {
@@ -222,7 +221,6 @@
     nvim.enable = true;
     hyprland.enable = true;
     rofi.enable = true;
-    tmux.enable = false;
     lazygit.enable = true;
   };
 
