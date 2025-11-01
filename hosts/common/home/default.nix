@@ -168,7 +168,6 @@
       usbutils # lsusb
 
       kitty
-      wofi
 
       fish
       xfce.thunar
