@@ -219,7 +219,7 @@
     ghostty.enable = true;
     nvim.enable = true;
     hyprland.enable = true;
-    rofi.enable = true;
+    rofi.enable = false;
     lazygit.enable = true;
   };
 
