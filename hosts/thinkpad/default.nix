@@ -3,8 +3,8 @@
 { pkgs, ... }:
 let
   tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
-  session = "${pkgs.hyprland}/bin/Hyprland";
   username = "deus";
+  session = "/etc/profiles/per-user/${username}/bin/Hyprland";
 in {
   imports = [
     ./hardware-configuration.nix
@@ -117,6 +117,7 @@ in {
     tailscale.enable = true;
     openssh.enable = true;
     gnome.gnome-keyring.enable = true;
+    fwupd.enable = true;
     mullvad-vpn = {
       enable = true;
       package = pkgs.mullvad-vpn;

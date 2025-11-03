@@ -1,5 +1,10 @@
 { pkgs, ... }: {
   fonts = {
+    fontconfig = {
+      antialias = true;
+      hinting = { enable = true; };
+      subpixel.rgba = "rgb";
+    };
     packages = with pkgs; [
       dejavu_fonts
       fira-code
