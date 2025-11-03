@@ -96,7 +96,7 @@ return {
         end,
         formatters_by_ft = {
           lua = { 'stylua' },
-          python = python_formatters,
+          python = {'isort', 'autopep8'},
           javascript = { 'prettier' },
           typescript = { 'prettier' },
           javascriptreact = { 'prettier' },
@@ -104,7 +104,7 @@ return {
           json = { 'prettier' },
           yaml = { 'prettier' },
           markdown = { 'prettier' },
-          nix = { 'alejandra' },
+          nix = { 'nixfmt' },
         },
       })
 
