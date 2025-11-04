@@ -174,7 +174,6 @@
       xfce.thunar-volman
       nixfmt-classic
       just
-      devenv
 
       # SECRETS
       age
@@ -206,7 +205,7 @@
       signal-desktop-bin
 
       httpie-desktop
-    ]) ++ (with pkgs-unstable; [ ghostty ]);
+    ]) ++ (with pkgs-unstable; [ ghostty devenv ]);
     stateVersion = "25.05";
   };
   catppuccin = {
@@ -219,8 +218,9 @@
     ghostty.enable = true;
     nvim.enable = true;
     hyprland.enable = true;
-    rofi.enable = false;
     lazygit.enable = true;
+    rofi.enable = false;
+    tmux.enable = false;
   };
 
   programs = {
@@ -229,6 +229,7 @@
       enable = true;
       nix-direnv.enable = true;
       silent = true;
+      # enableFishIntegration = true
     };
     zen-browser.enable = true;
     nix-index = {
@@ -248,7 +249,7 @@
     fish = {
       enable = true;
       interactiveShellInit = ''
-          set -g fish_greeting # Disable greeting message
+        set -g fish_greeting # Disable greeting message
         # ---- direnv helpers & hook (works on Home-Manager 25.05) ----
 
         # global list of currently-registered names (functions/aliases)
@@ -287,7 +288,7 @@
           __direnv_unload_all
 
           # import env vars from direnv (safe: this only evaluates direnv's exported env)
-          direnv export fish | source
+          # direnv export fish | source
 
           # if project set FISH_DIR_ENV in .envrc, source it
           if set -q FISH_DIR_ENV
