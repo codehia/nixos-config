@@ -62,7 +62,7 @@ in {
       # -- display -------------------------------------------------------------------
       set -g pane-active-border-style "bg=default,fg=colour166"
       set -g pane-border-style "bg=default,fg=colour245"
-      set -g pane-border-lines "double"
+      set -g pane-border-lines "heavy"
 
       set -g base-index 1           # start windows numbering at 1
       setw -g pane-base-index 1     # make pane numbering consistent with windows
