@@ -205,6 +205,7 @@
       signal-desktop-bin
 
       httpie-desktop
+      obs-studio
     ]) ++ (with pkgs-unstable; [ ghostty devenv ]);
     stateVersion = "25.05";
   };
