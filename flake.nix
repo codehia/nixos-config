@@ -33,10 +33,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixCats = { url = "github:BirdeeHub/nixCats-nvim"; };
+    apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
   };
 
   outputs = { self, nixpkgs, nixpkgs-unstable, disko, home-manager, catppuccin
-    , zen-browser, sops-nix, stylix, nixCats, ... }@inputs:
+    , zen-browser, sops-nix, stylix, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
