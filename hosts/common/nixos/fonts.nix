@@ -28,7 +28,7 @@
             <prefer>
               <family>SF Mono</family>
               <family>Symbols Nerd Font</family>
-            </V>
+            </prefer>
           </alias>
           
           <alias>
@@ -74,6 +74,6 @@
       roboto-mono
       #symbola
       terminus_font
-    ]) ++ (with inputs; [apple-fonts.packages.${pkgs.system}.sf-pro]);
+    ]) ++ (with inputs; [ apple-fonts.packages.${pkgs.system}.sf-pro ]);
   };
 }
