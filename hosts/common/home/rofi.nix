@@ -7,13 +7,15 @@
         modi = "drun,filebrowser,run";
         show-icons = true;
         icon-theme = "Papirus";
-        font = "JetBrainsMono Nerd Font Mono 12";
+        font = "JetBrainsMono Nerd Font 14";
         drun-display-format = "{icon} {name}";
         display-drun = " Apps";
-        display-run = " Run";
-        display-filebrowser = " File";
+        display-run = "  Run";
+        display-window = " 﩯 Window";
+        display-Network = " 󰤨  Network";
+        display-filebrowser = " File";
       };
-      theme = lib.mkDefault ./catppuccin-mocha.rasi;
+      theme = lib.mkForce ./catppuccin-mocha.rasi;
     };
   };
 }
