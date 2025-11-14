@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, lib, ... }: {
+{ pkgs, pkgs-unstable, ... }: {
   imports = [
     ./stylix.nix
     ./hyprland
@@ -212,7 +212,6 @@
   catppuccin = {
     flavor = "mocha";
     enable = true;
-    starship.enable = true;
     fish.enable = true;
     fzf.enable = true;
     kitty.enable = true;
@@ -226,13 +225,12 @@
 
   programs = {
     gh.enable = true;
+    zen-browser.enable = true;
     direnv = {
       enable = true;
       nix-direnv.enable = true;
       silent = true;
-      # enableFishIntegration = true
     };
-    zen-browser.enable = true;
     nix-index = {
       enable = true;
       enableFishIntegration = true;
@@ -313,6 +311,10 @@
       };
       plugins = with pkgs.fishPlugins; [
         {
+          name = "pure";
+          src = pure.src;
+        }
+        {
           name = "plugin-git";
           src = plugin-git.src;
         }
@@ -336,70 +338,23 @@
           name = "sponge";
           src = sponge;
         }
+        {
+          name = "colored-man-pages";
+          src = colored-man-pages;
+
+        }
+        {
+          name = "github-copilot-cli-fish";
+          src = github-copilot-cli-fish;
+
+        }
+        # col
       ];
       functions = {
         fish_command_not_found = {
           body = "__fish_default_command_not_found_handler $argv[1]";
         };
         gitignore = "curl -sL https://www.gitignore.io/api/$argv";
-      };
-    };
-
-    starship = {
-      enable = true;
-      enableFishIntegration = true;
-      settings = {
-        directory.style = "blue";
-        format = lib.concatStrings [
-          "$username"
-          "$hostname"
-          "$directory"
-          "$git_branch"
-          "$git_state"
-          "$git_status"
-          "$cmd_duration"
-          "$line_break"
-          "$python"
-          "$character"
-        ];
-        character = {
-          success_symbol = "[❯](purple)";
-          error_symbol = "[❯](red)";
-          vimcmd_symbol = "[❮](green)";
-
-        };
-        git_branch = {
-          format = "[$branch]($style)";
-          # style = "bright-black";
-          symbol = "󰊢 ";
-          style = "bold mauve";
-        };
-        git_status = {
-          format =
-            "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)";
-          style = "cyan";
-          conflicted = "​";
-          untracked = "​";
-          modified = "​";
-          staged = "​";
-          renamed = "​";
-          deleted = "​";
-          stashed = "≡";
-        };
-
-        git_state = {
-          format = "([$state( $progress_current/$progress_total)]($style)) ";
-          style = "bright-black";
-        };
-        cmd_duration = {
-          format = "[$duration]($style) ";
-          style = "yellow";
-        };
-
-        python = {
-          format = "[$virtualenv]($style) ";
-          style = "bright-black";
-        };
       };
     };
   };
