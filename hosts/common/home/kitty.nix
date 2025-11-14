@@ -16,6 +16,7 @@
       cursor_beam_thickness 1.5
       cursor_blink_interval -1
       cursor_stop_blinking_after 15.0
+      window_padding_width 4
     '';
     themeFile = lib.mkForce "Catppuccin-Macchiato";
   };
