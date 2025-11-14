@@ -14,7 +14,6 @@
       kitty.enable = false;
       nvf.enable = false;
       fzf.enable = false;
-      starship.enable = false;
       # qt = {
       #   enable = false;
       #   platformTheme.name = "kvantum";
