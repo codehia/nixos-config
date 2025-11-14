@@ -11,7 +11,6 @@ in {
     ./disko-config.nix
     ../common/nixos/fonts.nix
   ];
-  nixpkgs.config.allowUnfree = true;
   nix = {
     optimise = {
       automatic = true;
@@ -32,7 +31,7 @@ in {
     loader = {
       systemd-boot = {
         enable = true;
-        consoleMode = "2";
+        consoleMode = "max";
       };
       efi.canTouchEfiVariables = true;
     };
@@ -50,7 +49,7 @@ in {
     initrd = {
       verbose = false;
       systemd.enable = true;
-      kernelModules = [ ];
+      kernelModules = [ "amdgpu" ];
     };
     kernelParams = [
       "quiet"
@@ -60,6 +59,7 @@ in {
       "udev.log_priority=3"
       "rd.systemd.show_status=auto"
     ];
+    kernelModules = [ "uinput" ];
     consoleLogLevel = 0;
   };
   networking = {
@@ -73,7 +73,15 @@ in {
     extraLocales = [ "all" ];
   };
 
-  security.sudo = { wheelNeedsPassword = false; };
+  security = {
+    sudo = { wheelNeedsPassword = false; };
+    pam.services = {
+      greetd.enableGnomeKeyring = true;
+      greetd-password.enableGnomeKeyring = true;
+      login.enableGnomeKeyring = true;
+    };
+  };
+
   users.users.deus = {
     isNormalUser = true;
     description = "Soumyaranjan Acharya";
@@ -115,15 +123,24 @@ in {
       pulse.enable = true;
     };
     openssh = { enable = true; };
-    libinput = {
+    udev.extraRules = ''
+      KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
+    '';
+  };
+  hardware = {
+    uinput.enable = true;
+    bluetooth = {
       enable = true;
-      touchpad = { accelSpeed = "0.5"; };
+      powerOnBoot = false;
+      settings = { General = { Experimental = true; }; };
+    };
+    graphics = {
+      enable = true;
+      extraPackages = with pkgs; [ mesa rocmPackages.clr.icd ];
     };
   };
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = { General = { Experimental = true; }; };
+  systemd.services.kanata-internalKeyboard.serviceConfig = {
+    SupplementaryGroups = [ "input" "uinput" ];
   };
   system.stateVersion = "25.05";
 }
