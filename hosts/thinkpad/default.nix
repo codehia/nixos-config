@@ -11,7 +11,6 @@ in {
     ./disko-config.nix
     ../common/nixos/fonts.nix
   ];
-  nixpkgs.config.allowUnfree = true;
   nix = {
     optimise = {
       automatic = true;
