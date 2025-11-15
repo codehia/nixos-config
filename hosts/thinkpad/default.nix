@@ -109,6 +109,7 @@ in {
     };
   };
   services = {
+    udisks2.enable = true;
     dbus.packages = with pkgs; [ gnome-keyring gcr ];
     usbmuxd.enable = true;
     flatpak.enable = true;

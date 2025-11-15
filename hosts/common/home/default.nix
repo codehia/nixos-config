@@ -206,6 +206,9 @@
 
       httpie-desktop
       obs-studio
+
+      calibre
+      unrar
     ]) ++ (with pkgs-unstable; [ ghostty devenv ]);
     stateVersion = "25.05";
   };
@@ -224,7 +227,10 @@
   };
 
   programs = {
-    gh.enable = true;
+    gh = {
+      enable = true;
+      extensions = with pkgs; [ gh-dash gh-poi gh-f ];
+    };
     zen-browser.enable = true;
     direnv = {
       enable = true;
