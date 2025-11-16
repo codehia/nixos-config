@@ -29,11 +29,11 @@ in {
   };
   boot = {
     loader = {
+      efi.canTouchEfiVariables = true;
       systemd-boot = {
         enable = true;
         consoleMode = "2";
       };
-      efi.canTouchEfiVariables = true;
     };
     plymouth = {
       enable = true;
@@ -155,6 +155,7 @@ in {
   };
   hardware = {
     uinput.enable = true;
+    amdgpu.initrd.enable = true;
     bluetooth = {
       enable = true;
       powerOnBoot = true;
@@ -162,7 +163,7 @@ in {
     };
     graphics = {
       enable = true;
-      extraPackages = with pkgs; [ mesa rocmPackages.clr.icd ];
+      extraPackages = with pkgs; [ mesa rocmPackages.clr.icd amdvlk];
     };
   };
   systemd.services.kanata-internalKeyboard.serviceConfig = {

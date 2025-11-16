@@ -19,21 +19,21 @@ in {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store = true;
-      trusted-users = [ "root" "deus" ];
+      trusted-users = [ "root" username ];
     };
     gc = {
       automatic = true;
       dates = "weekly";
-      options = "--delete-older-than 15d";
+      options = "--delete-older-than 7d";
     };
   };
   boot = {
     loader = {
+      efi.canTouchEfiVariables = true;
       systemd-boot = {
         enable = true;
         consoleMode = "max";
       };
-      efi.canTouchEfiVariables = true;
     };
     plymouth = {
       enable = true;
@@ -102,6 +102,9 @@ in {
     };
   };
   services = {
+    gvfs.enable = true;
+    tailscale.enable = true;
+    openssh.enable = true;
     greetd = {
       enable = true;
       settings = {
@@ -116,19 +119,17 @@ in {
         };
       };
     };
-    gvfs.enable = true;
-    tailscale.enable = true;
     pipewire = {
       enable = true;
       pulse.enable = true;
     };
-    openssh = { enable = true; };
     udev.extraRules = ''
       KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
     '';
   };
   hardware = {
     uinput.enable = true;
+    amdgpu.initrd.enable = true;
     bluetooth = {
       enable = true;
       powerOnBoot = false;
@@ -136,7 +137,7 @@ in {
     };
     graphics = {
       enable = true;
-      extraPackages = with pkgs; [ mesa rocmPackages.clr.icd ];
+      extraPackages = with pkgs; [ mesa rocmPackages.clr.icd amdvlk];
     };
   };
   systemd.services.kanata-internalKeyboard.serviceConfig = {
