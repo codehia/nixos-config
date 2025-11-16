@@ -83,11 +83,11 @@
       noto-fonts-cjk-sans
       noto-fonts-cjk-serif
       noto-fonts-monochrome-emoji
-      
+
       # JetBrains Mono for coding (your preference)
       jetbrains-mono
       nerd-fonts.jetbrains-mono
-      
+
       # Additional useful fonts
       font-awesome
       material-icons
@@ -95,9 +95,9 @@
       powerline-fonts
     ]) ++ (with inputs.apple-fonts.packages.${pkgs.system}; [
       # Apple fonts for macOS-like experience
-      sf-pro        # Sans-serif (UI font)
-      sf-mono       # Monospace (fallback for coding)
-      ny            # New York (Serif font)
+      sf-pro # Sans-serif (UI font)
+      sf-mono # Monospace (fallback for coding)
+      ny # New York (Serif font)
     ]);
   };
 }
