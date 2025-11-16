@@ -164,7 +164,7 @@ in {
     };
     graphics = {
       enable = true;
-      extraPackages = with pkgs; [ mesa rocmPackages.clr.icd amdvlk];
+      extraPackages = with pkgs; [ mesa rocmPackages.clr.icd amdvlk ];
     };
   };
   systemd.services.kanata-internalKeyboard.serviceConfig = {
