@@ -4,9 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    zen-browser.url = "github:0xc000022070/zen-browser-flake";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
-    apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -23,6 +20,10 @@
       url = "github:catppuccin/nix/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -31,10 +32,25 @@
       url = "github:nix-community/stylix/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixCats = {
+      url = "github:BirdeeHub/nixCats-nvim";
+    };
+    apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, disko, home-manager, catppuccin
-    , zen-browser, sops-nix, stylix, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+      disko,
+      home-manager,
+      catppuccin,
+      zen-browser,
+      sops-nix,
+      stylix,
+      ...
+    }@inputs:
     let
       system = "x86_64-linux";
       # List of allowed unfree packages (add new packages here as needed)
@@ -62,11 +78,11 @@
         system = system;
         config = {
           allowUnfree = true;
-          allowUnfreePredicate = pkg:
-            builtins.elem (nixpkgs-unstable.lib.getName pkg) allowedUnfree;
+          allowUnfreePredicate = pkg: builtins.elem (nixpkgs-unstable.lib.getName pkg) allowedUnfree;
         };
       };
-    in {
+    in
+    {
       nixosConfigurations = {
         thinkpad = nixpkgs.lib.nixosSystem {
           inherit system;
@@ -79,8 +95,7 @@
             {
               nixpkgs.config = {
                 allowUnfree = true;
-                allowUnfreePredicate = pkg:
-                  builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
+                allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
               };
             }
             ./hosts/thinkpad
@@ -101,8 +116,7 @@
                   # Configure nixpkgs for home-manager
                   nixpkgs.config = {
                     allowUnfree = true;
-                    allowUnfreePredicate = pkg:
-                      builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
+                    allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
                   };
                 };
                 backupFileExtension = "hm-backup";
@@ -126,8 +140,7 @@
             {
               nixpkgs.config = {
                 allowUnfree = true;
-                allowUnfreePredicate = pkg:
-                  builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
+                allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
               };
             }
             ./hosts/workstation
@@ -148,8 +161,7 @@
                   # Configure nixpkgs for home-manager
                   nixpkgs.config = {
                     allowUnfree = true;
-                    allowUnfreePredicate = pkg:
-                      builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
+                    allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
                   };
                 };
                 backupFileExtension = "hm-backup";
