@@ -5,7 +5,8 @@ let
   tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
   username = "deus";
   session = "/etc/profiles/per-user/${username}/bin/Hyprland";
-in {
+in
+{
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
@@ -17,9 +18,15 @@ in {
       dates = [ "03:45" ];
     };
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       auto-optimise-store = true;
-      trusted-users = [ "root" username ];
+      trusted-users = [
+        "root"
+        username
+      ];
     };
     gc = {
       automatic = true;
@@ -29,22 +36,21 @@ in {
   };
   boot = {
     loader = {
-      efi.canTouchEfiVariables = true;
       systemd-boot = {
         enable = true;
         consoleMode = "2";
       };
+      efi.canTouchEfiVariables = true;
     };
     plymouth = {
       enable = true;
       theme = "connect";
-      themePackages = with pkgs;
-        [
-          # By default we would install all themes
-          (adi1090x-plymouth-themes.override {
-            selected_themes = [ "connect" ];
-          })
-        ];
+      themePackages = with pkgs; [
+        # By default we would install all themes
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [ "connect" ];
+        })
+      ];
     };
     initrd = {
       verbose = false;
@@ -74,7 +80,9 @@ in {
   };
 
   security = {
-    sudo = { wheelNeedsPassword = false; };
+    sudo = {
+      wheelNeedsPassword = false;
+    };
     pam.services = {
       greetd.enableGnomeKeyring = true;
       greetd-password.enableGnomeKeyring = true;
@@ -85,7 +93,10 @@ in {
     isNormalUser = true;
     description = "Soumyaranjan Acharya";
     initialPassword = "Soumya$321";
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+    ];
     shell = pkgs.fish;
   };
   environment.systemPackages = with pkgs; [
@@ -109,8 +120,10 @@ in {
     };
   };
   services = {
-    udisks2.enable = true;
-    dbus.packages = with pkgs; [ gnome-keyring gcr ];
+    dbus.packages = with pkgs; [
+      gnome-keyring
+      gcr
+    ];
     usbmuxd.enable = true;
     flatpak.enable = true;
     gvfs.enable = true;
@@ -136,8 +149,7 @@ in {
           user = "${username}";
         };
         default_session = {
-          command =
-            "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time -cmd ${session}";
+          command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time -cmd ${session}";
           user = "greeter";
         };
       };
@@ -148,7 +160,9 @@ in {
     };
     libinput = {
       enable = true;
-      touchpad = { accelSpeed = "0.5"; };
+      touchpad = {
+        accelSpeed = "0.5";
+      };
     };
     udev.extraRules = ''
       KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
@@ -156,19 +170,28 @@ in {
   };
   hardware = {
     uinput.enable = true;
-    amdgpu.initrd.enable = true;
     bluetooth = {
       enable = true;
       powerOnBoot = true;
-      settings = { General = { Experimental = true; }; };
+      settings = {
+        General = {
+          Experimental = true;
+        };
+      };
     };
     graphics = {
       enable = true;
-      extraPackages = with pkgs; [ mesa rocmPackages.clr.icd amdvlk ];
+      extraPackages = with pkgs; [
+        mesa
+        rocmPackages.clr.icd
+      ];
     };
   };
   systemd.services.kanata-internalKeyboard.serviceConfig = {
-    SupplementaryGroups = [ "input" "uinput" ];
+    SupplementaryGroups = [
+      "input"
+      "uinput"
+    ];
   };
   system.stateVersion = "25.05";
 }

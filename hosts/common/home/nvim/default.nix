@@ -1,6 +1,8 @@
 { inputs, ... }:
-let utils = inputs.nixCats.utils;
-in {
+let
+  utils = inputs.nixCats.utils;
+in
+{
   imports = [ inputs.nixCats.homeModule ];
   config = {
     # this value, nixCats is the defaultPackageName you pass to mkNixosModules
@@ -22,8 +24,17 @@ in {
       # the .replace vs .merge options are for modules based on existing configurations,
       # they refer to how multiple categoryDefinitions get merged together by the module.
       # for useage of this section, refer to :h nixCats.flake.outputs.categories
-      categoryDefinitions.replace = ({ pkgs, settings, categories, extra, name
-        , mkPlugin, ... }@packageDef: {
+      categoryDefinitions.replace = (
+        {
+          pkgs,
+          settings,
+          categories,
+          extra,
+          name,
+          mkPlugin,
+          ...
+        }@packageDef:
+        {
           # to define and use a new category, simply add a new list to a set here,
           # and later, you will include categoryname = true; in the set you
           # provide when you build the package using this builder function.
@@ -53,8 +64,14 @@ in {
               gnumake
               gcc
             ];
-            lua = with pkgs; [ lua-language-server stylua ];
-            nix = with pkgs; [ nixd alejandra ];
+            lua = with pkgs; [
+              lua-language-server
+              stylua
+            ];
+            nix = with pkgs; [
+              nixd
+              alejandra
+            ];
             go = with pkgs; [
               gopls
               delve
@@ -108,6 +125,7 @@ in {
               # LSP and completion
               nvim-lspconfig
               blink-cmp
+              nvim-navic
 
               # Syntax and treesitter
               nvim-treesitter.withAllGrammars
@@ -140,9 +158,9 @@ in {
               nvim-dap-ui
               nvim-dap-virtual-text
 
-              # GitHub Copilot (disabled by default)
-              copilot-vim
-              CopilotChat-nvim
+              # GitHub Copilot
+              copilot-lua
+              blink-cmp-copilot
 
               # Utilities
               vim-startuptime
@@ -151,7 +169,9 @@ in {
 
           # shared libraries to be added to LD_LIBRARY_PATH
           # variable available to nvim runtime
-          sharedLibraries = { general = with pkgs; [ ]; };
+          sharedLibraries = {
+            general = with pkgs; [ ];
+          };
 
           # environmentVariables:
           # this section is for environmentVariables that should be available
@@ -175,43 +195,51 @@ in {
             #   '' --set CATTESTVAR2 "It worked again!"''
             # ];
           };
-        });
+        }
+      );
 
       # see :help nixCats.flake.outputs.packageDefinitions
       packageDefinitions.replace = {
         # These are the names of your packages
         # you can include as many as you wish.
-        myHomeModuleNvim = { pkgs, name, ... }: {
-          # they contain a settings set defined above
-          # see :help nixCats.flake.outputs.settings
-          settings = {
-            suffix-path = true;
-            suffix-LD = true;
-            wrapRc = true;
-            # unwrappedCfgPath = ./.;
-            # IMPORTANT:
-            # your alias may not conflict with your other packages.
-            aliases = [ "vim" "nvim" "homeVim" ];
-            # Use neovim 0.11.4 from nixpkgs-unstable
-            neovim-unwrapped =
-              inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.neovim-unwrapped;
-            hosts.python3.enable = true;
-            hosts.node.enable = true;
+        myHomeModuleNvim =
+          { pkgs, name, ... }:
+          {
+            # they contain a settings set defined above
+            # see :help nixCats.flake.outputs.settings
+            settings = {
+              suffix-path = true;
+              suffix-LD = true;
+              wrapRc = true;
+              # unwrappedCfgPath = ./.;
+              # IMPORTANT:
+              # your alias may not conflict with your other packages.
+              aliases = [
+                "vim"
+                "nvim"
+                "homeVim"
+              ];
+              # Use neovim 0.11.4 from nixpkgs-unstable
+              neovim-unwrapped = inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.neovim-unwrapped;
+              hosts.python3.enable = true;
+              hosts.node.enable = true;
+            };
+            # and a set of categories that you want
+            # (and other information to pass to lua)
+            # and a set of categories that you want
+            categories = {
+              general = true;
+              lua = true;
+              nix = true;
+              python = true;
+              typescript = true;
+              go = false;
+            };
+            # anything else to pass and grab in lua with `nixCats.extra`
+            extra = {
+              nixdExtras.nixpkgs = "import ${pkgs.path} {}";
+            };
           };
-          # and a set of categories that you want
-          # (and other information to pass to lua)
-          # and a set of categories that you want
-          categories = {
-            general = true;
-            lua = true;
-            nix = true;
-            python = true;
-            typescript = true;
-            go = false;
-          };
-          # anything else to pass and grab in lua with `nixCats.extra`
-          extra = { nixdExtras.nixpkgs = "import ${pkgs.path} {}"; };
-        };
       };
     };
   };
