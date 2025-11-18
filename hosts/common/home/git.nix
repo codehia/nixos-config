@@ -1,10 +1,13 @@
-{ lib, ... }: {
+{ lib, ... }:
+{
   programs.git = {
     enable = true;
     userName = "codehia";
     userEmail = "dev@sacharya.dev";
     extraConfig = {
-      core = { editor = "vim"; };
+      core = {
+        editor = "vim";
+      };
       # interactive = { diffFilter = "delta --color-only"; };
       merge = {
         tool = "delta";

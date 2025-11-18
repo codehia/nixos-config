@@ -1,3 +1,9 @@
-{ ... }: {
-  imports = [ ./binds.nix ./hyprland.nix ./pyprland.nix ./hyprpaper.nix ];
+{ ... }:
+{
+  imports = [
+    ./binds.nix
+    ./hyprland.nix
+    ./pyprland.nix
+    ./hyprpaper.nix
+  ];
 }

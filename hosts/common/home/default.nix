@@ -1,4 +1,5 @@
-{ pkgs, pkgs-unstable, ... }: {
+{ pkgs, pkgs-unstable, ... }:
+{
   imports = [
     ./stylix.nix
     ./hyprland
@@ -21,13 +22,15 @@
         {
           profile = {
             name = "undocked";
-            outputs = [{
-              criteria = "eDP-1";
-              mode = "1920x1080@60.03300";
-              scale = 1.0;
-              position = "0,0";
-              status = "enable";
-            }];
+            outputs = [
+              {
+                criteria = "eDP-1";
+                mode = "1920x1080@60.03300";
+                scale = 1.0;
+                position = "0,0";
+                status = "enable";
+              }
+            ];
           };
         }
         {
@@ -84,11 +87,22 @@
       transitions = {
         sunrise = {
           calendar = "*-*-* 06:00:00";
-          requests = [ [ "temperature" "6500" ] [ "gamma 100" ] ];
+          requests = [
+            [
+              "temperature"
+              "6500"
+            ]
+            [ "gamma 100" ]
+          ];
         };
         sunset = {
           calendar = "*-*-* 19:00:00";
-          requests = [[ "temperature" "3000" ]];
+          requests = [
+            [
+              "temperature"
+              "3000"
+            ]
+          ];
         };
       };
     };
@@ -103,113 +117,118 @@
       gtk.enable = true;
     };
     # Packages that should be installed to the user profile.
-    packages = (with pkgs; [
-      cowsay
-      fortune
-      # archives
-      zip
-      xz
-      unzip
-      p7zip
+    packages =
+      (with pkgs; [
+        cowsay
+        fortune
+        # archives
+        zip
+        xz
+        unzip
+        p7zip
 
-      # utils
-      ripgrep # recursively searches directories for a regex pattern
-      jq # A lightweight and flexible command-line JSON processor
-      yq-go # yaml processor https://github.com/mikefarah/yq
-      eza # A modern replacement for ‘ls’
-      fzf # A command-line fuzzy finder
+        # utils
+        ripgrep # recursively searches directories for a regex pattern
+        jq # A lightweight and flexible command-line JSON processor
+        yq-go # yaml processor https://github.com/mikefarah/yq
+        eza # A modern replacement for ‘ls’
+        fzf # A command-line fuzzy finder
 
-      # networking tools
-      mtr # A network diagnostic tool
-      iperf3
-      dnsutils # `dig` + `nslookup`
-      ldns # replacement of `dig`, it provide the command `drill`
-      aria2 # A lightweight multi-protocol & multi-source command-line download utility
-      socat # replacement of openbsd-netcat
-      nmap # A utility for network discovery and security auditing
-      ipcalc # it is a calculator for the IPv4/v6 addresses
+        # networking tools
+        mtr # A network diagnostic tool
+        iperf3
+        dnsutils # `dig` + `nslookup`
+        ldns # replacement of `dig`, it provide the command `drill`
+        aria2 # A lightweight multi-protocol & multi-source command-line download utility
+        socat # replacement of openbsd-netcat
+        nmap # A utility for network discovery and security auditing
+        ipcalc # it is a calculator for the IPv4/v6 addresses
 
-      # misc
-      cowsay
-      file
-      which
-      tree
-      gnused
-      gnutar
-      gawk
-      zstd
-      gnupg
+        # misc
+        cowsay
+        file
+        which
+        tree
+        gnused
+        gnutar
+        gawk
+        zstd
+        gnupg
 
-      # nix related
-      #
-      # it provides the command `nom` works just like `nix`
-      # with more details log output
-      nix-output-monitor
+        # nix related
+        #
+        # it provides the command `nom` works just like `nix`
+        # with more details log output
+        nix-output-monitor
 
-      # productivity
-      hugo # static site generator
-      glow # markdown previewer in terminal
+        # productivity
+        hugo # static site generator
+        glow # markdown previewer in terminal
 
-      htop
-      btop # replacement of htop/nmon
-      iotop # io monitoring
-      iftop # network monitoring
+        htop
+        btop # replacement of htop/nmon
+        iotop # io monitoring
+        iftop # network monitoring
 
-      # system cal?l monitoring
-      strace # system call monitoring
-      ltrace # library call monitoring
-      lsof # list open files
+        # system cal?l monitoring
+        strace # system call monitoring
+        ltrace # library call monitoring
+        lsof # list open files
 
-      # system tools
-      sysstat
-      lm_sensors # for `sensors` command
-      ethtool
-      pciutils # lspci
-      usbutils # lsusb
+        # system tools
+        sysstat
+        lm_sensors # for `sensors` command
+        ethtool
+        pciutils # lspci
+        usbutils # lsusb
 
-      kitty
+        kitty
 
-      fish
-      xfce.thunar
-      xfce.thunar-volman
-      nixfmt-classic
-      just
+        fish
+        xfce.thunar
+        xfce.thunar-volman
+        nixfmt-classic
+        just
 
-      # SECRETS
-      age
-      ssh-to-age
+        # SECRETS
+        age
+        ssh-to-age
 
-      slack
-      brave
-      vlc
+        slack
+        brave
+        vlc
 
-      qbittorrent
-      brightnessctl
-      fastfetch
-      ente-auth
-      _1password-gui
-      _1password-cli
+        qbittorrent
+        brightnessctl
+        fastfetch
+        ente-auth
+        _1password-gui
+        _1password-cli
 
-      pulsemixer
-      bluetui
-      spotify
-      ncdu
+        pulsemixer
+        bluetui
+        spotify
+        ncdu
 
-      libglvnd
-      libglibutil
-      zoom-us
+        libglvnd
+        libglibutil
+        zoom-us
 
-      libreoffice-still
+        libreoffice-still
 
-      telegram-desktop
-      signal-desktop-bin
+        telegram-desktop
+        signal-desktop-bin
 
-      httpie-desktop
-      obs-studio
+        httpie-desktop
+        obs-studio
 
-      calibre
-      unrar
-    ]) ++ (with pkgs-unstable; [ ghostty devenv ]);
+        calibre
+        unrar
+      ])
+      ++ (with pkgs-unstable; [
+        ghostty
+        devenv
+      ]);
     stateVersion = "25.05";
   };
   catppuccin = {
@@ -229,7 +248,11 @@
   programs = {
     gh = {
       enable = true;
-      extensions = with pkgs; [ gh-dash gh-poi gh-f ];
+      extensions = with pkgs; [
+        gh-dash
+        gh-poi
+        gh-f
+      ];
     };
     zen-browser.enable = true;
     direnv = {

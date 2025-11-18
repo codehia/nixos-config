@@ -118,6 +118,19 @@ in
     };
   };
   services = {
+    kanata = {
+      enable = true;
+      keyboards = {
+        kinesis = {
+          devices = [
+            "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-event-if02"
+            "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-if01-event-kbd"
+          ];
+          extraDefCfg = "process-unmapped-keys yes";
+          configFile = ../common/nixos/kinesis.kbd;
+        };
+      };
+    };
     greetd = {
       enable = true;
       settings = {
