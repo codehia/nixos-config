@@ -1,4 +1,5 @@
-{ pkgs, inputs, ... }: {
+{ pkgs, inputs, ... }:
+{
   home.sessionVariables.NIXOS_OZONE_WL = "1";
   home.packages = with pkgs; [
     swww
@@ -10,12 +11,10 @@
     hyprpolkitagent
     hyprland-qtutils # needed for banners and ANR messages
   ];
-  systemd.user.targets.hyprland-session.Unit.Wants =
-    [ "xdg-desktop-autostart.target" ];
+  systemd.user.targets.hyprland-session.Unit.Wants = [ "xdg-desktop-autostart.target" ];
   wayland.windowManager.hyprland = {
     enable = true;
-    package =
-      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
     portalPackage =
       inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     systemd = {
@@ -23,7 +22,9 @@
       enableXdgAutostart = true;
       variables = [ "--all" ];
     };
-    xwayland = { enable = true; };
+    xwayland = {
+      enable = true;
+    };
     plugins = [ pkgs.pyprland ];
     settings = {
       exec-once = [
@@ -33,9 +34,15 @@
         "mullvad-gui &"
         "enteauth &"
       ];
-      env = [ "HYPRCURSOR_THEME, MyCursor" "HYPRCURSOR_SIZE, 32" ];
+      env = [
+        "HYPRCURSOR_THEME, MyCursor"
+        "HYPRCURSOR_SIZE, 32"
+      ];
       input = {
-        kb_options = [ "grp:alt_caps_toggle" "caps:super" ];
+        kb_options = [
+          "grp:alt_caps_toggle"
+          "caps:super"
+        ];
         numlock_by_default = false;
         repeat_delay = 300;
         follow_mouse = 0;
@@ -68,8 +75,7 @@
         disable_splash_rendering = true;
         enable_swallow = true;
         vfr = true; # Variable Frame Rate
-        vrr =
-          2; # Variable Refresh Rate  Might need to set to 0 for NVIDIA/AQ_DRM_DEVICES
+        vrr = 2; # Variable Refresh Rate  Might need to set to 0 for NVIDIA/AQ_DRM_DEVICES
         # Screen flashing to black momentarily or going black when app is fullscreen
         # Try setting vrr to 0
 

@@ -2,7 +2,8 @@
 let
   configJsonData = lib.importJSON ./waybar.json;
   configCssData = ./waybar.css;
-in {
+in
+{
   programs.waybar = {
     enable = true;
     settings = [ configJsonData ];
