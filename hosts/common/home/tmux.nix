@@ -2,8 +2,7 @@
 let
   dotbar = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "tmux-dotbar";
-    version =
-      "714ba5994f8857571d6146b1f3612949ae91f820"; # Or a specific tag/commit hash
+    version = "714ba5994f8857571d6146b1f3612949ae91f820"; # Or a specific tag/commit hash
     src = pkgs.fetchFromGitHub {
       owner = "vaaleyard";
       repo = "tmux-dotbar";
@@ -12,7 +11,8 @@ let
     };
     rtpFilePath = "dotbar.tmux";
   };
-in {
+in
+{
   programs.tmux = {
     shell = "${pkgs.fish}/bin/fish";
     terminal = "tmux-256color";
@@ -22,7 +22,10 @@ in {
     baseIndex = 1;
     newSession = true;
     tmuxp.enable = true;
-    plugins = with pkgs; [ dotbar tmuxPlugins.sensible ];
+    plugins = with pkgs; [
+      dotbar
+      tmuxPlugins.sensible
+    ];
     extraConfig = ''
 
       # split current window horizontally
@@ -83,7 +86,6 @@ in {
       # activity
       set -g monitor-activity on
       set -g visual-activity off
-
     '';
   };
 }
