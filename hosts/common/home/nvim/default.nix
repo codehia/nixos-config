@@ -164,6 +164,9 @@ in
 
               # Utilities
               vim-startuptime
+
+              friendly-snippets
+              luasnip
             ];
           };
 
