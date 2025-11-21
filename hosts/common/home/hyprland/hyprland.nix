@@ -137,33 +137,30 @@
         "special:minimized, gapsout:100"
       ];
 
-      windowrulev2 = [
-        # 1Password
-        "float,           class:^(1Password)$"
-        "size 30% 50%,    class:^(1Password)$"
-        "move 100%-w-40 5%,     class:^(1Password)$"
-        "workspace special:drop-1pw, class:^(1Password)$"
-
-        # Spotify
-        "float,           class:^(Spotify)$"
-        "size 40% 60%,    class:^(Spotify)$"
-        "move 100%-w-40 5%,     class:^(Spotify)$"
-        "workspace special:drop-spotify, class:^(Spotify)$"
-
-        # Ente (add ente-auth if you see it)
-        "float,           class:^(io.ente.auth)$"
-        "size 10% 80%,    class:^(io.ente.auth)$"
-        "move 100%-w-40 5%,     class:^(io.ente.auth)$"
-        "workspace special:drop-ente, class:^(io.ente.auth)$"
-
-        # Slack
-        "float,           class:^(Slack)$"
-        "size 70% 70%,    class:^(Slack)$"
-        "workspace special:drop-slack, class:^(Slack)$"
-      ];
+      # windowrule = [
+      #   # 1Password
+      #   "float,           class:^(1Password)$"
+      #   "size 30% 50%,    class:^(1Password)$"
+      #   "move 100%-w-40 5%,     class:^(1Password)$"
+      #   "workspace special:drop-1pw, class:^(1Password)$"
+      #
+      #   # Spotify
+      #   "float,           class:^(Spotify)$"
+      #   "size 40% 60%,    class:^(Spotify)$"
+      #   "move 100%-w-40 5%,     class:^(Spotify)$"
+      #   "workspace special:drop-spotify, class:^(Spotify)$"
+      #
+      #   # Ente (add ente-auth if you see it)
+      #   "float,           class:^(io.ente.auth)$"
+      #   "size 10% 80%,    class:^(io.ente.auth)$"
+      #   "move 100%-w-40 5%,     class:^(io.ente.auth)$"
+      #   "workspace special:drop-ente, class:^(io.ente.auth)$"
+      #
+      #   # Slack
+      #   "float,           class:^(Slack)$"
+      #   "size 70% 70%,    class:^(Slack)$"
+      #   "workspace special:drop-slack, class:^(Slack)$"
+      # ];
     };
-
-    # ${extraMonitorSettings}
-    extraConfig = "layerrule = blur,waybar";
   };
 }
