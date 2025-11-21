@@ -123,6 +123,11 @@ in
     kanata = {
       enable = true;
       keyboards = {
+        # internalKeyboard = {
+        #   devices = ["/dev/input/by-path/platform-i8042-serio-0-event-kbd"];
+        #   extraDefCfg = "process-unmapped-keys yes";
+        #   configFile = ../common/nixos/regular_keyboard.kbd;
+        # };
         kinesis = {
           devices = [
             "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-event-if02"
@@ -200,11 +205,11 @@ in
       ];
     };
   };
-  systemd.services.kanata-internalKeyboard.serviceConfig = {
-    SupplementaryGroups = [
-      "input"
-      "uinput"
-    ];
-  };
+  # systemd.services.kanata-internalKeyboard.serviceConfig = {
+  #   SupplementaryGroups = [
+  #     "input"
+  #     "uinput"
+  #   ];
+  # };
   system.stateVersion = "25.05";
 }
