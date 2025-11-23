@@ -66,6 +66,7 @@
         "mullvad-vpn"
         "brave"
         "signal-desktop"
+        "obsidian"
       ];
 
       # Create pkgs-unstable for use in home-manager
