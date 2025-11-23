@@ -228,6 +228,7 @@
       ++ (with pkgs-unstable; [
         ghostty
         devenv
+        obsidian
       ]);
     stateVersion = "25.05";
   };
