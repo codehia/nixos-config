@@ -81,12 +81,12 @@
     packages =
       (with pkgs; [
         # Essential fonts for fallback and emoji support
-        noto-fonts-emoji
+        noto-fonts-color-emoji
+        noto-fonts-monochrome-emoji
         noto-fonts-cjk-sans
         noto-fonts-cjk-serif
-        noto-fonts-monochrome-emoji
 
-        # JetBrains Mono for coding (your preference)
+        # JetBrains Mono for coding
         jetbrains-mono
         nerd-fonts.jetbrains-mono
 

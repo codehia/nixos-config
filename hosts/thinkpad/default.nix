@@ -2,7 +2,7 @@
 # from specialArgs/_module.args into the third parameter of this function
 { pkgs, ... }:
 let
-  tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
+  tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
   username = "deus";
   session = "/etc/profiles/per-user/${username}/bin/Hyprland";
 in
@@ -107,6 +107,7 @@ in
     libimobiledevice
     ifuse
     idevicerestore
+    tlp
   ];
   programs = {
     fish.enable = true;
@@ -120,6 +121,12 @@ in
     };
   };
   services = {
+    tlp = {
+      enable = true;
+      settings = {
+        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+      };
+    };
     kanata = {
       enable = true;
       keyboards = {
