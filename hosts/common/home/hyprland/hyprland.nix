@@ -39,10 +39,6 @@
         "HYPRCURSOR_SIZE, 32"
       ];
       input = {
-        kb_options = [
-          "grp:alt_caps_toggle"
-          "caps:super"
-        ];
         numlock_by_default = false;
         repeat_delay = 300;
         follow_mouse = 0;
@@ -135,6 +131,12 @@
         "4, persistent:true,"
         "5, persistent:true,"
         "special:minimized, gapsout:100"
+      ];
+      windowrule = [
+        # 1Password
+        ''
+          match:class ^(1Password)$, border_size 4,float on, tile off, fullscreen off, maximize off, tile off, center off, no_initial_focus on, 
+        ''
       ];
 
       # windowrule = [
