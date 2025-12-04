@@ -1,8 +1,8 @@
 (defalias
-  bspcctrl (tap-hold 200 200 bspc lctl)
-  enterctrl (tap-hold 200 200 ret rctl)
-  delmeta (tap-hold 200 200 del rmet)
-  spcnav  (tap-hold 200 200 spc (layer-toggle navigation))
+  bspcctrl (tap-hold-press 200 200 bspc lctl)
+  enterctrl (tap-hold-press 200 200 ret rctl)
+  delmeta (tap-hold-press 200 200 del rmet)
+  spcnav  (tap-hold-press 200 200 spc (layer-toggle navigation))
 )
 
 (

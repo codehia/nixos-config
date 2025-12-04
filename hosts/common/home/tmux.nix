@@ -11,8 +11,33 @@ let
     };
     rtpFilePath = "dotbar.tmux";
   };
+  # tmux-toggle-lazygit = pkgs.writeShellScriptBin "tmux-toggle-lazygit" ''
+  #   #!/bin/sh
+  #   # Requirement 1a: Context-aware ephemeral lazygit
+  #   # Dependencies: tmux, lazygit
+  #
+  #   # 1. Safety Check: If we are already in a popup, detach.
+  #   # We identify popups by checking if the session name contains "popup"
+  #   # (Note: This relies on our naming convention for other popups, but strictly
+  #   # lazygit doesn't have a session name unless we wrap it.
+  #   # Ideally, we just check if we want to close.)
+  #   # However, since lazygit is ephemeral, the 'toggle' key usually just needs to open it.
+  #   # Closing is handled by 'q' inside lazygit.
+  #
+  #
+  #   # 2. Execution
+  #   # -d "#{pane_current_path}" : Ensures it opens in the project root
+  #   # -E : Closes popup on exit
+  #   tmux display-popup \
+  #       -d "#{pane_current_path}" \
+  #       -E "${pkgs.lazygit}/bin/lazygit"
+  # '';
 in
 {
+  # home.packages = [
+  #   tmux-toggle-lazygit
+  # ];
+
   programs.tmux = {
     shell = "${pkgs.fish}/bin/fish";
     terminal = "tmux-256color";
@@ -27,7 +52,6 @@ in
       tmuxPlugins.sensible
     ];
     extraConfig = ''
-
       # split current window horizontally
       bind - split-window -v
       # split current window vertically
@@ -55,7 +79,7 @@ in
       unbind p
       bind -r p previous-window # select previous window
       bind -r n next-window     # select next window
-      bind Tab last-window        # move to last active window
+      bind Tab last-window      # move to last active window
 
       # Toggle status bar
       bind-key b set-option status

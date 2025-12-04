@@ -84,26 +84,19 @@
     dunst.enable = true;
     hyprsunset = {
       enable = true;
-      transitions = {
-        sunrise = {
-          calendar = "*-*-* 06:00:00";
-          requests = [
-            [
-              "temperature"
-              "6500"
-            ]
-            [ "gamma 100" ]
-          ];
-        };
-        sunset = {
-          calendar = "*-*-* 19:00:00";
-          requests = [
-            [
-              "temperature"
-              "3000"
-            ]
-          ];
-        };
+      settings = {
+        profile = [
+          {
+            time = "6:00";
+            identity = true;
+          }
+          {
+            time = "18:30";
+            temperature = 3000;
+            gamma = 0.6;
+          }
+
+        ];
       };
     };
   };
@@ -229,6 +222,7 @@
         ghostty
         devenv
         obsidian
+        vscode
       ]);
     stateVersion = "25.05";
   };
