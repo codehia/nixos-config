@@ -108,8 +108,12 @@ in
     ifuse
     idevicerestore
     tlp
+    webkitgtk_6_0
+    webkitgtk_4_1
+    gtk4
   ];
   programs = {
+    appimage.enable = true;
     fish.enable = true;
     gnupg.agent = {
       enable = true;
