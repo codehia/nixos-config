@@ -223,6 +223,7 @@
         devenv
         obsidian
         vscode
+        gearlever
       ]);
     stateVersion = "25.05";
   };
