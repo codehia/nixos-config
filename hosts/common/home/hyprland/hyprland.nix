@@ -39,6 +39,10 @@
         "HYPRCURSOR_SIZE, 32"
       ];
       input = {
+        kb_options = [
+          "grp:alt_caps_toggle"
+          "caps:super"
+        ];
         numlock_by_default = false;
         repeat_delay = 300;
         follow_mouse = 0;
