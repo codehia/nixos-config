@@ -4,7 +4,7 @@
 let
   tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
   username = "deus";
-  session = "/etc/profiles/per-user/${username}/bin/Hyprland";
+  session = "/etc/profiles/per-user/${username}/bin/start-hyprland";
 in
 {
   imports = [
