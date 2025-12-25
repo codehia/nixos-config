@@ -2,30 +2,36 @@
 # from specialArgs/_module.args into the third parameter of this function
 { pkgs, ... }:
 let
-  tuigreet = "${pkgs.greetd.tuigreet}/bin/tuigreet";
-  session = "${pkgs.hyprland}/bin/Hyprland";
+  tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
   username = "deus";
-in {
+  session = "/etc/profiles/per-user/${username}/bin/start-hyprland";
+in
+{
   imports = [
     ./hardware-configuration.nix
     ./disko-config.nix
     ../common/nixos/fonts.nix
   ];
-  nixpkgs.config.allowUnfree = true;
   nix = {
     optimise = {
       automatic = true;
       dates = [ "03:45" ];
     };
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       auto-optimise-store = true;
-      trusted-users = [ "root" "deus" ];
+      trusted-users = [
+        "root"
+        username
+      ];
     };
     gc = {
       automatic = true;
       dates = "weekly";
-      options = "--delete-older-than 15d";
+      options = "--delete-older-than 7d";
     };
   };
   boot = {
@@ -39,13 +45,12 @@ in {
     plymouth = {
       enable = true;
       theme = "connect";
-      themePackages = with pkgs;
-        [
-          # By default we would install all themes
-          (adi1090x-plymouth-themes.override {
-            selected_themes = [ "connect" ];
-          })
-        ];
+      themePackages = with pkgs; [
+        # By default we would install all themes
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [ "connect" ];
+        })
+      ];
     };
     initrd = {
       verbose = false;
@@ -75,7 +80,9 @@ in {
   };
 
   security = {
-    sudo = { wheelNeedsPassword = false; };
+    sudo = {
+      wheelNeedsPassword = false;
+    };
     pam.services = {
       greetd.enableGnomeKeyring = true;
       greetd-password.enableGnomeKeyring = true;
@@ -86,7 +93,10 @@ in {
     isNormalUser = true;
     description = "Soumyaranjan Acharya";
     initialPassword = "REDACTED";
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+    ];
     shell = pkgs.fish;
   };
   environment.systemPackages = with pkgs; [
@@ -97,8 +107,13 @@ in {
     libimobiledevice
     ifuse
     idevicerestore
+    tlp
+    webkitgtk_6_0
+    webkitgtk_4_1
+    gtk4
   ];
   programs = {
+    appimage.enable = true;
     fish.enable = true;
     gnupg.agent = {
       enable = true;
@@ -110,13 +125,41 @@ in {
     };
   };
   services = {
-    dbus.packages = with pkgs; [gnome-keyring gcr];
+    tlp = {
+      enable = true;
+      settings = {
+        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+      };
+    };
+    kanata = {
+      enable = true;
+      keyboards = {
+        # internalKeyboard = {
+        #   devices = ["/dev/input/by-path/platform-i8042-serio-0-event-kbd"];
+        #   extraDefCfg = "process-unmapped-keys yes";
+        #   configFile = ../common/nixos/regular_keyboard.kbd;
+        # };
+        kinesis = {
+          devices = [
+            "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-event-if02"
+            "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-if01-event-kbd"
+          ];
+          extraDefCfg = "process-unmapped-keys yes";
+          configFile = ../common/nixos/kinesis.kbd;
+        };
+      };
+    };
+    dbus.packages = with pkgs; [
+      gnome-keyring
+      gcr
+    ];
     usbmuxd.enable = true;
     flatpak.enable = true;
     gvfs.enable = true;
     tailscale.enable = true;
     openssh.enable = true;
     gnome.gnome-keyring.enable = true;
+    fwupd.enable = true;
     mullvad-vpn = {
       enable = true;
       package = pkgs.mullvad-vpn;
@@ -135,8 +178,7 @@ in {
           user = "${username}";
         };
         default_session = {
-          command =
-            "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time -cmd ${session}";
+          command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time -cmd ${session}";
           user = "greeter";
         };
       };
@@ -147,7 +189,9 @@ in {
     };
     libinput = {
       enable = true;
-      touchpad = { accelSpeed = "0.5"; };
+      touchpad = {
+        accelSpeed = "0.5";
+      };
     };
     udev.extraRules = ''
       KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
@@ -158,14 +202,25 @@ in {
     bluetooth = {
       enable = true;
       powerOnBoot = true;
-      settings = { General = { Experimental = true; }; };
+      settings = {
+        General = {
+          Experimental = true;
+        };
+      };
+    };
+    graphics = {
+      enable = true;
+      extraPackages = with pkgs; [
+        mesa
+        rocmPackages.clr.icd
+      ];
     };
   };
-  systemd.services.kanata-internalKeyboard.serviceConfig = {
-    SupplementaryGroups = [
-      "input"
-      "uinput"
-    ];
-  };
+  # systemd.services.kanata-internalKeyboard.serviceConfig = {
+  #   SupplementaryGroups = [
+  #     "input"
+  #     "uinput"
+  #   ];
+  # };
   system.stateVersion = "25.05";
 }

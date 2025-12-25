@@ -2,8 +2,7 @@
 let
   dotbar = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "tmux-dotbar";
-    version =
-      "714ba5994f8857571d6146b1f3612949ae91f820"; # Or a specific tag/commit hash
+    version = "714ba5994f8857571d6146b1f3612949ae91f820"; # Or a specific tag/commit hash
     src = pkgs.fetchFromGitHub {
       owner = "vaaleyard";
       repo = "tmux-dotbar";
@@ -12,7 +11,33 @@ let
     };
     rtpFilePath = "dotbar.tmux";
   };
-in {
+  # tmux-toggle-lazygit = pkgs.writeShellScriptBin "tmux-toggle-lazygit" ''
+  #   #!/bin/sh
+  #   # Requirement 1a: Context-aware ephemeral lazygit
+  #   # Dependencies: tmux, lazygit
+  #
+  #   # 1. Safety Check: If we are already in a popup, detach.
+  #   # We identify popups by checking if the session name contains "popup"
+  #   # (Note: This relies on our naming convention for other popups, but strictly
+  #   # lazygit doesn't have a session name unless we wrap it.
+  #   # Ideally, we just check if we want to close.)
+  #   # However, since lazygit is ephemeral, the 'toggle' key usually just needs to open it.
+  #   # Closing is handled by 'q' inside lazygit.
+  #
+  #
+  #   # 2. Execution
+  #   # -d "#{pane_current_path}" : Ensures it opens in the project root
+  #   # -E : Closes popup on exit
+  #   tmux display-popup \
+  #       -d "#{pane_current_path}" \
+  #       -E "${pkgs.lazygit}/bin/lazygit"
+  # '';
+in
+{
+  # home.packages = [
+  #   tmux-toggle-lazygit
+  # ];
+
   programs.tmux = {
     shell = "${pkgs.fish}/bin/fish";
     terminal = "tmux-256color";
@@ -22,9 +47,11 @@ in {
     baseIndex = 1;
     newSession = true;
     tmuxp.enable = true;
-    plugins = with pkgs; [ dotbar tmuxPlugins.sensible ];
+    plugins = with pkgs; [
+      dotbar
+      tmuxPlugins.sensible
+    ];
     extraConfig = ''
-
       # split current window horizontally
       bind - split-window -v
       # split current window vertically
@@ -52,7 +79,7 @@ in {
       unbind p
       bind -r p previous-window # select previous window
       bind -r n next-window     # select next window
-      bind Tab last-window        # move to last active window
+      bind Tab last-window      # move to last active window
 
       # Toggle status bar
       bind-key b set-option status
@@ -62,7 +89,7 @@ in {
       # -- display -------------------------------------------------------------------
       set -g pane-active-border-style "bg=default,fg=colour166"
       set -g pane-border-style "bg=default,fg=colour245"
-      set -g pane-border-lines "double"
+      set -g pane-border-lines "heavy"
 
       set -g base-index 1           # start windows numbering at 1
       setw -g pane-base-index 1     # make pane numbering consistent with windows
@@ -83,7 +110,6 @@ in {
       # activity
       set -g monitor-activity on
       set -g visual-activity off
-
     '';
   };
 }
