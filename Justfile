@@ -1,3 +1,12 @@
+# Deploy configuration using nixos-unified
+deploy:
+  nix run .#activate
+
+# Deploy specific host (e.g., just deploy-host thinkpad)
+deploy-host host:
+  nix run .#activate {{host}}
+
+# Legacy deploy using nixos-rebuild
 install:
   nixos-rebuild switch --flake . --use-remote-sudo
 
@@ -8,9 +17,13 @@ up:
   nix flake update
 
 # Update specific input
-# usage: make upp i=home-manager
-upp:
-  nix flake update $(i)
+# usage: just upp i=home-manager
+upp i:
+  nix flake update {{i}}
+
+# Update flake inputs using nixos-unified
+update:
+  nix run .#update
 
 history:
   nix profile history --profile /nix/var/nix/profiles/system

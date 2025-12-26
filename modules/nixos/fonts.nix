@@ -1,4 +1,7 @@
-{ pkgs, inputs, ... }:
+{ pkgs, flake, ... }:
+let
+  inherit (flake) inputs;
+in
 {
   fonts = {
     fontconfig = {
