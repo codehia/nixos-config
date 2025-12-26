@@ -4,6 +4,8 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    nixos-unified.url = "github:srid/nixos-unified";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
     apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
@@ -34,141 +36,9 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nixpkgs-unstable,
-      disko,
-      home-manager,
-      catppuccin,
-      zen-browser,
-      sops-nix,
-      stylix,
-      ...
-    }@inputs:
-    let
-      system = "x86_64-linux";
-      # List of allowed unfree packages (add new packages here as needed)
-      # This provides granular control over which unfree software is permitted
-      allowedUnfree = [
-        "1password"
-        "1password-cli"
-        "1password-gui"
-        "slack"
-        "spotify"
-        "spotify-unwrapped"
-        "zoom"
-        "zoom-us"
-        "discord"
-        "vscode"
-        "obsidian"
-        "mullvad"
-        "mullvad-vpn"
-        "brave"
-        "signal-desktop"
-        "obsidian"
-      ];
-
-      # Create pkgs-unstable for use in home-manager
-      pkgs-unstable = import nixpkgs-unstable {
-        system = system;
-        config = {
-          allowUnfree = true;
-          allowUnfreePredicate = pkg: builtins.elem (nixpkgs-unstable.lib.getName pkg) allowedUnfree;
-        };
-      };
-    in
-    {
-      nixosConfigurations = {
-        thinkpad = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            inherit inputs;
-            inherit pkgs-unstable;
-          };
-          modules = [
-            # Configure nixpkgs with allowUnfree BEFORE other modules
-            {
-              nixpkgs.config = {
-                allowUnfree = true;
-                allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
-              };
-            }
-            ./hosts/thinkpad
-            disko.nixosModules.disko
-            catppuccin.nixosModules.catppuccin
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                useUserPackages = true;
-                users.deus = {
-                  imports = [
-                    ./hosts/common/home
-                    catppuccin.homeModules.catppuccin
-                    zen-browser.homeModules.twilight
-                    sops-nix.homeManagerModules.sops
-                    stylix.homeModules.stylix
-                  ];
-                  # Configure nixpkgs for home-manager
-                  nixpkgs.config = {
-                    allowUnfree = true;
-                    allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
-                  };
-                };
-                backupFileExtension = "hm-backup";
-                extraSpecialArgs = {
-                  inherit inputs;
-                  inherit pkgs-unstable;
-                };
-              };
-            }
-          ];
-        };
-
-        workstation = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            inherit inputs;
-            inherit pkgs-unstable;
-          };
-          modules = [
-            # Configure nixpkgs with allowUnfree BEFORE other modules
-            {
-              nixpkgs.config = {
-                allowUnfree = true;
-                allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
-              };
-            }
-            ./hosts/workstation
-            disko.nixosModules.disko
-            catppuccin.nixosModules.catppuccin
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                useUserPackages = true;
-                users.deus = {
-                  imports = [
-                    ./hosts/common/home
-                    catppuccin.homeModules.catppuccin
-                    zen-browser.homeModules.twilight
-                    sops-nix.homeManagerModules.sops
-                    stylix.homeModules.stylix
-                  ];
-                  # Configure nixpkgs for home-manager
-                  nixpkgs.config = {
-                    allowUnfree = true;
-                    allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) allowedUnfree;
-                  };
-                };
-                backupFileExtension = "hm-backup";
-                extraSpecialArgs = {
-                  inherit inputs;
-                  inherit pkgs-unstable;
-                };
-              };
-            }
-          ];
-        };
-      };
+    inputs:
+    inputs.nixos-unified.lib.mkFlake {
+      inherit inputs;
+      root = ./.;
     };
 }
