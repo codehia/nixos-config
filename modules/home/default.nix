@@ -10,7 +10,7 @@ in
 {
   imports = [
     inputs.catppuccin.homeModules.catppuccin
-    inputs.zen-browser.homeModules.twilight
+    inputs.zen-browser.homeModules.beta
     inputs.sops-nix.homeManagerModules.sops
     inputs.stylix.homeModules.stylix
     ./stylix.nix
