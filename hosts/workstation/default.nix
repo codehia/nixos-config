@@ -3,8 +3,8 @@
 { pkgs, ... }:
 let
   tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
-  session = "${pkgs.hyprland}/bin/start-hyprland";
   username = "deus";
+  session = "/etc/profiles/per-user/${username}/bin/start-hyprland";
 in
 {
   imports = [
@@ -160,11 +160,11 @@ in
   hardware = {
     uinput.enable = true;
     bluetooth = {
-      enable = true;
+      enable = false;
       powerOnBoot = false;
       settings = {
         General = {
-          Experimental = true;
+          Experimental = false;
         };
       };
     };
