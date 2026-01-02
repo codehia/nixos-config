@@ -105,7 +105,7 @@
                   imports = [
                     ./hosts/common/home
                     catppuccin.homeModules.catppuccin
-                    zen-browser.homeModules.twilight
+                    zen-browser.homeModules.beta
                     sops-nix.homeManagerModules.sops
                     stylix.homeModules.stylix
                   ];
@@ -150,7 +150,7 @@
                   imports = [
                     ./hosts/common/home
                     catppuccin.homeModules.catppuccin
-                    zen-browser.homeModules.twilight
+                    zen-browser.homeModules.beta
                     sops-nix.homeManagerModules.sops
                     stylix.homeModules.stylix
                   ];
