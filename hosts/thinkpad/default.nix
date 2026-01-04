@@ -71,6 +71,10 @@ in
   networking = {
     hostName = "thinkpad";
     networkmanager.enable = true;
+    firewall = {
+      trustedInterfaces = [ "tailscale0" ];
+      checkReversePath = "loose";
+    };
   };
   time.timeZone = "Asia/Kolkata";
 
