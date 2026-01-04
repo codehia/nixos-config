@@ -79,6 +79,10 @@ in
   networking = {
     hostName = "personal";
     networkmanager.enable = true;
+    firewall = {
+      trustedInterfaces = [ "tailscale0" ];
+      checkReversePath = "loose";
+    };
   };
 
   # Set your time zone.
