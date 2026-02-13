@@ -1,10 +1,9 @@
 { inputs, ... }:
 {
-  # TODO: apple-fonts disabled due to hash mismatch (https://github.com/Lyndeno/apple-fonts.nix/issues/24)
-  # flake-file.inputs.apple-fonts = {
-  #   url = "github:Lyndeno/apple-fonts.nix";
-  #   inputs.nixpkgs.follows = "nixpkgs";
-  # };
+  flake-file.inputs.apple-fonts = {
+    url = "github:Lyndeno/apple-fonts.nix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   den.aspects.fonts = {
     nixos =
@@ -88,9 +87,8 @@
               </fontconfig>
             '';
           };
-          packages = (
-            with pkgs;
-            [
+          packages =
+            (with pkgs; [
               noto-fonts-color-emoji
               noto-fonts-monochrome-emoji
               noto-fonts-cjk-sans
@@ -101,15 +99,12 @@
               material-icons
               nerd-fonts.symbols-only
               powerline-fonts
-            ]
-          )
-          # TODO: apple-fonts disabled due to hash mismatch (https://github.com/Lyndeno/apple-fonts.nix/issues/24)
-          # ++ (with inputs.apple-fonts.packages.${pkgs.system}; [
-          #   sf-pro
-          #   sf-mono
-          #   ny
-          # ])
-          ;
+            ])
+            ++ (with inputs.apple-fonts.packages.${pkgs.system}; [
+              sf-pro
+              sf-mono
+              ny
+            ]);
         };
       };
   };
