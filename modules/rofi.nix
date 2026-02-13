@@ -12,7 +12,7 @@
           modi = "drun,filebrowser,run";
           show-icons = true;
           icon-theme = "Papirus";
-          font = "JetBrainsMono Nerd Font 14";
+          font = "JetBrainsMono Nerd Font 12";
           drun-display-format = "{icon} {name}";
           display-drun = " Apps";
           display-run = "  Run";
