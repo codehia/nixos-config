@@ -1,3 +1,5 @@
+# Hyprland keybindings — merges into the hyprland aspect via the collector pattern.
+# den.aspects.hyprland is also defined in hyprland.nix; den merges both definitions.
 {...}: {
   den.aspects.hyprland = {
     homeManager = {...}: {

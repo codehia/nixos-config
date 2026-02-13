@@ -1,3 +1,6 @@
+# Hyprland compositor — base config, packages, and settings.
+# Uses the collector pattern: other files (binds.nix, hyprpaper.nix, pyprland.nix) also define
+# den.aspects.hyprland and their attrs are merged together by den.
 {inputs, ...}: {
   flake-file.inputs.hyprland = {
     url = "github:hyprwm/hyprland";
