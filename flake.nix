@@ -40,7 +40,22 @@
       url = "github:nix-community/stylix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
+
+  # flake-parts
+  # outputs = inputs@ {flake-parts, ...}:
+  #    flake-parts.lib.mkFlake {inherit inputs; } (top@{config, withSystem, moduleWithSystem, ... }: {
+  #       imports = [];
+  #       flake = {};
+  #       systems = ["x86_64-linux"];
+  #       perSystem = { config, pkgs, ... }: {
+  #
+  #       };
+  # });
 
   outputs =
     {
