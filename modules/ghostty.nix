@@ -8,7 +8,7 @@
         installBatSyntax = true;
         settings = {
           font-family = "JetBrainsMono Nerd Font";
-          font-size = 16;
+          font-size = 13;
           cursor-style = "block";
           cursor-style-blink = true;
           shell-integration-features = "no-cursor";
