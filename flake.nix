@@ -1,8 +1,7 @@
 # DO-NOT-EDIT. This file was auto-generated using github:vic/flake-file.
 # Use `nix run .#write-flake` to regenerate it.
 {
-
-  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
+  outputs = inputs: inputs.flake-parts.lib.mkFlake {inherit inputs;} (inputs.import-tree ./modules);
 
   inputs = {
     apple-fonts = {
@@ -48,5 +47,4 @@
     systems.url = "github:nix-systems/default";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
   };
-
 }
