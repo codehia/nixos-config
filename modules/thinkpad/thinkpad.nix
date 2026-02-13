@@ -1,3 +1,6 @@
+# Host aspect for thinkpad — the main NixOS system configuration.
+# The `includes` list at the bottom composes all feature aspects into this host.
+# Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
 {den, ...}: {
   den.aspects.thinkpad = {
     nixos = {pkgs, ...}: let
