@@ -1,83 +1,49 @@
+# DO-NOT-EDIT. This file was auto-generated using github:vic/flake-file.
+# Use `nix run .#write-flake` to regenerate it.
 {
-  description = "Soumya's Flake configuration";
+
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/25.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    disko = {
-      url = "github:nix-community/disko";
+    apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
+    catppuccin = {
       inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:catppuccin/nix/release-25.11";
+    };
+    den.url = "github:vic/den";
+    disko = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/disko";
+    };
+    flake-aspects.url = "github:vic/flake-aspects";
+    flake-file.url = "github:vic/flake-file";
+    flake-parts = {
+      inputs.nixpkgs-lib.follows = "nixpkgs-lib";
+      url = "github:hercules-ci/flake-parts";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/home-manager/release-25.11";
     };
     hyprland = {
-      url = "github:hyprwm/hyprland";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
+      url = "github:hyprwm/hyprland";
     };
-    catppuccin = {
-      url = "github:catppuccin/nix/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nvf = {
-      url = "github:NotAShelf/nvf";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    zen-browser = {
-      url = "github:0xc000022070/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    import-tree.url = "github:vic/import-tree";
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs-lib.follows = "nixpkgs";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     sops-nix = {
-      url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:Mic92/sops-nix";
     };
     stylix = {
-      url = "github:nix-community/stylix/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/stylix/release-25.11";
     };
+    systems.url = "github:nix-systems/default";
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
   };
 
-  # `self` is the return value of the current flake's `outputs` function and
-  # also the path to the current flake's source code folder (source tree)
-  outputs = inputs @ {
-    self,
-    nixpkgs,
-    disko,
-    home-manager,
-    catppuccin,
-    zen-browser,
-    sops-nix,
-    stylix,
-    ...
-  }: {
-    nixosConfigurations.thinkpad = nixpkgs.lib.nixosSystem {
-      specialArgs = {inherit inputs;};
-      system = "x86_64-linux";
-      modules = [
-        ./nixos/configuration.nix
-        disko.nixosModules.disko
-        catppuccin.nixosModules.catppuccin
-        home-manager.nixosModules.home-manager
-        {
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            users.deus = {
-              imports = [
-                ./home
-                catppuccin.homeModules.catppuccin
-                zen-browser.homeModules.beta
-                sops-nix.homeManagerModules.sops
-                stylix.homeModules.stylix
-              ];
-            };
-            backupFileExtension = "backup";
-            extraSpecialArgs = {inherit inputs;};
-          };
-          # Optionally, use home-manager.extraSpecialArgs to pass arguments to home.nix
-        }
-      ];
-    };
-  };
 }
