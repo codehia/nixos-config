@@ -6,11 +6,14 @@
 #
 ############################################################################
 
-deploy:
+install:
   nixos-rebuild switch --flake . --use-remote-sudo
 
 debug:
   nixos-rebuild switch --flake . --use-remote-sudo --show-trace --verbose
+
+write-flake:
+  nix run ".#write-flake"
 
 up:
   nix flake update
@@ -33,6 +36,3 @@ clean:
 gc:
   # garbage collect all unused nix store entries
   sudo nix-collect-garbage --delete-old
-
-write-flake:
-  nix run ".#write-flake"
