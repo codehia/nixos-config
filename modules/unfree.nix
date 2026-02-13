@@ -1,5 +1,4 @@
-{ den, ... }:
-{
+{den, ...}: {
   den.default.includes = [
     (den._.unfree [
       "1password"

@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+{inputs, ...}: {
   imports = [
     inputs.flake-file.flakeModules.dendritic
     inputs.den.flakeModules.dendritic
@@ -29,5 +28,5 @@
     };
   };
 
-  systems = [ "x86_64-linux" ];
+  systems = ["x86_64-linux"];
 }

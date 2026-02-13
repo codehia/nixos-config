@@ -1,120 +1,117 @@
-{ ... }:
-{
+{...}: {
   den.aspects.packages = {
-    homeManager =
-      { pkgs, ... }:
-      {
-        home.packages =
-          (with pkgs; [
-            cowsay
-            fortune
-            # archives
-            zip
-            xz
-            unzip
-            p7zip
+    homeManager = {pkgs, ...}: {
+      home.packages =
+        (with pkgs; [
+          cowsay
+          fortune
+          # archives
+          zip
+          xz
+          unzip
+          p7zip
 
-            # utils
-            ripgrep
-            jq
-            yq-go
-            eza
-            fzf
+          # utils
+          ripgrep
+          jq
+          yq-go
+          eza
+          fzf
 
-            # networking tools
-            mtr
-            iperf3
-            dnsutils
-            ldns
-            aria2
-            socat
-            nmap
-            ipcalc
+          # networking tools
+          mtr
+          iperf3
+          dnsutils
+          ldns
+          aria2
+          socat
+          nmap
+          ipcalc
 
-            # misc
-            file
-            which
-            tree
-            gnused
-            gnutar
-            gawk
-            zstd
-            gnupg
+          # misc
+          file
+          which
+          tree
+          gnused
+          gnutar
+          gawk
+          zstd
+          gnupg
 
-            # nix related
-            nix-output-monitor
+          # nix related
+          nix-output-monitor
 
-            # productivity
-            hugo
-            glow
+          # productivity
+          hugo
+          glow
 
-            htop
-            btop
-            iotop
-            iftop
+          htop
+          btop
+          iotop
+          iftop
 
-            # system call monitoring
-            strace
-            ltrace
-            lsof
+          # system call monitoring
+          strace
+          ltrace
+          lsof
 
-            # system tools
-            sysstat
-            lm_sensors
-            ethtool
-            pciutils
-            usbutils
+          # system tools
+          sysstat
+          lm_sensors
+          ethtool
+          pciutils
+          usbutils
 
-            kitty
+          kitty
 
-            fish
-            xfce.thunar
-            xfce.thunar-volman
-            nixfmt-classic
-            just
+          fish
+          xfce.thunar
+          xfce.thunar-volman
+          nixfmt-classic
+          just
 
-            # SECRETS
-            age
-            ssh-to-age
+          # SECRETS
+          age
+          ssh-to-age
 
-            slack
-            vlc
+          slack
+          vlc
 
-            qbittorrent
-            brightnessctl
-            fastfetch
-            ente-auth
-            _1password-gui
-            _1password-cli
+          qbittorrent
+          brightnessctl
+          fastfetch
+          ente-auth
+          _1password-gui
+          _1password-cli
 
-            pulsemixer
-            bluetui
-            spotify
-            ncdu
+          pulsemixer
+          bluetui
+          spotify
+          ncdu
 
-            libglvnd
-            libglibutil
-            zoom-us
+          libglvnd
+          libglibutil
+          zoom-us
 
-            libreoffice-still
+          libreoffice-still
 
-            telegram-desktop
-            signal-desktop-bin
+          telegram-desktop
+          signal-desktop-bin
 
-            obs-studio
+          obs-studio
 
-            calibre
-            unrar
-            google-chrome
-          ])
-          ++ (with pkgs.unstable; [
-            ghostty
-            devenv
-            obsidian
-            vscode
-            gearlever
-            claude-code
-          ]);
-      };
+          calibre
+          unrar
+          google-chrome
+        ])
+        ++ (with pkgs.unstable; [
+          ghostty
+          devenv
+          obsidian
+          vscode
+          gearlever
+          claude-code
+        ]);
+    };
   };
 }
