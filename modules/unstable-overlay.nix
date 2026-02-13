@@ -1,19 +1,17 @@
-{ inputs, ... }:
-let
+{inputs, ...}: let
   unstableOverlay = final: prev: {
     unstable = import inputs.nixpkgs-unstable {
       system = final.system;
       config.allowUnfree = true;
     };
   };
-in
-{
+in {
   den.base.conf = {
-    nixpkgs.overlays = [ unstableOverlay ];
+    nixpkgs.overlays = [unstableOverlay];
   };
 
   den.default = {
-    nixos.nixpkgs.overlays = [ unstableOverlay ];
-    homeManager.nixpkgs.overlays = [ unstableOverlay ];
+    nixos.nixpkgs.overlays = [unstableOverlay];
+    homeManager.nixpkgs.overlays = [unstableOverlay];
   };
 }

@@ -1,15 +1,12 @@
-{ inputs, ... }:
-{
+{inputs, ...}: {
   flake-file.inputs.sops-nix = {
     url = "github:Mic92/sops-nix";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
   den.aspects.secrets = {
-    homeManager =
-      { ... }:
-      {
-        imports = [ inputs.sops-nix.homeManagerModules.sops ];
-      };
+    homeManager = {...}: {
+      imports = [inputs.sops-nix.homeManagerModules.sops];
+    };
   };
 }
