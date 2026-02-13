@@ -239,6 +239,10 @@
         obsidian
         vscode
         claude-code
+        gearlever
+        gearlever
+        trayscale
+        nicotine-plus
       ]);
     stateVersion = "25.05";
   };
