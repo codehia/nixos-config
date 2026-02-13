@@ -5,7 +5,10 @@
   outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 
   inputs = {
-    apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
+    apple-fonts = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:Lyndeno/apple-fonts.nix";
+    };
     catppuccin = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:catppuccin/nix/release-25.11";
