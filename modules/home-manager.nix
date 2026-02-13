@@ -11,7 +11,7 @@
   ];
 
   den.default = {
-    nixos.system.stateVersion = "25.05";
-    homeManager.home.stateVersion = "25.05";
+    nixos.home-manager.backupFileExtension = "hm-backup";
+    homeManager.home.stateVersion = "25.11";
   };
 }
