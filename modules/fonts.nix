@@ -1,10 +1,5 @@
-{ inputs, ... }:
+{ den, ... }:
 {
-  flake-file.inputs.apple-fonts = {
-    url = "github:Lyndeno/apple-fonts.nix";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-
   den.aspects.fonts = {
     nixos =
       { pkgs, ... }:
@@ -87,25 +82,23 @@
               </fontconfig>
             '';
           };
-          packages =
-            (with pkgs; [
-              noto-fonts-color-emoji
-              noto-fonts-monochrome-emoji
-              noto-fonts-cjk-sans
-              noto-fonts-cjk-serif
-              jetbrains-mono
-              nerd-fonts.jetbrains-mono
-              font-awesome
-              material-icons
-              nerd-fonts.symbols-only
-              powerline-fonts
-            ])
-            ++ (with inputs.apple-fonts.packages.${pkgs.system}; [
-              sf-pro
-              sf-mono
-              ny
-            ]);
+          packages = with pkgs; [
+            noto-fonts-color-emoji
+            noto-fonts-monochrome-emoji
+            noto-fonts-cjk-sans
+            noto-fonts-cjk-serif
+            jetbrains-mono
+            nerd-fonts.jetbrains-mono
+            font-awesome
+            material-icons
+            nerd-fonts.symbols-only
+            powerline-fonts
+          ];
         };
       };
+
+    includes = [
+      den.aspects.apple-fonts
+    ];
   };
 }
