@@ -20,7 +20,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     catppuccin = {
-      url = "github:catppuccin/nix/release-25.05";
+      url = "github:catppuccin/nix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     sops-nix = {
@@ -68,6 +68,7 @@
         "brave"
         "signal-desktop"
         "obsidian"
+        "google-chrome"
       ];
       # Create pkgs-unstable for use in home-manager
       pkgs-unstable = import nixpkgs-unstable {
