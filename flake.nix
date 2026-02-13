@@ -5,7 +5,7 @@
 
   inputs = {
     apple-fonts = {
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
       url = "github:Lyndeno/apple-fonts.nix";
     };
     catppuccin = {
