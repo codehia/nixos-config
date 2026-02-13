@@ -1,7 +1,7 @@
 {inputs, ...}: {
   flake-file.inputs.apple-fonts = {
     url = "github:Lyndeno/apple-fonts.nix";
-    inputs.nixpkgs.follows = "nixpkgs";
+    inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
   den.aspects.apple-fonts = {
