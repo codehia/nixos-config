@@ -3,8 +3,8 @@
 
 # Devenv
 .devenv*
-devenv.local.nix
-devenv.local.yaml
+.devenv.flake.*
+devenv.local*
 
 # direnv
 .direnv
