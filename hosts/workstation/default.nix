@@ -1,6 +1,6 @@
 # Nix will match by name and automatically inject the inputs
 # from specialArgs/_module.args into the third parameter of this function
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
 let
   tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
   username = "deus";
@@ -18,6 +18,7 @@ in
       dates = [ "03:45" ];
     };
     settings = {
+      download-buffer-size = 500000000; # 500 MB
       experimental-features = [
         "nix-command"
         "flakes"
@@ -123,7 +124,7 @@ in
   };
   services = {
     kanata = {
-      enable = true;
+      enable = false;
       keyboards = {
         kinesis = {
           devices = [
@@ -149,7 +150,12 @@ in
       };
     };
     gvfs.enable = true;
-    tailscale.enable = true;
+    tailscale = {
+      enable = true;
+      package = pkgs-unstable.tailscale;
+      openFirewall = true;
+      port = 7498;
+    };
     pipewire = {
       enable = true;
       pulse.enable = true;

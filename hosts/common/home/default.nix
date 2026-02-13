@@ -13,10 +13,21 @@
     ./nvim
   ];
 
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "text/html" = "zen.desktop";
+      "x-scheme-handler/http" = "zen.desktop";
+      "x-scheme-handler/https" = "zen.desktop";
+      "x-scheme-handler/about" = "zen.desktop";
+      "x-scheme-handler/unknown" = "zen.desktop";
+    };
+  };
+
   services = {
     gnome-keyring.enable = true;
     kanshi = {
-      enable = true;
+      enable = false;
       systemdTarget = "hyprland-session.target";
       settings = [
         {
@@ -109,6 +120,9 @@
       size = 35;
       gtk.enable = true;
     };
+    sessionVariables = {
+      BROWSER = "zen";
+    };
     # Packages that should be installed to the user profile.
     packages =
       (with pkgs; [
@@ -188,7 +202,6 @@
         ssh-to-age
 
         slack
-        brave
         vlc
 
         qbittorrent
@@ -212,11 +225,12 @@
         telegram-desktop
         signal-desktop-bin
 
-        httpie-desktop
+        # httpie-desktop
         obs-studio
 
         calibre
         unrar
+        google-chrome
       ])
       ++ (with pkgs-unstable; [
         ghostty
@@ -224,6 +238,7 @@
         obsidian
         vscode
         gearlever
+        claude-code
       ]);
     stateVersion = "25.05";
   };
@@ -248,9 +263,11 @@
         gh-dash
         gh-poi
         gh-f
+        act
       ];
     };
     zen-browser.enable = true;
+    # xdg-settings.enable = true;
     direnv = {
       enable = true;
       nix-direnv.enable = true;
