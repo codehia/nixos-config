@@ -1,0 +1,12 @@
+keys:
+  - &thinkpad age1e7x9jlcpmmhd03xm2amstt90kwjphwklu3wa028v20tauz6r4aeqfdw8gp
+
+creation_rules:
+  - path_regex: secrets/thinkpad\.yaml$
+    key_groups:
+      - age:
+          - *thinkpad
+  - path_regex: secrets/common\.yaml$
+    key_groups:
+      - age:
+          - *thinkpad
