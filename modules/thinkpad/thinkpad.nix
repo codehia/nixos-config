@@ -1,4 +1,4 @@
-{ inputs, den, ... }:
+{ den, ... }:
 {
   den.aspects.thinkpad = {
     nixos =
@@ -12,7 +12,6 @@
         imports = [
           ./_hardware-configuration.nix
           ./_disko-config.nix
-          inputs.disko.nixosModules.disko
         ];
 
         nix = {
@@ -233,6 +232,7 @@
       den.aspects.services
       den.aspects.programs
       den.aspects.cursor
+      den.aspects.disko
     ];
   };
 }
