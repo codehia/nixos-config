@@ -168,18 +168,16 @@ return {
 			)
 		end,
 	},
-
-	-- Better folding
-	{
-		"nvim-ufo",
-		event = "BufReadPost",
-		after = function()
-			require("ufo").setup()
-		end,
-	},
-
 	-- Auto-detect indentation
 	{
 		"vim-sleuth",
 	},
+	-- -- Better folding
+	-- {
+	-- 	"nvim-ufo",
+	-- 	event = "BufReadPost",
+	-- 	after = function()
+	-- 		require("ufo").setup()
+	-- 	end,
+	-- },
 }

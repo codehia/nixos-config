@@ -9,8 +9,17 @@ vim.keymap.set("n", "<up>", '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set("n", "<down>", '<cmd>echo "Use j to move!!"<CR>')
 
 -- Fold management
-vim.keymap.set("n", "zR", require("ufo").openAllFolds, { desc = "Open all folds" })
-vim.keymap.set("n", "zM", require("ufo").closeAllFolds, { desc = "Close all folds" })
+local function close_all_folds()
+	vim.api.nvim_exec2("%foldc!", { output = false })
+end
+local function open_all_folds()
+	vim.api.nvim_exec2("%foldo!", { output = false })
+end
+
+-- vim.keymap.set("n", "<leader>zs", close_all_folds, { desc = "[s]hut all folds" })
+-- vim.keymap.set("n", "<leader>zo", open_all_folds, { desc = "[o]pen all folds" })
+vim.keymap.set("n", "zR", open_all_folds, { desc = "Open all folds" })
+vim.keymap.set("n", "zM", close_all_folds, { desc = "Close all folds" })
 
 -- Escape terminal mode
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })

@@ -53,11 +53,13 @@ vim.o.scrolloff = 10
 -- Hide command line when not in use
 vim.o.cmdheight = 0
 
--- Folding configuration
-vim.o.foldcolumn = "1"
+-- Fqolding configuration
+vim.o.foldenable = true
+vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.o.foldcolumn = "0"
+vim.o.foldnestmax = 4
 vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
-vim.o.foldenable = true
 vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
 
 -- List chars
