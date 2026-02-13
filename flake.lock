@@ -3,7 +3,7 @@
     "apple-fonts": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-unstable"
         ],
         "ny": "ny",
         "sf-arabic": "sf-arabic",
