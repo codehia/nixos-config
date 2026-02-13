@@ -2,24 +2,24 @@
   inputs =
     let
       vars = {
-        version = "1.11.2";
-        system = "x86_64-linux";
-        devenv_root = "/home/deus/nixos-config";
-        project_input_ref = "path:/home/deus/nixos-config";
-        devenv_dotfile = "/home/deus/nixos-config/.devenv";
-        devenv_dotfile_path = ./.devenv;
-        devenv_tmpdir = "/run/user/1000";
-        devenv_runtime = "/run/user/1000/devenv-843bc36";
-        devenv_istesting = false;
-        devenv_direnvrc_latest_version = 1;
-        container_name = null;
-        active_profiles = [
-        ];
-        hostname = "workstation";
-        username = "deus";
-        git_root = "/home/deus/nixos-config";
-        secretspec = null;
-      };
+  version = "1.11.2";
+  system = "x86_64-linux";
+  devenv_root = "/home/deus/nixos-config";
+  project_input_ref = "path:/home/deus/nixos-config";
+  devenv_dotfile = "/home/deus/nixos-config/.devenv";
+  devenv_dotfile_path = ./.devenv;
+  devenv_tmpdir = "/run/user/1000";
+  devenv_runtime = "/run/user/1000/devenv-843bc36";
+  devenv_istesting = false;
+  devenv_direnvrc_latest_version = 1;
+  container_name = null;
+  active_profiles = [
+  ];
+  hostname = "thinkpad";
+  username = "deus";
+  git_root = "/home/deus/nixos-config";
+  secretspec = null;
+};
     in
     {
       git-hooks.url = "github:cachix/git-hooks.nix";
@@ -39,24 +39,24 @@
     { nixpkgs, ... }@inputs:
     let
       vars = {
-        version = "1.11.2";
-        system = "x86_64-linux";
-        devenv_root = "/home/deus/nixos-config";
-        project_input_ref = "path:/home/deus/nixos-config";
-        devenv_dotfile = "/home/deus/nixos-config/.devenv";
-        devenv_dotfile_path = ./.devenv;
-        devenv_tmpdir = "/run/user/1000";
-        devenv_runtime = "/run/user/1000/devenv-843bc36";
-        devenv_istesting = false;
-        devenv_direnvrc_latest_version = 1;
-        container_name = null;
-        active_profiles = [
-        ];
-        hostname = "workstation";
-        username = "deus";
-        git_root = "/home/deus/nixos-config";
-        secretspec = null;
-      };
+  version = "1.11.2";
+  system = "x86_64-linux";
+  devenv_root = "/home/deus/nixos-config";
+  project_input_ref = "path:/home/deus/nixos-config";
+  devenv_dotfile = "/home/deus/nixos-config/.devenv";
+  devenv_dotfile_path = ./.devenv;
+  devenv_tmpdir = "/run/user/1000";
+  devenv_runtime = "/run/user/1000/devenv-843bc36";
+  devenv_istesting = false;
+  devenv_direnvrc_latest_version = 1;
+  container_name = null;
+  active_profiles = [
+  ];
+  hostname = "thinkpad";
+  username = "deus";
+  git_root = "/home/deus/nixos-config";
+  secretspec = null;
+};
       devenv =
         if builtins.pathExists (vars.devenv_dotfile_path + "/devenv.json") then
           builtins.fromJSON (builtins.readFile (vars.devenv_dotfile_path + "/devenv.json"))
