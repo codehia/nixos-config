@@ -228,6 +228,7 @@
       den.aspects.programs
       den.aspects.cursor
       den.aspects.disko
+      den.aspects.rclone
     ];
   };
 }
