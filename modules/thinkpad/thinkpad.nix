@@ -1,74 +1,18 @@
 # Host aspect for thinkpad — the main NixOS system configuration.
 # The `includes` list at the bottom composes all feature aspects into this host.
 # Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
-{den, ...}: {
+{den, ...}: let
+  username = "deus"; # Can stay here - no pkgs dependency
+in {
   den.aspects.thinkpad = {
     nixos = {pkgs, ...}: let
       tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
-      username = "deus";
       session = "/etc/profiles/per-user/${username}/bin/start-hyprland";
     in {
       imports = [
         ./_hardware-configuration.nix
         ./_disko-config.nix
       ];
-
-      nix = {
-        optimise = {
-          automatic = true;
-          dates = ["03:45"];
-        };
-        settings = {
-          experimental-features = [
-            "nix-command"
-            "flakes"
-          ];
-          auto-optimise-store = true;
-          trusted-users = [
-            "root"
-            username
-          ];
-        };
-        gc = {
-          automatic = true;
-          dates = "weekly";
-          options = "--delete-older-than 7d";
-        };
-      };
-
-      boot = {
-        loader = {
-          systemd-boot = {
-            enable = true;
-            consoleMode = "2";
-          };
-          efi.canTouchEfiVariables = true;
-        };
-        plymouth = {
-          enable = true;
-          theme = "connect";
-          themePackages = with pkgs; [
-            (adi1090x-plymouth-themes.override {
-              selected_themes = ["connect"];
-            })
-          ];
-        };
-        initrd = {
-          verbose = false;
-          systemd.enable = true;
-          kernelModules = ["amdgpu"];
-        };
-        kernelParams = [
-          "quiet"
-          "splash"
-          "boot.shell_on_fail"
-          "udev.log_level=3"
-          "udev.log_priority=3"
-          "rd.systemd.show_status=auto"
-        ];
-        kernelModules = ["uinput"];
-        consoleLogLevel = 0;
-      };
 
       networking = {
         hostName = "thinkpad";
@@ -168,7 +112,7 @@
               user = "${username}";
             };
             default_session = {
-              command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time -cmd ${session}";
+              command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd ${session}";
               user = "greeter";
             };
           };
@@ -210,6 +154,8 @@
     };
 
     includes = [
+      den.aspects.boot
+      (den.aspects.nix-config username)
       den.aspects.catppuccin
       den.aspects.stylix
       den.aspects.fonts
