@@ -7,7 +7,9 @@ in {
   den.aspects.thinkpad = {
     nixos = {pkgs, ...}: let
       tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
-      session = "/home/${username}/.nix-profile/bin/start-hyprland";
+      # hyprlandSession = "/home/${username}/.nix-profile/bin/start-hyprland";
+      # MangoWC as default (pkgs.mango available via overlay from mangowc aspect)
+      session = "${pkgs.mango}/bin/mango";
     in {
       imports = [
         ./_hardware-configuration.nix
@@ -165,6 +167,7 @@ in {
       den.aspects.tmux
       den.aspects.rofi
       den.aspects.hyprland
+      den.aspects.mangowc
       den.aspects.waybar
       den.aspects.git
       den.aspects.lazygit
