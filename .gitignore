@@ -3,7 +3,7 @@
 
 # Devenv
 .devenv*
-.devenv.flake.*
+.devenv.flake.nix
 devenv.local*
 
 # direnv
