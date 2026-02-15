@@ -7,7 +7,7 @@ in {
   den.aspects.thinkpad = {
     nixos = {pkgs, ...}: let
       tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
-      session = "/etc/profiles/per-user/${username}/bin/start-hyprland";
+      session = "/home/${username}/.nix-profile/bin/start-hyprland";
     in {
       imports = [
         ./_hardware-configuration.nix
