@@ -4,10 +4,7 @@
 # den._.user-shell "fish": Sets fish as the login shell and ensures it's available.
 {den, ...}: {
   den.aspects.deus = {
-    includes = [
-      den._.primary-user
-      (den._.user-shell "fish")
-    ];
+    includes = [den._.primary-user (den._.user-shell "fish")];
 
     nixos = {...}: {
       users.users.deus = {
