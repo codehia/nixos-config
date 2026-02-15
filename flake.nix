@@ -29,6 +29,10 @@
       url = "github:hyprwm/hyprland";
     };
     import-tree.url = "github:vic/import-tree";
+    mango = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:DreamMaoMao/mango";
+    };
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-lib.follows = "nixpkgs";
