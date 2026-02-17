@@ -9,7 +9,7 @@ in {
       tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
       # hyprlandSession = "/home/${username}/.nix-profile/bin/start-hyprland";
       # MangoWC as default (pkgs.mango available via overlay from mangowc aspect)
-      session = "${pkgs.mango}/bin/mango";
+      session = "/home/${username}/.nix-profile/bin/mango -s /home/${username}/.config/mango/autostart.sh";
     in {
       imports = [
         ./_hardware-configuration.nix
@@ -114,7 +114,7 @@ in {
               user = "${username}";
             };
             default_session = {
-              command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd ${session}";
+              command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd '${session}'";
               user = "greeter";
             };
           };
@@ -168,7 +168,7 @@ in {
       den.aspects.rofi
       den.aspects.hyprland
       den.aspects.mangowc
-      den.aspects.waybar
+      (den.aspects.noctalia username)
       den.aspects.git
       den.aspects.lazygit
       den.aspects.nvim
