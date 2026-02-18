@@ -10,9 +10,7 @@
   den.aspects.mangowc = {
     nixos = {...}: {
       imports = [inputs.mango.nixosModules.mango];
-      programs.mango = {
-        enable = true;
-      };
+      programs.mango = {enable = true;};
     };
 
     homeManager = {pkgs, ...}: {
