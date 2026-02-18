@@ -7,7 +7,7 @@
         # Application launchers
         bind=SUPER,p,spawn,rofi -show drun
         bind=SUPER,q,spawn,ghostty
-        bind=SUPER,w,spawn,zen
+        bind=SUPER,w,spawn,zen-beta
         bind=SUPER,t,spawn,thunar
 
         # Window management

@@ -4,12 +4,7 @@
       programs = {
         gh = {
           enable = true;
-          extensions = with pkgs; [
-            gh-dash
-            gh-poi
-            gh-f
-            act
-          ];
+          extensions = with pkgs; [gh-dash gh-poi gh-f act];
         };
         nix-index = {
           enable = true;

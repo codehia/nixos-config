@@ -8,10 +8,7 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  den.default.includes = [
-    den._.home-manager
-    den._.define-user
-  ];
+  den.default.includes = [den._.home-manager den._.define-user];
 
   den.default = {
     nixos.home-manager.backupFileExtension = "hm-backup";

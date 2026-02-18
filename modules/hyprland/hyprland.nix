@@ -30,7 +30,8 @@
       systemd.user.targets.hyprland-session.Unit.Wants = ["xdg-desktop-autostart.target"];
       wayland.windowManager.hyprland = {
         enable = true;
-        package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+        package =
+          inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
         portalPackage =
           inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
         systemd = {
@@ -54,10 +55,7 @@
             "XCURSOR_SIZE, 32"
           ];
           input = {
-            kb_options = [
-              "grp:alt_caps_toggle"
-              "caps:super"
-            ];
+            kb_options = ["grp:alt_caps_toggle" "caps:super"];
             numlock_by_default = false;
             repeat_delay = 300;
             follow_mouse = 0;
@@ -126,9 +124,7 @@
             no_warps = true;
           };
 
-          render = {
-            direct_scanout = 0;
-          };
+          render = {direct_scanout = 0;};
 
           master = {
             orientation = "center";
@@ -137,9 +133,7 @@
             slave_count_for_center_master = 2;
           };
 
-          monitor = [
-            ", preferred, auto, 1"
-          ];
+          monitor = [", preferred, auto, 1"];
 
           workspace = [
             "1, persistent:true,"
