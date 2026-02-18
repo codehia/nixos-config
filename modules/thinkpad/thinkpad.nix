@@ -11,11 +11,14 @@ in {
       # MangoWC as default (pkgs.mango available via overlay from mangowc aspect)
       session = "/home/${username}/.nix-profile/bin/mango -s /home/${username}/.config/mango/autostart.sh";
     in {
-      imports = [
-        ./_hardware-configuration.nix
-        ./_disko-config.nix
-      ];
+      imports = [./_hardware-configuration.nix ./_disko-config.nix];
 
+      zramSwap = {
+        enable = true;
+        priority = 100;
+        algorithm = "lz4";
+        memoryPercent = 50;
+      };
       networking = {
         hostName = "thinkpad";
         networkmanager.enable = true;
@@ -68,9 +71,7 @@ in {
       services = {
         tlp = {
           enable = true;
-          settings = {
-            CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-          };
+          settings = {CPU_SCALING_GOVERNOR_ON_BAT = "powersave";};
         };
         kanata = {
           enable = true;
@@ -85,10 +86,7 @@ in {
             };
           };
         };
-        dbus.packages = with pkgs; [
-          gnome-keyring
-          gcr
-        ];
+        dbus.packages = with pkgs; [gnome-keyring gcr];
         usbmuxd.enable = true;
         flatpak.enable = true;
         gvfs.enable = true;
@@ -125,9 +123,7 @@ in {
         };
         libinput = {
           enable = true;
-          touchpad = {
-            accelSpeed = "0.5";
-          };
+          touchpad = {accelSpeed = "0.5";};
         };
         udev.extraRules = ''
           KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
@@ -139,25 +135,19 @@ in {
         bluetooth = {
           enable = true;
           powerOnBoot = true;
-          settings = {
-            General = {
-              Experimental = true;
-            };
-          };
+          settings = {General = {Experimental = true;};};
         };
         graphics = {
           enable = true;
-          extraPackages = with pkgs; [
-            mesa
-            rocmPackages.clr.icd
-          ];
+          extraPackages = with pkgs; [mesa rocmPackages.clr.icd];
         };
       };
     };
 
     includes = [
-      den.aspects.boot
       (den.aspects.nix-config username)
+      (den.aspects.noctalia username)
+      den.aspects.boot
       den.aspects.catppuccin
       den.aspects.stylix
       den.aspects.fonts
@@ -166,9 +156,7 @@ in {
       den.aspects.kitty
       den.aspects.tmux
       den.aspects.rofi
-      den.aspects.hyprland
       den.aspects.mangowc
-      (den.aspects.noctalia username)
       den.aspects.git
       den.aspects.lazygit
       den.aspects.nvim

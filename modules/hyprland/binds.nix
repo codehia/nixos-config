@@ -7,7 +7,7 @@
         bind = [
           "$modifier, P, exec, rofi -show drun"
           "$modifier, Q, exec, ghostty"
-          "$modifier, W, exec, zen"
+          "$modifier, W, exec, zen-beta"
           "$modifier, T, exec, thunar"
 
           "$modifier, M,        layoutmsg, focusmaster"

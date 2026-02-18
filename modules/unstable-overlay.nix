@@ -11,9 +11,7 @@
     };
   };
 in {
-  den.base.conf = {
-    nixpkgs.overlays = [unstableOverlay];
-  };
+  den.base.conf = {nixpkgs.overlays = [unstableOverlay];};
 
   den.default = {
     nixos.nixpkgs.overlays = [unstableOverlay];

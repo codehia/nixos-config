@@ -22,10 +22,7 @@
         baseIndex = 1;
         newSession = true;
         tmuxp.enable = true;
-        plugins = with pkgs; [
-          dotbar
-          tmuxPlugins.sensible
-        ];
+        plugins = with pkgs; [dotbar tmuxPlugins.sensible];
         extraConfig = ''
           # split current window horizontally
           bind - split-window -v

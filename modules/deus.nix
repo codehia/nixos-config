@@ -16,9 +16,7 @@
     homeManager = {...}: {
       home = {
         homeDirectory = "/home/deus";
-        sessionVariables = {
-          BROWSER = "zen";
-        };
+        sessionVariables = {BROWSER = "zen";};
       };
     };
   };
