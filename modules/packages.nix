@@ -3,6 +3,7 @@
     homeManager = {pkgs, ...}: {
       home.packages =
         (with pkgs; [
+          inkscape
           cowsay
           fortune
           # archives
