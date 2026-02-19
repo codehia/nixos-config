@@ -7,32 +7,108 @@
   };
 
   den.aspects.noctalia = username: {
+    nixos = {...}: {
+      imports = [inputs.noctalia.nixosModules.default];
+      services.noctalia-shell = {
+        enable = true;
+        target = "mango-session.target";
+      };
+    };
+
     homeManager = {...}: {
       imports = [inputs.noctalia.homeModules.default];
-
       programs.noctalia-shell = {
         enable = true;
-        # settings = {
-        #   predefinedScheme = "Catppuccin";
-        # };
-      };
+        package = null; # package managed by NixOS module — avoid IPC conflicts
+        settings = {
+          # Weather & location
+          location = {
+            name = "Bangalore";
+            weatherEnabled = true;
+            useFahrenheit = false;
+            showCalendarWeather = true;
+          };
 
-      # systemd.user.services.noctalia-shell = {
-      #   Unit = {
-      #     Description = "Noctalia Shell";
-      #     PartOf = ["graphical-session.target"];
-      #     Requisite = ["graphical-session.target"];
-      #     After = ["graphical-session.target"];
-      #   };
-      #   Service = {
-      #     ExecStart = "/home/${username}/.nix-profile/bin/noctalia-shell";
-      #     Restart = "on-failure";
-      #     RestartSec = 1;
-      #   };
-      #   Install = {
-      #     WantedBy = ["mango-session.target"];
-      #   };
-      # };
+          # Night light — auto sunrise/sunset based on location
+          nightLight = {
+            enabled = true;
+            autoSchedule = true;
+            nightTemp = "3500";
+            dayTemp = "6500";
+          };
+
+          # Notifications — top right, default density & durations
+          notifications = {
+            enabled = true;
+            location = "top_right";
+          };
+
+          # Calendar — all cards enabled (header, month, weather)
+          calendar.cards = [
+            {
+              enabled = true;
+              id = "calendar-header-card";
+            }
+            {
+              enabled = true;
+              id = "calendar-month-card";
+            }
+            {
+              enabled = true;
+              id = "weather-card";
+            }
+          ];
+
+          # Wallpaper — local directory, 5min rotation, fade transition
+          wallpaper = {
+            enabled = true;
+            directory = "/home/${username}/Pictures/Wallpapers";
+            automationEnabled = true;
+            wallpaperChangeMode = "random";
+            randomIntervalSec = 300;
+            transitionType = "fade";
+            fillMode = "fit";
+          };
+
+          # Control Center — all cards enabled, brightness on
+          controlCenter.cards = [
+            {
+              enabled = true;
+              id = "profile-card";
+            }
+            {
+              enabled = true;
+              id = "shortcuts-card";
+            }
+            {
+              enabled = true;
+              id = "audio-card";
+            }
+            {
+              enabled = true;
+              id = "brightness-card";
+            }
+            {
+              enabled = true;
+              id = "weather-card";
+            }
+            {
+              enabled = true;
+              id = "media-sysmon-card";
+            }
+          ];
+
+          # Dock — auto-hide, attached to edge, colorized icons
+          dock = {
+            enabled = true;
+            displayMode = "auto_hide";
+            dockType = "attached";
+            colorizeIcons = true;
+            onlySameOutput = false;
+            pinnedApps = [];
+          };
+        };
+      };
     };
   };
 }
