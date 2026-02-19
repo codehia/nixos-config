@@ -59,6 +59,7 @@ in {
       ];
 
       programs = {
+        dconf.enable = true;
         appimage.enable = true;
         fish.enable = true;
         gnupg.agent = {
