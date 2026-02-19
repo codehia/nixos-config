@@ -21,11 +21,11 @@
       wayland.windowManager.mango = {
         enable = true;
 
+        # noctalia-shell &
+        # mullvad-gui &
         autostart_sh = ''
-          noctalia-shell &
           1password --silent &
           spotify --minimized &
-          mullvad-gui &
           enteauth &
         '';
       };
