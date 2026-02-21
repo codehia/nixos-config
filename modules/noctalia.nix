@@ -15,18 +15,65 @@
       };
     };
 
-    homeManager = {...}: {
+    homeManager = {
+      lib,
+      pkgs,
+      ...
+    }: {
       imports = [inputs.noctalia.homeModules.default];
+
+      # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
+      # rsync --checksum compares file contents (not timestamps) and only
+      # transfers files that actually differ. --delete removes extras.
+      home.activation.syncWallpapers = lib.hm.dag.entryAfter ["writeBoundary"] ''
+        wallpaperSrc="/home/${username}/nixos-config/assets/.wallpapers"
+        wallpaperDst="$HOME/Pictures/Wallpapers"
+
+        if [ -d "$wallpaperSrc" ] && [ -n "$(ls -A "$wallpaperSrc" 2>/dev/null)" ]; then
+          $DRY_RUN_CMD mkdir -p "$wallpaperDst"
+          $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete "$wallpaperSrc/" "$wallpaperDst/"
+        fi
+      '';
+
       programs.noctalia-shell = {
         enable = true;
         package = null; # package managed by NixOS module — avoid IPC conflicts
         settings = {
+          # Bar widgets — must be explicit when settings are declared
+          bar.widgets = {
+            left = [
+              {
+                icon = "snowflake";
+                id = "Launcher";
+              }
+              {
+                id = "Workspace";
+                hideUnoccupied = false;
+              }
+              {id = "ActiveWindow";}
+            ];
+            center = [
+              {id = "Clock";}
+            ];
+            right = [
+              {id = "Tray";}
+              {id = "NotificationHistory";}
+              {id = "Battery";}
+              {id = "Network";}
+              {id = "Bluetooth";}
+              {id = "Volume";}
+              {id = "Brightness";}
+              {id = "ControlCenter";}
+            ];
+          };
+
           # Weather & location
           location = {
             name = "Bangalore";
             weatherEnabled = true;
             useFahrenheit = false;
             showCalendarWeather = true;
+            use12hourFormat = true;
           };
 
           # Night light — auto sunrise/sunset based on location
