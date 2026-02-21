@@ -94,6 +94,7 @@ in {
         tailscale.enable = true;
         openssh.enable = true;
         gnome.gnome-keyring.enable = true;
+        upower.enable = true;
         fwupd.enable = true;
         mullvad-vpn = {
           enable = true;
