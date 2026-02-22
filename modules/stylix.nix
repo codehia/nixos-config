@@ -12,6 +12,7 @@
         base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
         polarity = "dark";
         targets = {
+          zen-browser.profileNames = ["Default Profile"];
           waybar.enable = false;
           tmux.enable = false;
           hyprland.enable = false;
