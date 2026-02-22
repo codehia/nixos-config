@@ -66,7 +66,6 @@ in {
           enable = true;
           enableSSHSupport = true;
         };
-        # hyprland enable + UWSM is handled by the hyprland aspect
       };
 
       services = {
@@ -158,7 +157,9 @@ in {
       den.aspects.kitty
       den.aspects.tmux
       den.aspects.rofi
-      den.aspects.mangowc
+      # den.aspects.mangowc
+      den.aspects.swayfx
+      (den.aspects.dms username)
       den.aspects.git
       den.aspects.lazygit
       den.aspects.nvim
