@@ -120,7 +120,7 @@ in {
               wrapRc = true;
               aliases = ["vim" "nvim" "homeVim"];
               neovim-unwrapped =
-                inputs.nixpkgs-unstable.legacyPackages.${pkgs.system}.neovim-unwrapped;
+                inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.neovim-unwrapped;
               hosts.python3.enable = true;
               hosts.node.enable = true;
             };
