@@ -10,9 +10,17 @@
       url = "github:catppuccin/nix/release-25.11";
     };
     den.url = "github:vic/den";
+    dgop = {
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      url = "github:AvengeMedia/dgop";
+    };
     disko = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/disko";
+    };
+    dms = {
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      url = "github:AvengeMedia/DankMaterialShell/stable";
     };
     flake-aspects.url = "github:vic/flake-aspects";
     flake-file.url = "github:vic/flake-file";
@@ -33,6 +41,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:DreamMaoMao/mango";
     };
+    nfsm.url = "github:gvolpe/nfsm";
+    niri-flake = {
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      url = "github:sodiboo/niri-flake";
+    };
+    niri-scratchpad.url = "github:gvolpe/niri-scratchpad";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-lib.follows = "nixpkgs";
@@ -48,6 +62,10 @@
     stylix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/stylix/release-25.11";
+    };
+    sway-scratch = {
+      flake = false;
+      url = "github:aokellermann/sway-scratch";
     };
     systems.url = "github:nix-systems/default";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
