@@ -53,12 +53,19 @@
               {id = "ActiveWindow";}
             ];
             center = [
-              {id = "Clock";}
+              {
+                id = "Clock";
+                formatHorizontal = "h:mm AP | ddd - MMM dd";
+                tooltipFormat = "h:mm AP | ddd - MMM dd";
+              }
             ];
             right = [
               {id = "Tray";}
               {id = "NotificationHistory";}
-              {id = "Battery";}
+              {
+                id = "Battery";
+                displayMode = "icon-hover";
+              }
               {id = "Network";}
               {id = "Bluetooth";}
               {id = "Volume";}
