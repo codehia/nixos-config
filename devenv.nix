@@ -1,10 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  inputs,
-  ...
-}:
+{ pkgs, ... }:
 
 {
   languages = {
@@ -15,7 +9,9 @@
     git
     nixfmt
     stylua
+    prek
   ];
+
   git-hooks.hooks = {
     # Enable standard shell checks
     shellcheck.enable = true;

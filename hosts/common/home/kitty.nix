@@ -4,7 +4,7 @@
     enable = true;
     enableGitIntegration = true;
     font = {
-      name = "JetBrainsMono Nerd Font Mono";
+      name = "Iosevka";
       size = 14;
     };
     shellIntegration = {
