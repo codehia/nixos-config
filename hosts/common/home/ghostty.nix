@@ -6,7 +6,7 @@
     enableFishIntegration = true;
     installBatSyntax = true;
     settings = {
-      font-family = "JetBrainsMono Nerd Font";
+      font-family = "Iosevka";
       font-size = 16;
       cursor-style = "block";
       cursor-style-blink = true;
