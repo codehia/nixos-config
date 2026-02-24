@@ -231,13 +231,13 @@
         calibre
         unrar
         google-chrome
+        gearlever
       ])
       ++ (with pkgs-unstable; [
         ghostty
         devenv
         obsidian
         vscode
-        gearlever
         claude-code
       ]);
     stateVersion = "25.05";

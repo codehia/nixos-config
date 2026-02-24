@@ -95,6 +95,7 @@
         material-icons
         nerd-fonts.symbols-only
         powerline-fonts
+        iosevka
       ])
       ++ (with inputs.apple-fonts.packages.${pkgs.system}; [
         # Apple fonts for macOS-like experience
