@@ -239,8 +239,6 @@
         obsidian
         vscode
         claude-code
-        gearlever
-        gearlever
         trayscale
         nicotine-plus
       ]);
