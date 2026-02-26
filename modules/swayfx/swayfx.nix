@@ -18,52 +18,43 @@
     };
 
     homeManager = {pkgs, ...}: {
-      home.packages = with pkgs; [
-        wl-clipboard
-        grim
-        slurp
-        swappy
-        swayr
-        autotiling-rs
-      ];
-
-      home.sessionVariables.NIXOS_OZONE_WL = "1";
+      home = {
+        packages = with pkgs; [wl-clipboard grim slurp swappy swayr autotiling-rs];
+        sessionVariables.NIXOS_OZONE_WL = "1";
+      };
 
       wayland.windowManager.sway = {
         enable = true;
         package = pkgs.swayfx;
         checkConfig = false;
+        xwayland = true;
+        wrapperFeatures.gtk = true;
         systemd = {
           enable = true;
           xdgAutostart = true;
           variables = ["--all"];
         };
-        xwayland = true;
-        wrapperFeatures.gtk = true;
 
         config = {
           modifier = "Mod4";
+          floating.modifier = "Mod4";
           terminal = "ghostty";
           menu = "rofi -show drun";
           defaultWorkspace = "workspace number 1";
 
-          output."*" = {
-            scale = "1";
-          };
+          startup = [
+            {command = "exec autotiling-rs";}
+            {command = "1password --silent";}
+            {command = "spotify --minimized";}
+            {command = "enteauth";}
+          ];
+
+          output."*" = {scale = "1";};
 
           gaps = {
             inner = 7;
             outer = 0;
           };
-
-          floating.modifier = "Mod4";
-
-          startup = [
-            {command = "autotiling-rs";}
-            {command = "1password --silent";}
-            {command = "spotify --minimized";}
-            {command = "enteauth";}
-          ];
 
           bars = [];
 
