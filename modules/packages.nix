@@ -103,14 +103,15 @@
 
           calibre
           unrar
-          google-chrome
+
+          kdePackages.okular
+          gearlever
         ])
         ++ (with pkgs.unstable; [
           ghostty
           devenv
           obsidian
           vscode
-          gearlever
           claude-code
         ]);
     };
