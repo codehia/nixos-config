@@ -9,7 +9,8 @@ in {
       tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
       # hyprlandSession = "/home/${username}/.nix-profile/bin/start-hyprland";
       # MangoWC as default (pkgs.mango available via overlay from mangowc aspect)
-      session = "/home/${username}/.nix-profile/bin/mango -s /home/${username}/.config/mango/autostart.sh";
+      # session = "/home/${username}/.nix-profile/bin/mango -s /home/${username}/.config/mango/autostart.sh";
+      session = "/home/${username}/.nix-profile/bin/sway";
     in {
       imports = [./_hardware-configuration.nix ./_disko-config.nix];
 
@@ -157,7 +158,6 @@ in {
       den.aspects.kitty
       den.aspects.tmux
       den.aspects.rofi
-      # den.aspects.mangowc
       den.aspects.swayfx
       (den.aspects.dms username)
       den.aspects.git
