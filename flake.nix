@@ -44,6 +44,10 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    pam-fde-boot-pw = {
+      url = "git+https://git.sr.ht/~kennylevinsen/pam_fde_boot_pw";
+      flake = false;
+    };
   };
 
   # flake-parts
