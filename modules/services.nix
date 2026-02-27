@@ -3,7 +3,7 @@
     homeManager = {...}: {
       services = {
         gnome-keyring.enable = true;
-        dunst.enable = true;
+        dunst.enable = false;
         hyprsunset = {
           enable = true;
           settings = {

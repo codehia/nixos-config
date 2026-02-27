@@ -21,10 +21,9 @@
         in
           lib.mkOptionDefault {
             # ── App launchers ──
-            "${mod}+p" = "exec rofi -show drun";
+            "${mod}+space" = "exec dms ipc launcher toggle";
             "${mod}+q" = "exec ghostty";
             "${mod}+w" = "exec zen-beta";
-            "${mod}+t" = "exec thunar";
 
             # ── Window management ──
             "${mod}+c" = "kill";
@@ -77,17 +76,33 @@
             "${mod}+Ctrl+4" = "move container to workspace number 4";
             "${mod}+Ctrl+5" = "move container to workspace number 5";
 
-            # ── Native scratchpad (minimize/restore) ──
-            "${mod}+n" = "scratchpad show";
-            "${mod}+Shift+n" = "move scratchpad";
+            # ── Scratchpad: Mod+N minimizes or restores; Mod+Shift+N shows overlay ──
+            "${mod}+n" = "exec scratch-smart";
+            "${mod}+Shift+n" = "exec scratch-toggle";
 
             # ── Per-app scratchpads (sway-scratch) ──
             "${mod}+grave" = ''exec sway-scratch show --app-id kitty-dropterm --exec "kitty --class kitty-dropterm" --resize "set 70 ppt 70 ppt"'';
-            "${mod}+Shift+o" = ''exec sway-scratch show --app-id 1password --exec "1password --silent"'';
-            "${mod}+Shift+m" = ''exec sway-scratch show --app-id spotify --exec spotify'';
-            "${mod}+Shift+s" = ''exec sway-scratch show --class Slack --exec slack'';
-            "${mod}+Shift+e" = ''exec sway-scratch show --app-id "Ente Auth" --exec enteauth'';
-            "${mod}+Shift+t" = ''exec sway-scratch show --app-id thunar --exec thunar --resize "set 70 ppt 70 ppt"'';
+            "${mod}+Shift+o" = ''exec sway-scratch show --app-id 1password --exec "1password --silent" --resize "set 70 ppt 70 ppt"'';
+            "${mod}+Shift+m" = ''exec sway-scratch show --class Spotify --exec spotify --resize "set 70 ppt 70 ppt"'';
+            "${mod}+Shift+s" = ''exec sway-scratch show --class Slack --exec slack --resize "set 70 ppt 70 ppt"'';
+            "${mod}+e" = ''exec sway-scratch show --app-id io.ente.auth --exec enteauth --resize "set 70 ppt 70 ppt"'';
+            "${mod}+t" = ''exec sway-scratch show --app-id thunar --exec thunar --resize "set 70 ppt 70 ppt"'';
+
+            # ── Media / brightness ──
+            "F1" = "exec dms ipc audio mute";
+            "F2" = "exec dms ipc audio decrement 5";
+            "F3" = "exec dms ipc audio increment 5";
+            "F4" = "exec dms ipc audio micmute";
+            "F5" = "exec dms ipc brightness decrement 10 backlight:amdgpu_bl1";
+            "F6" = "exec dms ipc brightness increment 10 backlight:amdgpu_bl1";
+
+            # ── DMS toggles ──
+            "${mod}+Shift+p" = "exec dms ipc powermenu toggle";
+            "${mod}+Shift+d" = "exec dms ipc notifications toggleDoNotDisturb";
+            "${mod}+Shift+i" = "exec dms ipc notepad toggle";
+            "${mod}+Shift+v" = "exec dms ipc clipboard toggle";
+            "${mod}+Shift+b" = "exec dms ipc notifications toggle";
+            "${mod}+Shift+g" = "exec dms ipc control-center toggle";
 
             # ── Alt-Tab ──
             "Mod1+Tab" = "focus next";

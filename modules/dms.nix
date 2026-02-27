@@ -33,6 +33,8 @@
     }: {
       imports = [inputs.dms.homeModules.dank-material-shell];
 
+      home.file.".config/DankMaterialShell/settings.json".source = ./dms-settings.json;
+
       # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
       home.activation.syncWallpapers = lib.hm.dag.entryAfter ["writeBoundary"] ''
         wallpaperSrc="/home/${username}/nixos-config/assets/.wallpapers"
@@ -56,6 +58,13 @@
           enable = true;
           restartIfChanged = true;
         };
+      };
+
+      # qt5ct/qt6ct config requests kvantum as the Qt style, but kvantum fails
+      # to load due to a qtsvg version mismatch, causing quickshell to deadlock.
+      # Bypass qt5ct entirely for DMS — it uses its own QML theme anyway.
+      systemd.user.services.dms = {
+        Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
       };
     };
   };
