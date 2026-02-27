@@ -1166,6 +1166,22 @@
         "url": "https://devimages-cdn.apple.com/design/resources/download/NY.dmg"
       }
     },
+    "pam-fde-boot-pw": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1739527044,
+        "narHash": "sha256-dS9ufryg3xfxgUzJKDgrvMZP2qaYH+WJQFw1ogl1isc=",
+        "ref": "refs/heads/master",
+        "rev": "49bf498fd8d13f73e4a24221818a8a5d2af20088",
+        "revCount": 2,
+        "type": "git",
+        "url": "https://git.sr.ht/~kennylevinsen/pam_fde_boot_pw"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.sr.ht/~kennylevinsen/pam_fde_boot_pw"
+      }
+    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -1236,6 +1252,7 @@
         ],
         "nixpkgs-unstable": "nixpkgs-unstable",
         "noctalia": "noctalia",
+        "pam-fde-boot-pw": "pam-fde-boot-pw",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
         "sway-scratch": "sway-scratch",

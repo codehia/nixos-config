@@ -36,14 +36,7 @@ in {
         extraLocales = ["all"];
       };
 
-      security = {
-        sudo.wheelNeedsPassword = false;
-        pam.services = {
-          greetd.enableGnomeKeyring = true;
-          greetd-password.enableGnomeKeyring = true;
-          login.enableGnomeKeyring = true;
-        };
-      };
+      security.sudo.wheelNeedsPassword = false;
 
       environment.systemPackages = with pkgs; [
         vim
@@ -87,13 +80,11 @@ in {
             };
           };
         };
-        dbus.packages = with pkgs; [gnome-keyring gcr];
         usbmuxd.enable = true;
         flatpak.enable = true;
         gvfs.enable = true;
         tailscale.enable = true;
         openssh.enable = true;
-        gnome.gnome-keyring.enable = true;
         upower.enable = true;
         fwupd.enable = true;
         mullvad-vpn = {
@@ -178,6 +169,7 @@ in {
       den.aspects.cursor
       den.aspects.disko
       den.aspects.rclone
+      den.aspects.gnome-keyring
     ];
   };
 }
