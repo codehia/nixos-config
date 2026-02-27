@@ -25,7 +25,7 @@
       mirror-push = {
         enable = true;
         name = "Post Commit push to mirror repo";
-        entry = "bash -c '(git push git@github.com:codehia/nixos-config.git -f --mirror > /dev/null 2>&1 &)'";
+        entry = "./.githooks/post-commit";
         stages = [ "post-commit" ];
         pass_filenames = false;
       };
