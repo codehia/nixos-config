@@ -28,6 +28,7 @@
         entry = "./.githooks/post-commit";
         stages = [ "post-commit" ];
         pass_filenames = false;
+        always_run = true;
       };
       prepend-hostname = {
         enable = true;
