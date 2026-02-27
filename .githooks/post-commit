@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo "Commit successful. Pushing mirror to GitHub in the background..."
+
+# Run the push in the background and discard output so it doesn't interrupt your workflow
+git push git@github.com:codehia/nixos-config.git -f --mirror > /dev/null 2>&1
