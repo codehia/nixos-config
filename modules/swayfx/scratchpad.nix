@@ -51,6 +51,25 @@
         {app_id = "io.ente.auth";}
         {app_id = "thunar";}
       ];
+
+      # Auto-scratchpad apps that are pre-launched at startup so they start hidden.
+      # sway-scratch can then find them in the scratchpad and show/hide on demand.
+      # Only applies to startup apps — on-demand apps (kitty-dropterm, thunar, slack)
+      # are NOT listed here so their first sway-scratch invocation shows them directly.
+      wayland.windowManager.sway.config.window.commands = [
+        {
+          criteria.app_id = "1password";
+          command = "move scratchpad";
+        }
+        {
+          criteria.class = "Spotify";
+          command = "move scratchpad";
+        }
+        {
+          criteria.app_id = "io.ente.auth";
+          command = "move scratchpad";
+        }
+      ];
     };
   };
 }

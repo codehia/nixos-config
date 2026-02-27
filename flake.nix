@@ -55,6 +55,10 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
       url = "github:noctalia-dev/noctalia-shell";
     };
+    pam-fde-boot-pw = {
+      flake = false;
+      url = "git+https://git.sr.ht/~kennylevinsen/pam_fde_boot_pw";
+    };
     sops-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:Mic92/sops-nix";
