@@ -2,9 +2,12 @@
 
 Multi-machine NixOS flake configuration using the **dendritic pattern** — a feature-centric alternative to traditional host-centric NixOS configs. Currently manages:
 
-- **Host**: ThinkPad (x86\_64-linux)
+| Host | Arch | Desktop | Description |
+|---|---|---|---|
+| `thinkpad` | x86\_64-linux | SwayFX + DMS | ThinkPad laptop |
+| `personal` | x86\_64-linux | SwayFX + DMS | Personal desktop |
+
 - **User**: deus (Soumya)
-- **Desktop**: Hyprland (Wayland compositor)
 - **Theme**: Catppuccin Mocha (system-wide via catppuccin + stylix)
 - **Editor**: Neovim (via nixCats)
 
@@ -14,7 +17,7 @@ All commands are run via [just](https://github.com/casey/just):
 
 | Command | Description |
 |---|---|
-| `just deploy` | Apply config: `nixos-rebuild switch --flake . --use-remote-sudo` |
+| `just install` | Apply config: `nixos-rebuild switch --flake . --use-remote-sudo` |
 | `just debug` | Apply with `--show-trace --verbose` |
 | `just up` | Update all flake inputs |
 | `just upp i=<name>` | Update a single flake input (e.g. `just upp i=home-manager`) |
@@ -22,6 +25,70 @@ All commands are run via [just](https://github.com/casey/just):
 | `just clean` | Wipe generations older than 7 days |
 | `just gc` | Garbage collect unused Nix store entries |
 | `just write-flake` | Regenerate `flake.nix` from `flake-file` declarations |
+
+## Installation
+
+Fresh installs use [`disko-install`](https://github.com/nix-community/disko) which handles partitioning and NixOS installation in a single step.
+
+### 1. Boot the NixOS installer ISO
+
+Boot the target machine from a [NixOS installer ISO](https://nixos.org/download). An internet connection is required.
+
+### 2. Run the install script
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/codehia/nixos-config/master/install.sh)
+```
+
+Or download first:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/codehia/nixos-config/master/install.sh -o install.sh
+bash install.sh
+```
+
+The script will:
+1. Ask which host to install (`thinkpad` or `personal`)
+2. Show available block devices and ask for disk device path(s)
+3. Print a summary and ask for confirmation before touching anything
+4. Run `disko-install` — partitions disks and installs NixOS from the flake
+
+**Disk layout by host:**
+
+| Host | Disk | Layout |
+|---|---|---|
+| `thinkpad` | `main` (1 disk) | ESP + LUKS → Btrfs (`/`, `/home`, `/nix`, `/var/log`) |
+| `personal` | `main` (fast) | ESP + LUKS → Btrfs (`/`, `/home`, `/nix`, `/var/log`) |
+| `personal` | `slow` (archive) | LUKS → Btrfs (`/var/lib/btrbk`) |
+
+Both hosts use `zramSwap` instead of a disk swap partition.
+
+### 3. Set up secrets (sops-nix)
+
+Secrets are encrypted with [sops-nix](https://github.com/Mic92/sops-nix) using an age key tied to each machine. Before rebooting:
+
+```bash
+# Generate a new age key for this machine
+mkdir -p /mnt/home/deus/.config/sops/age
+age-keygen -o /mnt/home/deus/.config/sops/age/keys.txt
+
+# Print the public key — you'll need it for the next step
+cat /mnt/home/deus/.config/sops/age/keys.txt
+```
+
+Then, from the repo on another machine, add the new public key to `.sops.yaml` and re-encrypt any secrets that should be accessible on the new host:
+
+```bash
+# In the repo
+sops updatekeys secrets/common.yaml
+sops updatekeys secrets/<hostname>.yaml
+```
+
+### 4. Reboot
+
+```bash
+reboot
+```
 
 ## Architecture
 
@@ -214,8 +281,8 @@ The host aspect pulls in features by listing them in `includes`:
    }
    ```
 2. If it needs a flake input, add `flake-file.inputs.<input-name> = { ... };` and run `just write-flake`.
-3. Add `den.aspects.<name>` to the `includes` list in `modules/thinkpad/thinkpad.nix`.
-4. Apply: `just deploy`.
+3. Add `den.aspects.<name>` to the `includes` list in the relevant host aspect (`modules/thinkpad/thinkpad.nix`, `modules/personal/personal.nix`, or both).
+4. Apply: `just install`.
 
 ## Adding a New Host
 
@@ -225,7 +292,7 @@ The host aspect pulls in features by listing them in `includes`:
    ```
 2. Create `modules/<hostname>/<hostname>.nix` with a `den.aspects.<hostname>` containing the hardware config and `includes` list.
 3. Prefix hardware-specific files with `_` so import-tree ignores them (import them explicitly in the host aspect).
-4. Apply: `just deploy`.
+4. Apply: `just install`.
 
 ## Key Conventions
 
