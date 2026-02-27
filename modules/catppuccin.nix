@@ -16,13 +16,14 @@
       catppuccin = {
         flavor = "mocha";
         enable = true;
-        fish.enable = true;
-        fzf.enable = true;
-        kitty.enable = true;
-        ghostty.enable = true;
-        nvim.enable = true;
-        hyprland.enable = true;
-        lazygit.enable = true;
+        fish.enable = true; # no stylix fish target
+        nvim.enable = true; # nixCats — stylix nvf/nixvim targets don't apply
+        # disabled — stylix handles these
+        fzf.enable = false;
+        kitty.enable = false;
+        ghostty.enable = false;
+        hyprland.enable = false;
+        lazygit.enable = false;
         rofi.enable = false;
         tmux.enable = false;
       };

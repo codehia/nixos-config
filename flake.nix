@@ -67,7 +67,6 @@
       flake = false;
       url = "github:aokellermann/sway-scratch";
     };
-    systems.url = "github:nix-systems/default";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
   };
 }

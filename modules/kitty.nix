@@ -1,11 +1,11 @@
 {...}: {
   den.aspects.kitty = {
-    homeManager = {lib, ...}: {
+    homeManager = {...}: {
       programs.kitty = {
         enable = true;
         enableGitIntegration = true;
         font = {
-          name = "JetBrainsMono Nerd Font Mono";
+          name = "Iosevka Nerd Font Mono";
           size = 14;
         };
         shellIntegration = {
@@ -20,7 +20,6 @@
           cursor_stop_blinking_after 15.0
           window_padding_width 4
         '';
-        themeFile = lib.mkForce "Catppuccin-Macchiato";
       };
     };
   };

@@ -80,12 +80,14 @@
           '';
         };
         packages = with pkgs; [
+          noto-fonts
           noto-fonts-color-emoji
           noto-fonts-monochrome-emoji
           noto-fonts-cjk-sans
           noto-fonts-cjk-serif
           jetbrains-mono
           nerd-fonts.jetbrains-mono
+          nerd-fonts.iosevka
           font-awesome
           material-icons
           nerd-fonts.symbols-only
