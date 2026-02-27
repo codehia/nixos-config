@@ -7,12 +7,11 @@
         enableFishIntegration = true;
         installBatSyntax = true;
         settings = {
-          font-family = "JetBrainsMono Nerd Font";
+          font-family = "Iosevka Nerd Font Mono";
           font-size = 13;
           cursor-style = "block";
           cursor-style-blink = true;
           shell-integration-features = "no-cursor";
-          theme = "catppuccin-mocha";
           window-padding-balance = true;
           window-decoration = false;
           keybind = "ctrl+enter=unbind";

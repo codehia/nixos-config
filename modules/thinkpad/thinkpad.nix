@@ -148,7 +148,6 @@ in {
 
     includes = [
       (den.aspects.nix-config username)
-      (den.aspects.noctalia username)
       den.aspects.boot
       den.aspects.catppuccin
       den.aspects.stylix
@@ -157,7 +156,6 @@ in {
       den.aspects.ghostty
       den.aspects.kitty
       den.aspects.tmux
-      den.aspects.rofi
       den.aspects.swayfx
       (den.aspects.dms username)
       den.aspects.git
@@ -168,7 +166,15 @@ in {
       den.aspects.secrets
       den.aspects.packages
       den.aspects.services
-      den.aspects.programs
+      den.aspects.shell-tools
+      den.aspects.tui
+      den.aspects.cli-utils
+      den.aspects.dev-tools
+      den.aspects.productivity
+      den.aspects.media
+      den.aspects.creative
+      den.aspects.chat
+      den.aspects.zoom
       den.aspects.cursor
       den.aspects.disko
       den.aspects.rclone
