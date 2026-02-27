@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Git passes the path to the commit message file as the first argument ($1)
+COMMIT_MSG_FILE=$1
+
+# Get the current hostname and convert it to uppercase
+HOST_CAPS=$(hostname | tr '[:lower:]' '[:upper:]')
+
+# Read just the first line of the commit message to check it
+FIRST_LINE=$(head -n 1 "$COMMIT_MSG_FILE")
+
+# Check if the first line already starts with "HOSTNAME: "
+if [[ "$FIRST_LINE" != "$HOST_CAPS: "* ]]; then
+  
+  # Use GNU sed to insert the hostname at the beginning of the first line (1s/^/...)
+  sed -i "1s/^/$HOST_CAPS: /" "$COMMIT_MSG_FILE"
+  
+fi
