@@ -232,6 +232,7 @@
         unrar
         google-chrome
         gearlever
+        zathura
       ])
       ++ (with pkgs-unstable; [
         ghostty

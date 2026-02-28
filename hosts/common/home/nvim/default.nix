@@ -100,6 +100,9 @@ in
               # Linting
               eslint_d
             ];
+            latex = with pkgs; [
+              texlab
+            ];
           };
 
           # This is for plugins that will load at startup without using packadd:
@@ -117,6 +120,7 @@ in
           optionalPlugins = {
             go = with pkgs.vimPlugins; [ nvim-dap-go ];
             lua = with pkgs.vimPlugins; [ lazydev-nvim ];
+            latex = with pkgs.vimPlugins; [ vimtex ];
             general = with pkgs.vimPlugins; [
               # Core functionality
               mini-nvim
@@ -237,6 +241,7 @@ in
               python = true;
               typescript = true;
               go = false;
+              latex = true;
             };
             # anything else to pass and grab in lua with `nixCats.extra`
             extra = {

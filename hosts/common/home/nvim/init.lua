@@ -910,6 +910,19 @@ require("lze").load({
 		end,
 	},
 	{
+		"vimtex",
+		enabled = nixCats("latex") or false,
+		ft = { "tex", "plaintex", "bib" },
+		before = function()
+			vim.g.vimtex_view_method = "zathura"
+			vim.g.vimtex_compiler_method = "latexmk"
+			-- Let treesitter handle syntax
+			vim.g.vimtex_syntax_enabled = 0
+			-- Disable insert mode mappings to avoid conflicts with snippets
+			vim.g.vimtex_imaps_enabled = 0
+		end,
+	},
+	{
 		"oil-nvim",
 		enabled = nixCats("general") or false,
 		keys = {
@@ -1189,6 +1202,32 @@ require("lze").load({
 		enabled = nixCats("typescript") or false,
 		lsp = {
 			filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+		},
+	},
+	{
+		"texlab",
+		enabled = nixCats("latex") or false,
+		lsp = {
+			filetypes = { "tex", "plaintex", "bib" },
+			settings = {
+				texlab = {
+					build = {
+						executable = "latexmk",
+						args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
+						onSave = true,
+						forwardSearchAfter = false,
+					},
+					forwardSearch = {
+						executable = "zathura",
+						args = { "--synctex-forward", "%l:1:%f", "%p" },
+					},
+					chktex = {
+						onOpenAndSave = true,
+						onEdit = false,
+					},
+					diagnosticsDelay = 300,
+				},
+			},
 		},
 	},
 })
