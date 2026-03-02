@@ -1,12 +1,13 @@
 keys:
   - &thinkpad age1e7x9jlcpmmhd03xm2amstt90kwjphwklu3wa028v20tauz6r4aeqfdw8gp
+  - &rclone age1kg0cjadgrycgx3s0qufp9c0xlhmc3ectsvmtt5k79lwsyh3x7q9qj3m3tp
 
 creation_rules:
   - path_regex: secrets/thinkpad\.yaml$
     key_groups:
       - age:
           - *thinkpad
-  - path_regex: secrets/common\.yaml$
+  - path_regex: secrets/rclone\.yaml$
     key_groups:
       - age:
-          - *thinkpad
+          - *rclone
