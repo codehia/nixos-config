@@ -9,7 +9,7 @@ Multi-machine NixOS flake configuration using the **dendritic pattern** — a fe
 
 - **User**: deus (Soumya)
 - **Theme**: Catppuccin Mocha (system-wide via catppuccin + stylix)
-- **Editor**: Neovim (via nixCats)
+- **Editor**: Neovim (via nix-wrapper-modules)
 
 ## Commands
 
@@ -146,9 +146,13 @@ modules/
 │   └── waybar.css          # Bar styles
 │
 ├── nvim/
-│   ├── nvim.nix            # Neovim aspect via nixCats (plugins in Nix)
-│   ├── init.lua            # Neovim entry point
-│   └── lua/                # Runtime Lua config (keymaps, plugins, LSP)
+│   ├── nvim.nix            # Neovim aspect via nix-wrapper-modules
+│   ├── _lsps.nix           # extraPackages: LSP servers, formatters, tools (excluded from import-tree)
+│   ├── _plugins.nix        # specs: vim plugins with lazy/start flags (excluded from import-tree)
+│   ├── _nvim_nixcats.nix   # Backup of old nixCats config (excluded from import-tree)
+│   ├── init.lua            # All runtime Lua config (single entry point)
+│   ├── README.md           # Nvim setup docs: plugins, LSPs, how to add/remove/edit
+│   └── lua/                # NOT loaded — legacy subdirectory
 │
 ├── catppuccin.nix          # Catppuccin Mocha theme (system-wide)
 ├── stylix.nix              # Stylix base16 theming
@@ -305,7 +309,16 @@ The host aspect pulls in features by listing them in `includes`:
 
 ## Neovim
 
-Uses [nixCats](https://github.com/BirdeeHub/nixCats-nvim) — plugins and LSP servers are managed in Nix (`modules/nvim/nvim.nix`) while runtime config is standard Lua (`modules/nvim/lua/`). The built package is aliased to both `vim` and `nvim`.
+Uses [nix-wrapper-modules](https://github.com/BirdeeHub/nix-wrapper-modules) — plugins and LSP tools are declared in Nix, runtime config is standard Lua in a single `init.lua`. The built package binary is `nvim`, aliased to `vim`.
+
+| File | Purpose |
+|---|---|
+| `modules/nvim/nvim.nix` | Aspect definition — `evalPackage`, categories, aliases |
+| `modules/nvim/_plugins.nix` | vim plugin specs (`data`, `lazy`, `pluginDeps`) |
+| `modules/nvim/_lsps.nix` | `extraPackages`: LSP servers, formatters, linters |
+| `modules/nvim/init.lua` | All runtime config — options, keymaps, plugin setup |
+
+See [`modules/nvim/README.md`](modules/nvim/README.md) for full docs: adding/removing plugins, LSP tools, categories, and the nix→Lua data API.
 
 ## Dev Environment
 

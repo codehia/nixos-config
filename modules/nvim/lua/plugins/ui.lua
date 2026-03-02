@@ -3,7 +3,9 @@
 -- =============================================================================
 
 return {
-	-- Colorscheme
+	-- ---------------------------------------------------------------------------
+	-- Catppuccin — colorscheme (loaded immediately)
+	-- ---------------------------------------------------------------------------
 	{
 		"catppuccin-nvim",
 		lazy = false,
@@ -12,10 +14,17 @@ return {
 			require("catppuccin").setup({
 				flavour = "mocha",
 				transparent_background = false,
+				show_end_of_buffer = false,
+				term_colors = false,
+				dim_inactive = { enabled = false },
+				styles = {
+					comments = { "italic" },
+					conditionals = { "italic" },
+				},
 				integrations = {
 					blink_cmp = true,
 					gitsigns = true,
-					mini = true,
+					mini = { enabled = true },
 					treesitter = true,
 					which_key = true,
 					native_lsp = {
@@ -32,44 +41,30 @@ return {
 							warnings = { "underline" },
 							information = { "underline" },
 						},
-						inlay_hints = {
-							background = true,
-						},
+						inlay_hints = { background = true },
 					},
+					telescope = { enabled = true },
+					lsp_trouble = true,
+					indent_blankline = { enabled = true },
+					navic = { enabled = true },
+					noice = true,
 				},
 			})
 			vim.cmd.colorscheme("catppuccin")
 		end,
 	},
 
-	-- Better UI for vim.ui.select and vim.ui.input
+	-- ---------------------------------------------------------------------------
+	-- Mini — starter, statusline, pairs, icons, ai, surround
+	-- ---------------------------------------------------------------------------
 	{
-		"dressing-nvim",
-		event = "VeryLazy",
+		"mini.nvim",
+		lazy = false,
 		after = function()
-			require("dressing").setup()
-		end,
-	},
-
-	-- Indent guides
-	{
-		"indent-blankline-nvim",
-		event = "BufReadPost",
-		after = function()
-			require("ibl").setup()
-		end,
-	},
-
-	-- Status line and more
-	{
-		"mini-nvim",
-		before = function()
 			-- Mini.starter for start screen
 			local starter = require("mini.starter")
-
-			-- Custom header function
 			local function get_header()
-				local handle = io.popen("fortune | cowsay")
+				local handle = io.popen("fortune -s | cowsay")
 				if not handle then
 					return "Welcome to Neovim!"
 				end
@@ -92,7 +87,12 @@ return {
 			})
 
 			-- Mini.statusline
-			require("mini.statusline").setup({ use_icons = vim.g.have_nerd_font })
+			local statusline = require("mini.statusline")
+			statusline.setup({ use_icons = vim.g.have_nerd_font })
+			---@diagnostic disable-next-line: duplicate-set-field
+			statusline.section_location = function()
+				return "%2l:%-2v"
+			end
 
 			-- Mini.pairs for auto-pairing brackets
 			require("mini.pairs").setup()
@@ -101,72 +101,202 @@ return {
 			require("mini.icons").setup()
 
 			-- Mini.ai for better text objects
-			require("mini.ai").setup()
+			require("mini.ai").setup({ n_lines = 500 })
 
 			-- Mini.surround for surround operations
 			require("mini.surround").setup()
 		end,
 	},
 
-	-- Notification manager
+	-- ---------------------------------------------------------------------------
+	-- Snacks — notifier, lazygit, bigfile (NOT picker/explorer)
+	-- ---------------------------------------------------------------------------
 	{
-		"snacks-nvim",
+		"snacks.nvim",
+		lazy = false,
 		before = function()
 			require("snacks").setup({
 				dashboard = { enabled = false },
 				bigfile = { enabled = true },
-				notifier = {
-					enabled = true,
-					timeout = 3000,
-				},
+				notifier = { enabled = true, timeout = 3000 },
 				quickfile = { enabled = true },
-				statuscolumn = { enabled = true },
-				words = { enabled = true },
 				lazygit = { enabled = true },
 				git = { enabled = true },
 			})
 
-			-- Git keymaps
-			local git = require("snacks.git")
-			vim.keymap.set("n", "<leader>gb", git.blame_line, { desc = "Git Blame Line" })
-			vim.keymap.set("n", "<leader>gB", git.browse, { desc = "Git Browse" })
-			vim.keymap.set("n", "<leader>gf", git.browse, { desc = "Git Browse File" })
-
-			-- Lazygit
-			local lazygit = require("snacks.lazygit")
 			vim.keymap.set("n", "<leader>gg", function()
-				lazygit.open()
+				Snacks.lazygit()
 			end, { desc = "Lazygit" })
 			vim.keymap.set("n", "<leader>gl", function()
-				lazygit.log()
+				Snacks.lazygit.log()
 			end, { desc = "Lazygit Log" })
-			vim.keymap.set("n", "<leader>gL", function()
-				lazygit.log_file()
-			end, { desc = "Lazygit Log (current file)" })
+			vim.keymap.set({ "n", "v" }, "<leader>gB", function()
+				Snacks.gitbrowse()
+			end, { desc = "Git Browse" })
 		end,
 	},
 
-	-- Which-key for keymap hints
+	-- ---------------------------------------------------------------------------
+	-- Which-Key — keymap hints
+	-- ---------------------------------------------------------------------------
 	{
-		"which-key-nvim",
-		event = "VeryLazy",
+		"which-key.nvim",
+		event = "DeferredUIEnter",
 		after = function()
 			require("which-key").setup()
-
-			-- Document existing key chains
 			require("which-key").add({
+				{ "<leader>a", group = "[A]I" },
+				{ "<leader>b", group = "[B]uffer" },
 				{ "<leader>c", group = "[C]ode" },
-				{ "<leader>d", group = "[D]ocument" },
+				{ "<leader>d", group = "[D]ocument / Debug" },
+				{ "<leader>f", group = "[F]ile" },
+				{ "<leader>g", group = "[G]it" },
+				{ "<leader>gt", group = "[G]it [T]oggle" },
+				{ "<leader>h", group = "Git [H]unk" },
 				{ "<leader>r", group = "[R]ename" },
 				{ "<leader>s", group = "[S]earch" },
-				{ "<leader>w", group = "[W]orkspace" },
 				{ "<leader>t", group = "[T]oggle" },
-				{ "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
-				{ "<leader>g", group = "[G]it" },
-				{ "<leader>f", group = "[F]ile" },
-				{ "<leader>b", group = "[B]uffer" },
+				{ "<leader>w", group = "[W]orkspace" },
 				{ "<leader>x", group = "Diagnostics/Quickfi[x]" },
+				{ "<leader>z", group = "[Z]en" },
 			})
 		end,
 	},
+
+	-- ---------------------------------------------------------------------------
+	-- Dressing — better vim.ui.select and vim.ui.input
+	-- ---------------------------------------------------------------------------
+	{
+		"dressing.nvim",
+		lazy = false,
+		after = function()
+			require("dressing").setup()
+		end,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- Noice — cmdline, messages, popupmenu UI
+	-- ---------------------------------------------------------------------------
+	{
+		"noice.nvim",
+		lazy = false,
+		after = function()
+			require("noice").setup({
+				cmdline = { enabled = true },
+				messages = { enabled = true },
+				popupmenu = { enabled = true },
+				notify = { enabled = false }, -- snacks.notifier handles vim.notify
+				lsp = {
+					hover = { enabled = false }, -- lspsaga handles hover
+					signature = { enabled = false }, -- blink-cmp handles signature
+					progress = { enabled = true },
+					message = { enabled = true },
+					documentation = { enabled = true },
+				},
+				presets = {
+					bottom_search = true,
+					command_palette = true,
+					long_message_to_split = true,
+					inc_rename = false,
+					lsp_doc_border = true,
+				},
+			})
+		end,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- Lspkind — vscode-style completion icons (dep of blink-cmp)
+	-- ---------------------------------------------------------------------------
+	{
+		"lspkind.nvim",
+		dep_of = { "blink.cmp" },
+		lazy = true,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- Indent-blankline — indent guides
+	-- ---------------------------------------------------------------------------
+	{
+		"indent-blankline.nvim",
+		event = "BufReadPost",
+		after = function()
+			require("ibl").setup({
+				indent = { char = "│", tab_char = "│" },
+				scope = { enabled = true, show_start = false, show_end = false },
+				exclude = {
+					filetypes = {
+						"help",
+						"dashboard",
+						"Trouble",
+						"trouble",
+						"notify",
+						"starter",
+					},
+				},
+			})
+		end,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- Nvim-navic — breadcrumbs in winbar
+	-- ---------------------------------------------------------------------------
+	{
+		"nvim-navic",
+		event = "DeferredUIEnter",
+		after = function()
+			require("nvim-navic").setup({
+				icons = {
+					File = "󰈙 ",
+					Module = " ",
+					Namespace = "󰌗 ",
+					Package = " ",
+					Class = "󰌗 ",
+					Method = "󰆧 ",
+					Property = " ",
+					Field = " ",
+					Constructor = " ",
+					Enum = "󰕘 ",
+					Interface = "󰕘 ",
+					Function = "󰊕 ",
+					Variable = "󰆧 ",
+					Constant = "󰏿 ",
+					String = " ",
+					Number = "󰎠 ",
+					Boolean = "◩ ",
+					Array = "󰅪 ",
+					Object = "󰅩 ",
+					Key = "󰌋 ",
+					Null = "󰟢 ",
+					EnumMember = " ",
+					Struct = "󰌗 ",
+					Event = " ",
+					Operator = "󰆕 ",
+					TypeParameter = "󰊄 ",
+				},
+				lsp = { auto_attach = false },
+				highlight = true,
+				separator = " > ",
+				depth_limit = 0,
+				depth_limit_indicator = "..",
+				safe_output = true,
+				click = true,
+			})
+			vim.o.winbar = "%{%v:lua.require'nvim-navic'.get_location()%}"
+		end,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- Vim-startuptime — :StartupTime profiler
+	-- ---------------------------------------------------------------------------
+	{
+		"vim-startuptime",
+		cmd = { "StartupTime" },
+		before = function()
+			vim.g.startuptime_event_width = 0
+			vim.g.startuptime_tries = 10
+		end,
+	},
+
+	-- Dependencies loaded by lze before their parent plugins
+	{ "nui.nvim", dep_of = { "noice.nvim" } },
 }

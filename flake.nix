@@ -1,7 +1,8 @@
 # DO-NOT-EDIT. This file was auto-generated using github:vic/flake-file.
 # Use `nix run .#write-flake` to regenerate it.
 {
-  outputs = inputs: inputs.flake-parts.lib.mkFlake {inherit inputs;} (inputs.import-tree ./modules);
+
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 
   inputs = {
     apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
@@ -47,7 +48,6 @@
       url = "github:sodiboo/niri-flake";
     };
     niri-scratchpad.url = "github:gvolpe/niri-scratchpad";
-    nixCats.url = "github:BirdeeHub/nixCats-nvim";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-lib.follows = "nixpkgs";
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
@@ -59,6 +59,7 @@
       flake = false;
       url = "git+https://git.sr.ht/~kennylevinsen/pam_fde_boot_pw";
     };
+    persway.url = "github:johnae/persway";
     sops-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:Mic92/sops-nix";
@@ -71,6 +72,8 @@
       flake = false;
       url = "github:aokellermann/sway-scratch";
     };
+    wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
   };
+
 }

@@ -1,97 +1,187 @@
 -- =============================================================================
--- CODING PLUGINS (Completion, LSP, Linting, Formatting)
+-- CODING PLUGINS (LSP, Completion, Formatting, Linting, AI, Debug)
 -- =============================================================================
 
 return {
-	-- Completion
+	-- ---------------------------------------------------------------------------
+	-- Lazydev — improved Lua LSP for neovim config editing
+	-- pname: lazydev.nvim
+	-- ---------------------------------------------------------------------------
 	{
-		"blink-cmp",
+		"lazydev.nvim",
+		enabled = nix_has_feature("lua"),
+		ft = "lua",
+		after = function()
+			require("lazydev").setup({ library = {} })
+		end,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- blink-cmp — completion engine
+	-- pname: blink.cmp
+	-- ---------------------------------------------------------------------------
+	{
+		"blink.cmp",
 		event = "InsertEnter",
 		after = function()
-			require("blink-cmp").setup({
+			require("blink.cmp").setup({
 				keymap = {
 					preset = "default",
 					["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
 					["<C-e>"] = { "hide" },
 					["<C-y>"] = { "select_and_accept" },
-
 					["<C-p>"] = { "select_prev", "fallback" },
 					["<C-n>"] = { "select_next", "fallback" },
-
 					["<C-b>"] = { "scroll_documentation_up", "fallback" },
 					["<C-f>"] = { "scroll_documentation_down", "fallback" },
-
 					["<Tab>"] = { "snippet_forward", "fallback" },
 					["<S-Tab>"] = { "snippet_backward", "fallback" },
 				},
-
 				appearance = {
 					use_nvim_cmp_as_default = true,
 					nerd_font_variant = "mono",
 				},
-
 				sources = {
-					default = { "lsp", "path", "snippets", "buffer" },
-				},
-
-				completion = {
-					menu = {
-						border = "rounded",
-					},
-					documentation = {
-						auto_show = true,
-						window = {
-							border = "rounded",
+					default = { "lsp", "path", "snippets", "buffer", "copilot" },
+					providers = {
+						copilot = {
+							name = "copilot",
+							module = "blink-cmp-copilot",
+							score_offset = 100,
+							async = true,
 						},
 					},
 				},
-
+				completion = {
+					menu = { border = "rounded" },
+					documentation = {
+						auto_show = true,
+						window = { border = "rounded" },
+					},
+				},
 				signature = {
 					enabled = true,
-					window = {
-						border = "rounded",
-					},
+					window = { border = "rounded" },
 				},
 			})
 		end,
 	},
 
-	-- LSP Configuration
+	-- ---------------------------------------------------------------------------
+	-- Copilot — GitHub Copilot (panel/suggestions off; blink-cmp-copilot handles)
+	-- pname: copilot.lua
+	-- ---------------------------------------------------------------------------
 	{
-		"nvim-lspconfig",
-		event = { "BufReadPost", "BufNewFile" },
+		"copilot.lua",
+		event = { "InsertEnter", "CmdlineEnter" },
 		after = function()
-			require("config.lsp").setup()
+			require("copilot").setup({
+				panel = { enabled = false },
+				suggestion = { enabled = false },
+			})
 		end,
 	},
 
-	-- Formatting
+	-- ---------------------------------------------------------------------------
+	-- blink-cmp-copilot — copilot source for blink-cmp (dep, loaded lazily)
+	-- pname: blink-cmp-copilot
+	-- ---------------------------------------------------------------------------
 	{
-		"conform-nvim",
-		event = { "BufWritePre" },
-		after = function()
-			-- Smart selection of Python formatters based on availability
-			local python_formatters = { "autopep8" }
-			if vim.fn.executable("autopep8") == 0 and vim.fn.executable("black") == 1 then
-				python_formatters = { "isort", "black" }
-			end
+		"blink-cmp-copilot",
+		dep_of = { "blink.cmp" },
+		lazy = true,
+	},
 
+	-- ---------------------------------------------------------------------------
+	-- CopilotChat — GitHub Copilot chat interface
+	-- pname: CopilotChat.nvim
+	-- ---------------------------------------------------------------------------
+	{
+		"CopilotChat.nvim",
+		cmd = "CopilotChat",
+		keys = {
+			{ "<leader>aa", desc = "CopilotChat: toggle", mode = { "n", "x" } },
+			{ "<leader>aq", desc = "CopilotChat: quick chat", mode = { "n", "x" } },
+			{ "<leader>ax", desc = "CopilotChat: reset", mode = { "n", "v" } },
+			{ "<leader>ap", desc = "CopilotChat: prompt actions", mode = { "n", "x" } },
+		},
+		after = function()
+			require("CopilotChat").setup({
+				model = "claude-3.5-sonnet",
+				question_header = "  User ",
+				answer_header = "  Copilot ",
+				window = { layout = "vertical", width = 0.4 },
+				mappings = {
+					close = { insert = "" },
+					reset = { normal = "", insert = "" },
+				},
+			})
+
+			vim.keymap.set({ "n", "x" }, "<leader>aa", "<cmd>CopilotChatToggle<CR>", {
+				desc = "CopilotChat: toggle",
+			})
+			vim.keymap.set({ "n", "x" }, "<leader>aq", function()
+				vim.ui.input({ prompt = "Ask AI: " }, function(input)
+					if input and input ~= "" then
+						require("CopilotChat").ask(input)
+					end
+				end)
+			end, { desc = "CopilotChat: quick chat" })
+			vim.keymap.set({ "n", "v" }, "<leader>ax", function()
+				require("CopilotChat").reset()
+			end, { desc = "CopilotChat: reset" })
+			vim.keymap.set({ "n", "x" }, "<leader>ap", function()
+				local ok, integ = pcall(require, "CopilotChat.integrations.telescope")
+				if ok then
+					integ.pick(require("CopilotChat.actions").prompt_actions())
+				end
+			end, { desc = "CopilotChat: prompt actions" })
+
+			vim.api.nvim_create_autocmd("BufEnter", {
+				pattern = "copilot-chat",
+				callback = function()
+					vim.opt_local.relativenumber = false
+					vim.opt_local.number = false
+				end,
+			})
+		end,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- Lspsaga — enhanced LSP UI (owns K, <leader>ca, <leader>rn)
+	-- pname: lspsaga.nvim
+	-- ---------------------------------------------------------------------------
+	{
+		"lspsaga.nvim",
+		event = "LspAttach",
+		after = function()
+			require("lspsaga").setup({
+				lightbulb = { enable = true },
+				ui = { border = "rounded" },
+			})
+			vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", { desc = "LSP: Hover Documentation" })
+			vim.keymap.set("n", "<leader>ca", "<cmd>Lspsaga code_action<CR>", { desc = "LSP: [C]ode [A]ction" })
+			vim.keymap.set("n", "<leader>rn", "<cmd>Lspsaga rename<CR>", { desc = "LSP: [R]e[n]ame" })
+			vim.keymap.set("n", "<leader>pd", "<cmd>Lspsaga peek_definition<CR>", { desc = "LSP: [P]eek [D]efinition" })
+			vim.keymap.set("n", "<leader>o", "<cmd>Lspsaga outline<CR>", { desc = "LSP: [O]utline" })
+		end,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- Conform — format on save
+	-- pname: conform.nvim
+	-- ---------------------------------------------------------------------------
+	{
+		"conform.nvim",
+		event = "BufWritePre",
+		after = function()
 			require("conform").setup({
 				notify_on_error = false,
 				format_on_save = function(bufnr)
-					-- Disable "format_on_save lsp_fallback" for languages that don't
-					-- have a well standardized coding style. You can add additional
-					-- languages here or re-enable it for the disabled ones.
 					local disable_filetypes = { c = true, cpp = true }
-					local lsp_format_opt
-					if disable_filetypes[vim.bo[bufnr].filetype] then
-						lsp_format_opt = "never"
-					else
-						lsp_format_opt = "fallback"
-					end
 					return {
 						timeout_ms = 500,
-						lsp_format = lsp_format_opt,
+						lsp_format = disable_filetypes[vim.bo[bufnr].filetype] and "never" or "fallback",
 					}
 				end,
 				formatters_by_ft = {
@@ -107,35 +197,24 @@ return {
 					nix = { "nixfmt" },
 				},
 			})
-
 			vim.keymap.set("n", "<leader>cf", function()
 				require("conform").format({ async = true, lsp_format = "fallback" })
 			end, { desc = "[C]ode [F]ormat" })
 		end,
 	},
 
-	-- Linting
+	-- ---------------------------------------------------------------------------
+	-- nvim-lint — async linting
+	-- pname: nvim-lint
+	-- ---------------------------------------------------------------------------
 	{
 		"nvim-lint",
-		event = { "BufReadPost", "BufNewFile" },
+		event = "BufReadPost",
 		after = function()
 			local lint = require("lint")
-
-			-- Smart selection of Python linter based on availability
-			local python_linter = "flake8"
-			if vim.fn.executable("flake8") == 0 and vim.fn.executable("ruff") == 1 then
-				python_linter = "ruff"
-			end
-
 			lint.linters_by_ft = {
-				python = { python_linter },
-				javascript = { "eslint_d" },
-				typescript = { "eslint_d" },
-				javascriptreact = { "eslint_d" },
-				typescriptreact = { "eslint_d" },
+				go = { "golangcilint" },
 			}
-
-			-- Create autocommand which carries out the actual linting
 			local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
 			vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 				group = lint_augroup,
@@ -146,62 +225,124 @@ return {
 		end,
 	},
 
-	-- Debug Adapter Protocol
+	-- ---------------------------------------------------------------------------
+	-- nvim-dap — debug adapter protocol
+	-- pname: nvim-dap
+	-- ---------------------------------------------------------------------------
 	{
 		"nvim-dap",
-		event = "VeryLazy",
+		keys = {
+			{ "<F5>", desc = "Debug: Start/Continue" },
+			{ "<F10>", desc = "Debug: Step Over" },
+			{ "<F11>", desc = "Debug: Step Into" },
+			{ "<F12>", desc = "Debug: Step Out" },
+			{ "<leader>db", desc = "Debug: Toggle Breakpoint" },
+			{ "<leader>dB", desc = "Debug: Set Breakpoint" },
+			{ "<leader>du", desc = "Debug: Toggle UI" },
+		},
 		after = function()
 			local dap = require("dap")
+			local dapui = require("dapui")
 
-			-- Python DAP configuration
-			if nixCats("python") then
-				dap.adapters.python = {
-					type = "executable",
-					command = "python",
-					args = { "-m", "debugpy.adapter" },
-				}
-				dap.configurations.python = {
-					{
-						type = "python",
-						request = "launch",
-						name = "Launch file",
-						program = "${file}",
-						pythonPath = function()
-							return "python"
-						end,
+			dapui.setup({
+				icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
+				controls = {
+					icons = {
+						pause = "⏸",
+						play = "▶",
+						step_into = "⏎",
+						step_over = "⏭",
+						step_out = "⏮",
+						step_back = "b",
+						run_last = "▶▶",
+						terminate = "⏹",
+						disconnect = "⏏",
 					},
-				}
-			end
+				},
+			})
 
-			-- Go DAP configuration
-			if nixCats("go") then
-				dap.adapters.delve = {
-					type = "server",
-					port = "${port}",
-					executable = {
-						command = "dlv",
-						args = { "dap", "-l", "127.0.0.1:${port}" },
-					},
-				}
-				dap.configurations.go = {
-					{
-						type = "delve",
-						name = "Debug",
-						request = "launch",
-						program = "${file}",
-					},
-				}
-			end
+			require("nvim-dap-virtual-text").setup({
+				enabled = true,
+				highlight_changed_variables = true,
+				show_stop_reason = true,
+				virt_text_pos = vim.fn.has("nvim-0.10") == 1 and "inline" or "eol",
+			})
 
-			-- DAP keymaps
+			dap.listeners.after.event_initialized["dapui_config"] = dapui.open
+			dap.listeners.before.event_terminated["dapui_config"] = dapui.close
+			dap.listeners.before.event_exited["dapui_config"] = dapui.close
+
 			vim.keymap.set("n", "<F5>", dap.continue, { desc = "Debug: Start/Continue" })
 			vim.keymap.set("n", "<F10>", dap.step_over, { desc = "Debug: Step Over" })
 			vim.keymap.set("n", "<F11>", dap.step_into, { desc = "Debug: Step Into" })
 			vim.keymap.set("n", "<F12>", dap.step_out, { desc = "Debug: Step Out" })
-			vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "[D]ebug: Toggle [B]reakpoint" })
+			vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Debug: Toggle Breakpoint" })
 			vim.keymap.set("n", "<leader>dB", function()
 				dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
-			end, { desc = "[D]ebug: Set [B]reakpoint" })
+			end, { desc = "Debug: Set Breakpoint" })
+			vim.keymap.set("n", "<leader>du", dapui.toggle, { desc = "Debug: Toggle UI" })
 		end,
 	},
+
+	-- ---------------------------------------------------------------------------
+	-- nvim-dap-go — Go DAP adapter
+	-- pname: nvim-dap-go
+	-- ---------------------------------------------------------------------------
+	{
+		"nvim-dap-go",
+		enabled = nix_has_feature("go"),
+		on_plugin = { "nvim-dap" },
+		after = function()
+			require("dap-go").setup()
+		end,
+	},
+
+	-- ---------------------------------------------------------------------------
+	-- Avante — AI assistant (Claude)
+	-- pname: avante.nvim
+	-- Loads after UI renders (DeferredUIEnter) — no VeryLazy in lze
+	-- ---------------------------------------------------------------------------
+	{
+		"avante.nvim",
+		event = "DeferredUIEnter",
+		after = function()
+			require("avante").setup({
+				provider = "claude",
+				claude = {
+					endpoint = "https://api.anthropic.com",
+					model = "claude-opus-4-6",
+					temperature = 0,
+					max_tokens = 8192,
+				},
+				behaviour = {
+					auto_suggestions = false,
+					auto_set_highlight_group = true,
+					auto_set_keymaps = true,
+					auto_apply_diff_after_generation = false,
+				},
+				mappings = {
+					ask = "<leader>aa",
+					edit = "<leader>ae",
+					refresh = "<leader>ar",
+				},
+				hints = { enabled = true },
+				windows = {
+					position = "right",
+					wrap = true,
+					width = 30,
+					sidebar_header = { align = "center", rounded = true },
+				},
+				highlights = { diff = { current = "DiffText", incoming = "DiffAdd" } },
+				diff = { autojump = true, list_opener = "copen" },
+			})
+		end,
+	},
+
+	-- Dependencies loaded by lze before their parent plugins
+	{ "nvim-nio", dep_of = { "nvim-dap-ui" } },
+	{ "nvim-dap-ui", dep_of = { "nvim-dap" } },
+	{ "nvim-dap-virtual-text", dep_of = { "nvim-dap" } },
+	{ "render-markdown.nvim", dep_of = { "avante.nvim" } },
+	{ "img-clip.nvim", dep_of = { "avante.nvim" } },
+	{ "fzf-lua", dep_of = { "avante.nvim" } },
 }
