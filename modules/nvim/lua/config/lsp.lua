@@ -4,8 +4,8 @@
 
 local M = {}
 
--- LSP on_attach function for keymaps
-M.lsp_on_attach = function(client, bufnr)
+-- LSP on_attach — keymaps, inlay hints, navic, document highlights
+M.on_attach = function(client, bufnr)
 	local map = function(keys, func, desc, mode)
 		mode = mode or "n"
 		vim.keymap.set(mode, keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
@@ -15,25 +15,13 @@ M.lsp_on_attach = function(client, bufnr)
 	local has_telescope, telescope = pcall(require, "telescope.builtin")
 
 	if has_telescope then
-		-- Jump to the definition of the word under your cursor
 		map("gd", telescope.lsp_definitions, "[G]oto [D]efinition")
-
-		-- Find references for the word under your cursor
 		map("gr", telescope.lsp_references, "[G]oto [R]eferences")
-
-		-- Jump to the implementation of the word under your cursor
 		map("gI", telescope.lsp_implementations, "[G]oto [I]mplementation")
-
-		-- Jump to the type of the word under your cursor
 		map("<leader>D", telescope.lsp_type_definitions, "Type [D]efinition")
-
-		-- Fuzzy find all the symbols in your current document
 		map("<leader>ds", telescope.lsp_document_symbols, "[D]ocument [S]ymbols")
-
-		-- Fuzzy find all the symbols in your current workspace
 		map("<leader>ws", telescope.lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
 	else
-		-- Fallback to built-in LSP functions
 		map("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
 		map("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
 		map("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
@@ -42,17 +30,14 @@ M.lsp_on_attach = function(client, bufnr)
 		map("<leader>ws", vim.lsp.buf.workspace_symbol, "[W]orkspace [S]ymbols")
 	end
 
-	-- Rename the variable under your cursor
-	map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-
-	-- Execute a code action
-	map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction", { "n", "x" })
-
-	-- Opens a popup that displays documentation about the word under your cursor
-	map("K", vim.lsp.buf.hover, "Hover Documentation")
-
-	-- WARN: This is not Goto Definition, this is Goto Declaration.
+	-- NOTE: K, <leader>ca, <leader>rn are owned by lspsaga
 	map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+	map("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
+	map("<leader>wa", vim.lsp.buf.add_workspace_folder, "[W]orkspace [A]dd Folder")
+	map("<leader>wr", vim.lsp.buf.remove_workspace_folder, "[W]orkspace [R]emove Folder")
+	map("<leader>wl", function()
+		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+	end, "[W]orkspace [L]ist Folders")
 
 	-- Toggle inlay hints
 	if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
@@ -60,92 +45,130 @@ M.lsp_on_attach = function(client, bufnr)
 			vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }))
 		end, "[T]oggle Inlay [H]ints")
 	end
+
+	-- Document highlight on cursor hold
+	if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+		local highlight_augroup = vim.api.nvim_create_augroup("lsp-highlight-" .. bufnr, { clear = true })
+		vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+			buffer = bufnr,
+			group = highlight_augroup,
+			callback = vim.lsp.buf.document_highlight,
+		})
+		vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+			buffer = bufnr,
+			group = highlight_augroup,
+			callback = vim.lsp.buf.clear_references,
+		})
+		vim.api.nvim_create_autocmd("LspDetach", {
+			buffer = bufnr,
+			group = highlight_augroup,
+			callback = function()
+				vim.lsp.buf.clear_references()
+				vim.api.nvim_clear_autocmds({ group = highlight_augroup })
+			end,
+		})
+	end
+
+	-- Attach navic for breadcrumbs
+	local has_navic, navic = pcall(require, "nvim-navic")
+	if has_navic and client and client.server_capabilities.documentSymbolProvider then
+		navic.attach(client, bufnr)
+	end
+
+	-- Format command
+	vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
+		vim.lsp.buf.format()
+	end, { desc = "Format current buffer with LSP" })
 end
 
--- Setup LSP servers
+-- Native Neovim 0.11 LSP setup
 M.setup = function()
-	local lspconfig = require("lspconfig")
+	vim.lsp.config("*", { on_attach = M.on_attach })
 
-	-- Lua LSP
-	if nixCats("lua") then
-		lspconfig.lua_ls.setup({
-			on_attach = M.lsp_on_attach,
+	if nix_has_feature("lua") then
+		vim.lsp.config("lua_ls", {
+			cmd = { "lua-language-server" },
+			filetypes = { "lua" },
+			root_markers = { ".luarc.json", ".luarc.jsonc", ".stylua.toml", "stylua.toml", ".git" },
 			settings = {
 				Lua = {
 					runtime = { version = "LuaJIT" },
-					workspace = {
-						checkThirdParty = false,
-						library = {
-							"${3rd}/luv/library",
-							unpack(vim.api.nvim_get_runtime_file("", true)),
-						},
-					},
-					completion = {
-						callSnippet = "Replace",
-					},
-					diagnostics = { disable = { "missing-fields" } },
+					formatters = { ignoreComments = true },
+					signatureHelp = { enabled = true },
+					diagnostics = { globals = { "vim" }, disable = { "missing-fields" } },
+					telemetry = { enabled = false },
 				},
 			},
 		})
 	end
 
-	-- Nix LSP
-	if nixCats("nix") then
-		lspconfig.nixd.setup({
-			on_attach = M.lsp_on_attach,
+	if nix_has_feature("nix") then
+		vim.lsp.config("nixd", {
+			cmd = { "nixd" },
+			filetypes = { "nix" },
+			root_markers = { "flake.nix", ".git" },
+			settings = {
+				nixd = {
+					nixpkgs = { expr = nix_info("nixdExtras", "nixpkgs") or "import <nixpkgs> {}" },
+					formatting = { command = { "alejandra" } },
+					diagnostic = { suppress = { "sema-escaping-with" } },
+				},
+			},
 		})
 	end
 
-	-- Python LSP
-	if nixCats("python") then
-		lspconfig.basedpyright.setup({
+	if nix_has_feature("python") then
+		vim.lsp.config("basedpyright", {
 			cmd = { "basedpyright-langserver", "--stdio" },
 			filetypes = { "python" },
-			root_markers = {
-				"pyproject.toml",
-				"setup.py",
-				"setup.cfg",
-				"requirements.txt",
-				"Pipfile",
-				"pyrightconfig.json",
-				".git",
-			},
+			root_markers = { "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git" },
 			settings = {
 				basedpyright = {
 					analysis = {
+						typeCheckingMode = "basic",
 						autoSearchPaths = true,
 						useLibraryCodeForTypes = true,
 						diagnosticMode = "openFilesOnly",
 					},
 				},
 			},
-			on_attach = function(client, bufnr)
-				M.lsp_on_attach(client, bufnr)
-				vim.api.nvim_buf_create_user_command(bufnr, "LspPyrightOrganizeImports", function()
-					client:exec_cmd({
-						command = "basedpyright.organizeimports",
-						arguments = { vim.uri_from_bufnr(bufnr) },
-					})
-				end, {
-					desc = "Organize Imports",
-				})
-			end,
 		})
 	end
 
-	-- TypeScript LSP
-	if nixCats("typescript") then
-		lspconfig.ts_ls.setup({
-			on_attach = M.lsp_on_attach,
+	if nix_has_feature("typescript") then
+		vim.lsp.config("ts_ls", {
+			cmd = { "typescript-language-server", "--stdio" },
+			filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+			root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
 		})
 	end
 
-	-- Go LSP
-	if nixCats("go") then
-		lspconfig.gopls.setup({
-			on_attach = M.lsp_on_attach,
+	if nix_has_feature("go") then
+		vim.lsp.config("gopls", {
+			cmd = { "gopls" },
+			filetypes = { "go", "gomod", "gowork", "gotmpl" },
+			root_markers = { "go.mod", "go.work", ".git" },
 		})
 	end
+
+	-- Enable all configured servers
+	local servers = {}
+	if nix_has_feature("lua") then
+		table.insert(servers, "lua_ls")
+	end
+	if nix_has_feature("nix") then
+		table.insert(servers, "nixd")
+	end
+	if nix_has_feature("python") then
+		table.insert(servers, "basedpyright")
+	end
+	if nix_has_feature("typescript") then
+		table.insert(servers, "ts_ls")
+	end
+	if nix_has_feature("go") then
+		table.insert(servers, "gopls")
+	end
+	vim.lsp.enable(servers)
 end
 
 return M

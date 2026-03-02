@@ -3,82 +3,97 @@
 # also define den.aspects.swayfx and their attrs are merged together by den.
 #
 # To activate: add den.aspects.swayfx to thinkpad.nix includes and set greetd session to "sway".
-{...}: {
+{ ... }:
+{
   den.aspects.swayfx = {
-    nixos = {pkgs, ...}: {
-      programs.sway = {
-        enable = true;
-        package = pkgs.swayfx;
-      };
-
-      xdg.portal = {
-        enable = true;
-        extraPortals = [pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gtk];
-      };
-    };
-
-    homeManager = {pkgs, ...}: {
-      home = {
-        packages = with pkgs; [wl-clipboard grim slurp swappy swayr autotiling-rs];
-        sessionVariables.NIXOS_OZONE_WL = "1";
-      };
-
-      wayland.windowManager.sway = {
-        enable = true;
-        package = pkgs.swayfx;
-        checkConfig = false;
-        xwayland = true;
-        wrapperFeatures.gtk = true;
-        systemd = {
+    nixos =
+      { pkgs, ... }:
+      {
+        programs.sway = {
           enable = true;
-          xdgAutostart = true;
-          variables = ["--all"];
+          package = pkgs.swayfx;
         };
 
-        config = {
-          modifier = "Mod4";
-          floating.modifier = "Mod4";
-          terminal = "ghostty";
-          menu = "rofi -show drun";
-          defaultWorkspace = "workspace number 1";
-
-          startup = [
-            {command = "exec autotiling-rs";}
-            {command = "1password --silent";}
-            {command = "spotify --minimized";}
-            {command = "enteauth";}
+        xdg.portal = {
+          enable = true;
+          extraPortals = [
+            pkgs.xdg-desktop-portal-wlr
+            pkgs.xdg-desktop-portal-gtk
           ];
+        };
+      };
 
-          output."*" = {scale = "1";};
+    homeManager =
+      { pkgs, ... }:
+      {
+        home = {
+          packages = with pkgs; [
+            wl-clipboard
+            grim
+            slurp
+            swappy
+            swayr
+          ];
+          sessionVariables.NIXOS_OZONE_WL = "1";
+        };
 
-          gaps = {
-            inner = 7;
-            outer = 0;
+        wayland.windowManager.sway = {
+          enable = true;
+          package = pkgs.swayfx;
+          checkConfig = false;
+          xwayland = true;
+          wrapperFeatures.gtk = true;
+          systemd = {
+            enable = true;
+            xdgAutostart = true;
+            variables = [ "--all" ];
           };
 
-          bars = [];
+          config = {
+            modifier = "Mod4";
+            floating.modifier = "Mod4";
+            terminal = "ghostty";
+            menu = "rofi -show drun";
+            defaultWorkspace = "workspace number 1";
 
-          window = {
-            titlebar = false;
-            border = 4;
-            hideEdgeBorders = "none";
-          };
+            startup = [
+              { command = "1password --silent"; }
+              { command = "spotify --minimized"; }
+              { command = "enteauth"; }
+            ];
 
-          floating = {
-            titlebar = false;
-            border = 4;
-          };
+            output."*" = {
+              scale = "1";
+            };
 
-          focus = {
-            followMouse = "no";
-            wrapping = "yes";
-          };
+            gaps = {
+              inner = 7;
+              outer = 0;
+            };
 
-          seat."*" = {
-            xcursor_theme = "default 32";
+            bars = [ ];
+
+            window = {
+              titlebar = false;
+              border = 4;
+              hideEdgeBorders = "none";
+            };
+
+            floating = {
+              titlebar = false;
+              border = 4;
+            };
+
+            focus = {
+              followMouse = "no";
+              wrapping = "yes";
+            };
+
+            seat."*" = {
+              xcursor_theme = "default 32";
+            };
           };
         };
       };
-    };
   };
 }
