@@ -22,5 +22,6 @@ require("config.lsp").setup()
 
 -- Load plugins (each returns a table of lze specs)
 require("lze").load(require("plugins.ui"))
+require("lze").load(require("plugins.mini"))
 require("lze").load(require("plugins.editor"))
 require("lze").load(require("plugins.coding"))
