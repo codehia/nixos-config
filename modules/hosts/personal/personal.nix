@@ -74,7 +74,6 @@ in
           flatpak.enable = true;
           gvfs.enable = true;
           tailscale.enable = true;
-          openssh.enable = true;
           mullvad-vpn = {
             enable = true;
             package = pkgs.mullvad-vpn;
@@ -132,6 +131,7 @@ in
       den.aspects.direnv
       den.aspects.browser
       den.aspects.secrets
+      (den.aspects.ssh { sopsFile = ../../../secrets/personal.yaml; })
       den.aspects.packages
       den.aspects.services
       den.aspects.shell-tools
