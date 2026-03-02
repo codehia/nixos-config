@@ -2,17 +2,13 @@
 -- OPTIONS
 -- =============================================================================
 
--- Set mapleader before any keymaps are loaded
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-
 -- Make line numbers default with relative numbers
 vim.wo.number = true
 vim.wo.relativenumber = true
 
--- Disable mouse (matching reference config)
+-- Disable mouse
 vim.o.mouse = ""
-vim.o.showmode = false -- Don't show mode since we have statusline
+vim.o.showmode = false
 
 -- Clipboard integration
 vim.opt.clipboard = "unnamedplus"
@@ -44,27 +40,51 @@ vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menu,preview,noselect"
 
--- Enable true colors (matching reference config)
+-- Enhanced list characters
+vim.opt.list = true
+vim.opt.listchars = {
+	eol = "↲",
+	tab = "▏·",
+	trail = "·",
+	extends = "⟩",
+	precedes = "⟨",
+	nbsp = "␣",
+}
+
+-- Preview substitutions live
+vim.opt.inccommand = "split"
+
+-- Set highlight on search
+vim.opt.hlsearch = true
+
+-- Scrolling and display
+vim.opt.scrolloff = 10
+vim.opt.laststatus = 3
+vim.opt.splitkeep = "screen"
+vim.opt.smoothscroll = true
+
+-- Fill characters for folds and diffs
+vim.opt.fillchars = {
+	foldopen = "▾",
+	foldclose = "▸",
+	fold = " ",
+	foldsep = " ",
+	diff = "╱",
+	eob = " ",
+}
+
+-- True color support
 vim.o.termguicolors = true
 
--- Scroll offset
-vim.o.scrolloff = 10
+-- Disable netrw (oil replaces it)
+vim.g.netrw_liststyle = 0
+vim.g.netrw_banner = 0
 
--- Hide command line when not in use
-vim.o.cmdheight = 0
+-- Disable wrapping by default
+vim.wo.wrap = false
 
--- Fqolding configuration
-vim.o.foldenable = true
-vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-vim.o.foldcolumn = "0"
-vim.o.foldnestmax = 4
-vim.o.foldlevel = 99
-vim.o.foldlevelstart = 99
-vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
-
--- List chars
-vim.opt.list = true
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-
--- Preview substitutions
-vim.opt.inccommand = "split"
+-- Fold settings (foldmethod/foldexpr set in treesitter after hook to avoid
+-- the race condition where expr folds are evaluated before treesitter loads)
+vim.opt.foldcolumn = "0"
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
