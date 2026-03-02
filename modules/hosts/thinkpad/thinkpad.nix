@@ -14,7 +14,7 @@ in
         # hyprlandSession = "/home/${username}/.nix-profile/bin/start-hyprland";
         # MangoWC as default (pkgs.mango available via overlay from mangowc aspect)
         # session = "/home/${username}/.nix-profile/bin/mango -s /home/${username}/.config/mango/autostart.sh";
-        session = "/home/${username}/.nix-profile/bin/sway";
+        session = "/home/${username}/.nix-profile/bin/river";
       in
       {
         imports = [
@@ -165,7 +165,7 @@ in
       den.aspects.ghostty
       den.aspects.kitty
       den.aspects.tmux
-      den.aspects.swayfx
+      den.aspects.river
       (den.aspects.dms username)
       den.aspects.git
       den.aspects.lazygit
