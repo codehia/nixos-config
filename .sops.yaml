@@ -1,6 +1,7 @@
 keys:
   - &thinkpad age1e7x9jlcpmmhd03xm2amstt90kwjphwklu3wa028v20tauz6r4aeqfdw8gp
   - &personal age1uu6vj77ea5gtdwxsarvw7rygzrefeg4nl3vam9ddue279a3nhanqvsy8km
+  - &workstation age15x04ndua2q3czqdcf8vrnwr9r2d4fe5ntj4e3gjj8vztrw303ums90e843
   - &rclone age1kg0cjadgrycgx3s0qufp9c0xlhmc3ectsvmtt5k79lwsyh3x7q9qj3m3tp
 
 
@@ -13,6 +14,10 @@ creation_rules:
     key_groups:
       - age:
         - *personal
+  - path_regex: secrets/workstation\.yaml$
+    key_groups:
+      - age:
+          - *workstation
   - path_regex: secrets/rclone\.yaml$
     key_groups:
       - age:
