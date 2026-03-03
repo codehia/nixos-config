@@ -3,7 +3,16 @@
 # Each host declared here gets a NixOS system configuration built for it.
 { ... }:
 {
-  den.hosts.x86_64-linux.thinkpad.users.deus = { };
-  den.hosts.x86_64-linux.personal.users.deus = { };
-  den.hosts.x86_64-linux.workstation.users.deus = { };
+  den.hosts.x86_64-linux.thinkpad = {
+    home-manager.enable = true;
+    users.deus = { };
+  };
+  den.hosts.x86_64-linux.personal = {
+    home-manager.enable = true;
+    users.deus = { };
+  };
+  den.hosts.x86_64-linux.workstation = {
+    home-manager.enable = true;
+    users.deus = { };
+  };
 }
