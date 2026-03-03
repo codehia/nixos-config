@@ -1,4 +1,4 @@
-# Host aspect for personal — desktop NixOS system configuration.
+# Host aspect for workstation — desktop with Hyprland + DMS.
 # The `includes` list at the bottom composes all feature aspects into this host.
 # Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
 { den, ... }:
@@ -6,12 +6,12 @@ let
   username = "deus";
 in
 {
-  den.aspects.personal = {
+  den.aspects.workstation = {
     nixos =
       { pkgs, ... }:
       let
         tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
-        session = "/home/${username}/.nix-profile/bin/sway";
+        session = "/home/${username}/.nix-profile/bin/start-hyprland";
       in
       {
         imports = [
@@ -19,17 +19,8 @@ in
           ./_disko-config.nix
         ];
 
-        boot.initrd.kernelModules = [ "amdgpu" ];
-
-        zramSwap = {
-          enable = true;
-          priority = 100;
-          algorithm = "lz4";
-          memoryPercent = 50;
-        };
-
         networking = {
-          hostName = "personal";
+          hostName = "workstation";
           networkmanager.enable = true;
           firewall = {
             trustedInterfaces = [ "tailscale0" ];
@@ -51,17 +42,9 @@ in
           wget
           git
           fish
-          libimobiledevice
-          ifuse
-          idevicerestore
-          webkitgtk_6_0
-          webkitgtk_4_1
-          gtk4
         ];
 
         programs = {
-          dconf.enable = true;
-          appimage.enable = true;
           fish.enable = true;
           gnupg.agent = {
             enable = true;
@@ -70,19 +53,18 @@ in
         };
 
         services = {
-          usbmuxd.enable = true;
-          flatpak.enable = true;
-          gvfs.enable = true;
-          tailscale.enable = true;
-          mullvad-vpn = {
-            enable = true;
-            package = pkgs.mullvad-vpn;
-          };
-          avahi = {
-            enable = true;
-            nssmdns4 = true;
-            nssmdns6 = true;
-            openFirewall = true;
+          kanata = {
+            enable = false;
+            keyboards = {
+              kinesis = {
+                devices = [
+                  "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-event-if02"
+                  "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-if01-event-kbd"
+                ];
+                extraDefCfg = "process-unmapped-keys yes";
+                configFile = ../thinkpad/kinesis.kbd;
+              };
+            };
           };
           greetd = {
             enable = true;
@@ -92,24 +74,52 @@ in
                 user = "${username}";
               };
               default_session = {
-                command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd '${session}'";
+                command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd ${session}";
                 user = "greeter";
               };
             };
           };
+          gvfs.enable = true;
+          tailscale = {
+            enable = true;
+            package = pkgs.unstable.tailscale;
+            openFirewall = true;
+            port = 7498;
+          };
           pipewire = {
             enable = true;
             pulse.enable = true;
-            alsa = {
-              enable = true;
-              support32Bit = true;
+          };
+          udev.extraRules = ''
+            KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
+          '';
+        };
+
+        hardware = {
+          uinput.enable = true;
+          bluetooth = {
+            enable = false;
+            powerOnBoot = false;
+            settings = {
+              General = {
+                Experimental = false;
+              };
             };
+          };
+          graphics = {
+            enable = true;
+            extraPackages = with pkgs; [
+              mesa
+              rocmPackages.clr.icd
+            ];
           };
         };
 
-        hardware.graphics = {
-          enable = true;
-          extraPackages = with pkgs; [ mesa ];
+        systemd.services.kanata-internalKeyboard.serviceConfig = {
+          SupplementaryGroups = [
+            "input"
+            "uinput"
+          ];
         };
       };
 
@@ -123,7 +133,7 @@ in
       den.aspects.ghostty
       den.aspects.kitty
       den.aspects.tmux
-      den.aspects.swayfx
+      den.aspects.hyprland
       (den.aspects.dms username)
       den.aspects.git
       den.aspects.lazygit
@@ -132,15 +142,12 @@ in
           "lua"
           "nix"
           "python"
-          "typescript"
-          "go"
-          "latex"
         ];
       })
       den.aspects.direnv
       den.aspects.browser
       den.aspects.secrets
-      (den.aspects.ssh { sopsFile = ../../../secrets/personal.yaml; })
+      (den.aspects.ssh { sopsFile = ../../../secrets/workstation.yaml; })
       den.aspects.packages
       den.aspects.services
       den.aspects.shell-tools
@@ -151,9 +158,9 @@ in
       den.aspects.media
       den.aspects.creative
       den.aspects.chat
+      den.aspects.work
       den.aspects.cursor
       den.aspects.disko
-      den.aspects.rclone
       den.aspects.gnome-keyring
     ];
   };

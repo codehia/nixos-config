@@ -194,8 +194,16 @@ with pkgs.vimPlugins;
     data = lspkind-nvim;
     lazy = true;
   };
+  web-devicons = {
+    data = nvim-web-devicons;
+    lazy = true;
+  };
   fzf-lua = {
     data = fzf-lua;
+    lazy = true;
+  };
+  fiendly-snippets = {
+    data = friendly-snippets;
     lazy = true;
   };
 }
