@@ -115,7 +115,16 @@ return {
     'dressing.nvim',
     lazy = false,
     after = function()
-      require('dressing').setup()
+      require('dressing').setup({
+        input = {
+          border = 'rounded',
+        },
+        select = {
+          builtin = {
+            border = 'rounded',
+          },
+        },
+      })
     end,
   },
 
