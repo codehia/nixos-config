@@ -1,10 +1,13 @@
-{...}: {
+{ ... }:
+{
   den.aspects.media = {
-    homeManager = {pkgs, ...}: {
-      home.packages = with pkgs; [
-        vlc
-        spotify
-      ];
-    };
+    homeManager =
+      { pkgs, ... }:
+      {
+        home.packages = with pkgs; [
+          vlc
+          spotify
+        ];
+      };
   };
 }
