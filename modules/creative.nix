@@ -1,10 +1,13 @@
-{...}: {
+{ ... }:
+{
   den.aspects.creative = {
-    homeManager = {pkgs, ...}: {
-      home.packages = with pkgs; [
-        inkscape
-        obs-studio
-      ];
-    };
+    homeManager =
+      { pkgs, ... }:
+      {
+        home.packages = with pkgs; [
+          inkscape
+          obs-studio
+        ];
+      };
   };
 }

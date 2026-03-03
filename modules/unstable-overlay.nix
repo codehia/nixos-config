@@ -3,18 +3,22 @@
 #
 # den.base.conf:  Applied at the flake-parts perSystem level (devShells, checks, etc.)
 # den.default:    Applied to every host's NixOS and home-manager evaluations.
-{inputs, ...}: let
+{ inputs, ... }:
+let
   unstableOverlay = final: prev: {
     unstable = import inputs.nixpkgs-unstable {
       system = final.stdenv.hostPlatform.system;
       config.allowUnfree = true;
     };
   };
-in {
-  den.base.conf = {nixpkgs.overlays = [unstableOverlay];};
+in
+{
+  den.base.conf = {
+    nixpkgs.overlays = [ unstableOverlay ];
+  };
 
   den.default = {
-    nixos.nixpkgs.overlays = [unstableOverlay];
-    homeManager.nixpkgs.overlays = [unstableOverlay];
+    nixos.nixpkgs.overlays = [ unstableOverlay ];
+    homeManager.nixpkgs.overlays = [ unstableOverlay ];
   };
 }
