@@ -83,7 +83,7 @@
       "id": "brightnessSlider",
       "enabled": true,
       "width": 50,
-      "deviceName": "backlight:amdgpu_bl1"
+      "deviceName": "leds:mmc0::"
     },
     {
       "id": "wifi",
@@ -359,7 +359,7 @@
     "poweroff",
     "lock",
     "suspend",
-    "restart"
+    "hibernate"
   ],
   "powerMenuDefaultAction": "logout",
   "powerMenuGridLayout": false,
@@ -394,26 +394,44 @@
       ],
       "showOnLastDisplay": true,
       "leftWidgets": [
-        "launcherButton",
-        "workspaceSwitcher",
-        "focusedWindow"
+        {
+          "id": "launcherButton",
+          "enabled": true
+        },
+        {
+          "id": "dankPomodoroTimer",
+          "enabled": true
+        },
+        {
+          "id": "workspaceSwitcher",
+          "enabled": true
+        },
+        {
+          "id": "focusedWindow",
+          "enabled": true,
+          "focusedWindowCompactMode": false
+        }
       ],
       "centerWidgets": [
-        "music",
-        "clock",
-        "weather"
+        "clock"
       ],
       "rightWidgets": [
         "systemTray",
         "clipboard",
-        "memUsage",
+        {
+          "id": "memUsage",
+          "enabled": true,
+          "minimumWidth": false,
+          "showSwap": false
+        },
         "notificationButton",
         "battery",
         {
           "id": "controlCenterButton",
           "enabled": true,
+          "showBrightnessIcon": true,
           "showBrightnessPercent": true,
-          "showBrightnessIcon": true
+          "showBatteryIcon": false
         },
         {
           "id": "powerMenuButton",
