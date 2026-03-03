@@ -45,7 +45,7 @@ return {
           preset = 'luasnip',
         },
         sources = {
-          default = { 'lsp', 'snippets', 'buffer', 'copilot' },
+          default = { 'lsp', 'snippets', 'copilot', 'buffer' },
           providers = {
             snippets = {
               opts = {
@@ -66,13 +66,13 @@ return {
             copilot = {
               name = 'copilot',
               module = 'blink-cmp-copilot',
-              score_offset = -50,
               async = true,
             },
           },
         },
         completion = {
           menu = {
+            border = 'rounded',
             draw = {
               components = {
                 kind_icon = {
@@ -84,12 +84,11 @@ return {
                         icon = dev_icon
                       end
                     else
-                      icon = require('lspkind').symbol_map[ctx.kind] or ''
+                      icon = require('lspkind').symbol_map[ctx.kind] or ctx.kind_icon
                     end
 
                     return icon .. ctx.icon_gap
                   end,
-
                   -- Optionally, use the highlight groups from nvim-web-devicons
                   -- You can also add the same function for `kind.highlight` if you want to
                   -- keep the highlight groups in sync with the icons.
@@ -173,21 +172,30 @@ return {
   {
     'CopilotChat.nvim',
     cmd = 'CopilotChat',
-    keys = {
-      { '<leader>aa', desc = 'CopilotChat: toggle', mode = { 'n', 'x' } },
-      { '<leader>aq', desc = 'CopilotChat: quick chat', mode = { 'n', 'x' } },
-      { '<leader>ax', desc = 'CopilotChat: reset', mode = { 'n', 'v' } },
-      { '<leader>ap', desc = 'CopilotChat: prompt actions', mode = { 'n', 'x' } },
-    },
     after = function()
       require('CopilotChat').setup({
-        model = 'claude-3.5-sonnet',
-        question_header = '  User ',
-        answer_header = '  Copilot ',
-        window = { layout = 'vertical', width = 0.4 },
+        model = 'auto',
+        question_header = '  User ',
+        answer_header = '  Copilot ',
+        window = { layout = 'vertical', width = 0.3, border = 'rounded' },
+        show_help = true,
+        auto_follow_cursor = true,
+        auto_insert_mode = false,
+        clear_chat_on_new_prompt = false,
+        highlight_selection = true,
+        context = 'buffer',
+        selection_spec = 'visual',
+        chat_autocomplete = true,
+        separator = '─',
+        show_folds = true,
         mappings = {
           close = { insert = '' },
           reset = { normal = '', insert = '' },
+          submit_prompt = { normal = '<CR>', insert = '<C-s>' },
+          accept_diff = { normal = '<C-y>', insert = '<C-y>' },
+          show_diff = { normal = '<leader>ad' },
+          show_system_prompt = { normal = '<leader>as' },
+          show_user_selection = { normal = '<leader>al' },
         },
       })
 
@@ -225,6 +233,7 @@ return {
   -- Lspsaga — enhanced LSP UI (owns K, <leader>ca, <leader>rn)
   -- pname: lspsaga.nvim
   -- ---------------------------------------------------------------------------
+
   {
     'lspsaga.nvim',
     event = 'LspAttach',
@@ -232,10 +241,17 @@ return {
       require('lspsaga').setup({
         lightbulb = { enable = true },
         ui = { border = 'rounded' },
+        rename = { in_select = true },
       })
       vim.keymap.set('n', 'K', '<cmd>Lspsaga hover_doc<CR>', { desc = 'LSP: Hover Documentation' })
       vim.keymap.set('n', '<leader>ca', '<cmd>Lspsaga code_action<CR>', { desc = 'LSP: [C]ode [A]ction' })
       vim.keymap.set('n', '<leader>rn', '<cmd>Lspsaga rename<CR>', { desc = 'LSP: [R]e[n]ame' })
+      vim.keymap.set(
+        'n',
+        '<leader>rN',
+        '<cmd>Lspsaga rename ++project<CR>',
+        { desc = 'LSP: [R]e[N]ame (project-wide)' }
+      )
       vim.keymap.set('n', '<leader>pd', '<cmd>Lspsaga peek_definition<CR>', { desc = 'LSP: [P]eek [D]efinition' })
       vim.keymap.set('n', '<leader>o', '<cmd>Lspsaga outline<CR>', { desc = 'LSP: [O]utline' })
     end,
