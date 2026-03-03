@@ -11,11 +11,12 @@
             dates = [ "03:45" ];
           };
           settings = {
+            download-buffer-size = 524288000; # 500 MiB
+            auto-optimise-store = true;
             experimental-features = [
               "nix-command"
               "flakes"
             ];
-            auto-optimise-store = true;
             trusted-users = [
               "root"
               username
