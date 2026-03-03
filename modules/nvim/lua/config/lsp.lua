@@ -151,6 +151,25 @@ M.setup = function()
 		})
 	end
 
+	if nix_has_feature("latex") then
+		vim.lsp.config("texlab", {
+			cmd = { "texlab" },
+			filetypes = { "tex", "plaintex", "bib" },
+			root_markers = { ".latexmkrc", ".texlabroot", "texlabroot", "Tectonic.toml", ".git" },
+			settings = {
+				texlab = {
+					build = {
+						executable = "latexrun",
+						args = { "%f" },
+						onSave = false,
+						forwardSearchAfter = false,
+					},
+					chktex = { onOpenAndSave = true, onEdit = false },
+				},
+			},
+		})
+	end
+
 	-- Enable all configured servers
 	local servers = {}
 	if nix_has_feature("lua") then
@@ -167,6 +186,9 @@ M.setup = function()
 	end
 	if nix_has_feature("go") then
 		table.insert(servers, "gopls")
+	end
+	if nix_has_feature("latex") then
+		table.insert(servers, "texlab")
 	end
 	vim.lsp.enable(servers)
 end

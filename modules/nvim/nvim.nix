@@ -1,46 +1,81 @@
-{ inputs, ... }:
+{ inputs, lib, ... }:
 let
   wlib = inputs.wrappers.lib;
 in
 {
   flake-file.inputs.wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
 
-  den.aspects.nvim.homeManager =
-    { pkgs, ... }:
-    let
-      nvimPkg =
-        inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.neovim-unwrapped;
-    in
+  den.aspects.nvim =
     {
-      home.packages = [
-        (wlib.evalPackage [
-          { inherit pkgs; }
-          (
-            { pkgs, wlib, ... }:
-            {
-              imports = [ wlib.wrapperModules.neovim ];
-              package = nvimPkg;
-              settings.aliases = [ "vim" ];
-              settings.config_directory = ./.;
-              settings.block_normal_config = true;
-              extraPackages = import ./_lsps.nix { inherit pkgs; };
-              specs = import ./_plugins.nix { inherit pkgs; };
-              info = {
-                nixdExtras.nixpkgs = "import ${pkgs.path} {}";
-                categories = {
-                  general = true;
-                  lua = true;
-                  nix = true;
-                  python = true;
-                  typescript = true;
-                  go = false;
-                };
-              };
-              hosts.python3.nvim-host.enable = true;
-              hosts.node.nvim-host.enable = true;
-            }
-          )
-        ])
-      ];
+      languages ? [
+        "lua"
+        "nix"
+      ],
+    }:
+    {
+      homeManager =
+        { pkgs, ... }:
+        let
+          nvimPkg =
+            inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.neovim-unwrapped;
+
+          langDefs = import ./_lang-defs.nix { inherit pkgs; };
+          enabledLangs = [ "general" ] ++ languages;
+
+          # Collect packages from all enabled languages
+          extraPackages = lib.concatMap (l: (langDefs.${l}).packages) enabledLangs;
+
+          # Merge formatter maps (fast and slow) across enabled languages
+          mergeFmtMaps =
+            speed:
+            lib.foldl' (
+              acc: l: lib.recursiveUpdate acc (langDefs.${l}.formatters.${speed} or { })
+            ) { } enabledLangs;
+
+          fastFormatters = mergeFmtMaps "fast";
+          slowFormatters = mergeFmtMaps "slow";
+
+          # Merge linter maps across enabled languages
+          linters = lib.foldl' (
+            acc: l: lib.recursiveUpdate acc (langDefs.${l}.linters or { })
+          ) { } enabledLangs;
+
+          # Build categories attrset from languages list
+          categories = lib.listToAttrs (map (l: lib.nameValuePair l true) enabledLangs);
+        in
+        {
+          home.packages = [
+            (wlib.evalPackage [
+              { inherit pkgs; }
+              (
+                { pkgs, wlib, ... }:
+                {
+                  imports = [ wlib.wrapperModules.neovim ];
+                  package = nvimPkg;
+                  inherit extraPackages;
+                  specs = import ./_plugins.nix { inherit pkgs; };
+                  info = {
+                    nixdExtras.nixpkgs = "import ${pkgs.path} {}";
+                    inherit categories;
+                    formatters = {
+                      fast = fastFormatters;
+                      slow = slowFormatters;
+                    };
+                    inherit linters;
+                  };
+                  settings = {
+                    aliases = [ "vim" ];
+                    config_directory = ./.;
+                    block_normal_config = true;
+                  };
+                  hosts = {
+                    python3.nvim-host.enable = true;
+                    node.nvim-host.enable = true;
+                  };
+                }
+              )
+            ])
+          ];
+        };
     };
 }

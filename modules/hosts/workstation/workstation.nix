@@ -8,10 +8,10 @@ in
 {
   den.aspects.workstation = {
     nixos =
-      { pkgs, lib, ... }:
+      { pkgs, ... }:
       let
         tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
-        session = "/etc/profiles/per-user/${username}/bin/start-hyprland";
+        session = "/home/${username}/.nix-profile/bin/start-hyprland";
       in
       {
         imports = [
@@ -137,7 +137,13 @@ in
       (den.aspects.dms username)
       den.aspects.git
       den.aspects.lazygit
-      den.aspects.nvim
+      (den.aspects.nvim {
+        languages = [
+          "lua"
+          "nix"
+          "python"
+        ];
+      })
       den.aspects.direnv
       den.aspects.browser
       den.aspects.secrets
