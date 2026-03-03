@@ -8,7 +8,7 @@
       {
         wayland.windowManager.hyprland.settings = {
           bind = [
-            "$modifier, SPACE, exec, dms ipc launcher toggle"
+            "$modifier, P, exec, rofi -show drun"
             "$modifier, Q, exec, ghostty"
             "$modifier, W, exec, zen-beta"
             "$modifier, T, exec, thunar"
@@ -16,7 +16,7 @@
             "$modifier, M,        layoutmsg, focusmaster"
             "$modifier, RETURN,   layoutmsg, swapwithmaster master"
             "$modifier  SHIFT, R, layoutmsg, rollnext"
-            "$modifier ALT, R, layoutmsg, rollprev"
+            "$modifier  SHIFT, P, layoutmsg, rollprev"
 
             "$modifier, C, killactive"
             "$modifier, F, fullscreen,"
@@ -79,26 +79,6 @@
             "$modifier, N, exec, pypr toggle_special minimized"
 
             "ALT,Tab,cyclenext"
-
-            # ── Media / brightness ──
-            ", F1, exec, dms ipc audio mute"
-            ", F2, exec, dms ipc audio decrement 5"
-            ", F3, exec, dms ipc audio increment 5"
-            ", F4, exec, dms ipc audio micmute"
-            ", F5, exec, dms ipc brightness decrement 10 backlight:amdgpu_bl1"
-            ", F6, exec, dms ipc brightness increment 10 backlight:amdgpu_bl1"
-
-            # ── DMS toggles ──
-            "$modifier SHIFT, P, exec, dms ipc powermenu toggle"
-            "$modifier SHIFT, D, exec, dms ipc notifications toggleDoNotDisturb"
-            "$modifier SHIFT, I, exec, dms ipc notepad toggle"
-            "$modifier SHIFT, V, exec, dms ipc clipboard toggle"
-            "$modifier SHIFT, B, exec, dms ipc notifications toggle"
-            "$modifier SHIFT, G, exec, dms ipc control-center toggle"
-
-            # ── Screenshot ──
-            ", Print, exec, grim - | wl-copy"
-            "CONTROL, Print, exec, grim -g \"$(slurp)\" - | wl-copy"
           ];
         };
       };

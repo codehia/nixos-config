@@ -1,7 +1,10 @@
-{...}: {
+{ ... }:
+{
   den.aspects.shell-tools = {
-    homeManager = {pkgs, ...}: {
-      home.packages = [pkgs.ripgrep];
-    };
+    homeManager =
+      { pkgs, ... }:
+      {
+        home.packages = [ pkgs.ripgrep ];
+      };
   };
 }
