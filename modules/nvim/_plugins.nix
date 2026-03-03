@@ -206,4 +206,8 @@ with pkgs.vimPlugins;
     data = friendly-snippets;
     lazy = true;
   };
+  hardtime = {
+    data = hardtime-nvim;
+    lazy = false;
+  };
 }
