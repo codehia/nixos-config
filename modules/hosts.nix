@@ -5,4 +5,5 @@
 {
   den.hosts.x86_64-linux.thinkpad.users.deus = { };
   den.hosts.x86_64-linux.personal.users.deus = { };
+  den.hosts.x86_64-linux.workstation.users.deus = { };
 }
