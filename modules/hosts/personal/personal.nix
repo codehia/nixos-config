@@ -127,7 +127,16 @@ in
       (den.aspects.dms username)
       den.aspects.git
       den.aspects.lazygit
-      den.aspects.nvim
+      (den.aspects.nvim {
+        languages = [
+          "lua"
+          "nix"
+          "python"
+          "typescript"
+          "go"
+          "latex"
+        ];
+      })
       den.aspects.direnv
       den.aspects.browser
       den.aspects.secrets

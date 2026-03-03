@@ -175,36 +175,54 @@ return {
 		"conform.nvim",
 		event = "BufWritePre",
 		after = function()
+			local fmt = require("config.format")
+
+			-- Build formatters_by_ft from Nix-provided fast + slow metadata
+			local formatters_by_ft = {}
+			local fast_info = nix_info("formatters", "fast")
+			local slow_info = nix_info("formatters", "slow")
+
+			if type(fast_info) == "table" then
+				for ft, fmts in pairs(fast_info) do
+					formatters_by_ft[ft] = formatters_by_ft[ft] or {}
+					for _, f in ipairs(fmts) do
+						table.insert(formatters_by_ft[ft], f)
+					end
+				end
+			end
+			if type(slow_info) == "table" then
+				for ft, fmts in pairs(slow_info) do
+					formatters_by_ft[ft] = formatters_by_ft[ft] or {}
+					for _, f in ipairs(fmts) do
+						table.insert(formatters_by_ft[ft], f)
+					end
+				end
+			end
+
 			require("conform").setup({
 				notify_on_error = false,
+				-- Use the format dispatcher for on-save: fast only (sync)
 				format_on_save = function(bufnr)
-					local disable_filetypes = { c = true, cpp = true }
-					return {
-						timeout_ms = 500,
-						lsp_format = disable_filetypes[vim.bo[bufnr].filetype] and "never" or "fallback",
-					}
+					fmt.format_fast(bufnr)
+					return nil -- we handled formatting ourselves
 				end,
-				formatters_by_ft = {
-					lua = { "stylua" },
-					python = { "isort", "autopep8" },
-					javascript = { "prettier" },
-					typescript = { "prettier" },
-					javascriptreact = { "prettier" },
-					typescriptreact = { "prettier" },
-					json = { "prettier" },
-					yaml = { "prettier" },
-					markdown = { "prettier" },
-					nix = { "nixfmt" },
-				},
+				formatters_by_ft = formatters_by_ft,
 			})
+
+			-- <leader>cf: run all formatters (fast sync + slow async)
 			vim.keymap.set("n", "<leader>cf", function()
-				require("conform").format({ async = true, lsp_format = "fallback" })
-			end, { desc = "[C]ode [F]ormat" })
+				fmt.format_all()
+			end, { desc = "[C]ode [F]ormat (all)" })
+
+			-- <leader>cF: run only slow formatters (async)
+			vim.keymap.set("n", "<leader>cF", function()
+				fmt.format_slow()
+			end, { desc = "[C]ode [F]ormat (slow)" })
 		end,
 	},
 
 	-- ---------------------------------------------------------------------------
-	-- nvim-lint — async linting
+	-- nvim-lint — async linting (dynamic from Nix)
 	-- pname: nvim-lint
 	-- ---------------------------------------------------------------------------
 	{
@@ -212,9 +230,17 @@ return {
 		event = "BufReadPost",
 		after = function()
 			local lint = require("lint")
-			lint.linters_by_ft = {
-				go = { "golangcilint" },
-			}
+
+			-- Build linters_by_ft from Nix-provided metadata
+			local linters_by_ft = {}
+			local linters_info = nix_info("linters")
+			if type(linters_info) == "table" then
+				for ft, lints in pairs(linters_info) do
+					linters_by_ft[ft] = lints
+				end
+			end
+			lint.linters_by_ft = linters_by_ft
+
 			local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
 			vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
 				group = lint_augroup,
