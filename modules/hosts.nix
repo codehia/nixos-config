@@ -6,6 +6,7 @@
   den.hosts.x86_64-linux.thinkpad = {
     home-manager.enable = true;
     users.deus = { };
+    users.soumya = { };
   };
   den.hosts.x86_64-linux.personal = {
     home-manager.enable = true;
@@ -14,5 +15,6 @@
   den.hosts.x86_64-linux.workstation = {
     home-manager.enable = true;
     users.deus = { };
+    users.soumya = { };
   };
 }
