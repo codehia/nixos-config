@@ -1,14 +1,17 @@
 # SSH service and host key management.
-# If sopsFile is provided, host keys are restored from sops and auto-generation is disabled.
-# If sopsFile is null (default), openssh generates its own host keys normally.
+# sopsFile:     host key (ssh_host_ed25519_key) — per-machine, placed at /etc/ssh/
+# userSopsFile: user identity key (ssh_user_ed25519_key) — shared across hosts, placed at ~/.ssh/id_ed25519
+# If either is null (default), that key is not managed by sops.
 { lib, ... }:
 {
   den.aspects.ssh =
     {
       sopsFile ? null,
+      userSopsFile ? null,
     }:
     let
       sopsManaged = sopsFile != null;
+      userSopsManaged = userSopsFile != null;
     in
     {
       nixos =
@@ -27,11 +30,16 @@
               group = "root";
               mode = "0600";
             };
-            ssh_host_rsa_key = {
-              inherit sopsFile;
-              path = "/etc/ssh/ssh_host_rsa_key";
-              owner = "root";
-              group = "root";
+          };
+        };
+
+      homeManager =
+        { config, ... }:
+        {
+          sops.secrets = lib.mkIf userSopsManaged {
+            ssh_user_ed25519_key = {
+              sopsFile = userSopsFile;
+              path = "${config.home.homeDirectory}/.ssh/id_ed25519";
               mode = "0600";
             };
           };
