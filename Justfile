@@ -26,6 +26,13 @@ install:
 	  echo "==> Age key placed at ${SYSTEM_KEY} and ${USER_KEY}."
 	fi
 
+	if [[ -f "${SYSTEM_KEY}" ]] && [[ ! -f "${USER_KEY}" ]]; then
+	  echo "==> Syncing user age key from system key..."
+	  mkdir -p "$(dirname "${USER_KEY}")"
+	  sudo install -m 600 -o "$(id -u)" -g "$(id -g)" "${SYSTEM_KEY}" "${USER_KEY}"
+	  echo "==> User age key placed at ${USER_KEY}."
+	fi
+
 	nixos-rebuild switch --flake . --sudo
 
 debug:
