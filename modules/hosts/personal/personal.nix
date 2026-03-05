@@ -63,10 +63,6 @@ in
           dconf.enable = true;
           appimage.enable = true;
           fish.enable = true;
-          gnupg.agent = {
-            enable = true;
-            enableSSHSupport = true;
-          };
         };
 
         services = {
@@ -140,7 +136,10 @@ in
       den.aspects.direnv
       den.aspects.browser
       den.aspects.secrets
-      (den.aspects.ssh { sopsFile = ../../../secrets/personal.yaml; })
+      (den.aspects.ssh {
+        sopsFile = ../../../secrets/personal.yaml;
+        userSopsFile = ../../../secrets/deus.yaml;
+      })
       den.aspects.packages
       den.aspects.services
       den.aspects.shell-tools
