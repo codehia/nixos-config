@@ -1,6 +1,7 @@
 # Unfree package allowlist — den._.unfree (shorthand for den.provides.unfree)
 # takes a list of package names and permits them across all hosts.
-{den, ...}: {
+{ den, ... }:
+{
   den.default.includes = [
     (den._.unfree [
       "1password"
@@ -20,6 +21,7 @@
       "signal-desktop"
       "google-chrome"
       "unrar"
+      "httpie-desktop"
     ])
   ];
 }
