@@ -103,6 +103,7 @@ return {
         { '<leader>t', group = '[T]oggle' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>x', group = 'Diagnostics/Quickfi[x]' },
+        { '<leader>m', group = '[M]arkview' },
         { '<leader>z', group = '[Z]en' },
       })
     end,
@@ -250,7 +251,32 @@ return {
       vim.g.startuptime_tries = 0
     end,
   },
+  -- ---------------------------------------------------------------------------
+  -- Markview — Markdown/LaTeX/Typst previewer (must not be lazy-loaded)
+  -- ---------------------------------------------------------------------------
+  {
+    'markview.nvim',
+    lazy = false,
+    after = function()
+      require('markview').setup({
+        preview = {
+          icon_provider = 'devicons',
+          callbacks = {
+            on_attach = function(buffer, wins)
+              -- Auto-open splitview for markdown buffers
+              require('markview.actions').splitOpen(buffer)
+              for _, win in ipairs(wins) do
+                vim.wo[win].conceallevel = 3
+              end
+            end,
+          },
+        },
+      })
 
+      vim.keymap.set('n', '<leader>mt', '<cmd>Markview Toggle<cr>', { desc = '[M]arkview [T]oggle' })
+      vim.keymap.set('n', '<leader>ms', '<cmd>Markview splitToggle<cr>', { desc = '[M]arkview [S]plit toggle' })
+    end,
+  },
   -- Dependencies loaded by lze before their parent plugins
   { 'nui.nvim', dep_of = { 'noice.nvim' } },
 }
