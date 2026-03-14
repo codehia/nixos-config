@@ -210,4 +210,8 @@ with pkgs.vimPlugins;
     data = hardtime-nvim;
     lazy = false;
   };
+  markview = {
+    data = markview-nvim;
+    lazy = false;
+  };
 }
