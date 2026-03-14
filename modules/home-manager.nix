@@ -9,7 +9,8 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  # Give all users the homeManager class by default so den imports the HM NixOS module.
+  # Enable homeManager class for all users (required for den to import the HM NixOS module).
+  # Without this, den.ctx.hm-host never activates and home-manager.* NixOS options don't exist.
   den.schema.user.classes = lib.mkDefault [ "homeManager" ];
 
   den.default = {
