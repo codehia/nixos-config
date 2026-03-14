@@ -6,7 +6,7 @@ return {
     'hardtime.nvim',
     lazy = false,
     after = function()
-      require('hardtime').setup()
+      require('hardtime').setup({ enabled = false })
     end,
   },
 }
