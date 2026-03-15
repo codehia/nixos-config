@@ -151,6 +151,19 @@ M.setup = function()
     })
   end
 
+  if nix_has_feature('rust') then
+    vim.lsp.config('rust_analyzer', {
+      cmd = { 'rust-analyzer' },
+      filetypes = { 'rust' },
+      root_markers = { 'Cargo.toml', 'Cargo.lock', '.git' },
+      settings = {
+        ['rust-analyzer'] = {
+          checkOnSave = { command = 'clippy' },
+        },
+      },
+    })
+  end
+
   if nix_has_feature('latex') then
     vim.lsp.config('texlab', {
       cmd = { 'texlab' },
@@ -186,6 +199,9 @@ M.setup = function()
   end
   if nix_has_feature('go') then
     table.insert(servers, 'gopls')
+  end
+  if nix_has_feature('rust') then
+    table.insert(servers, 'rust_analyzer')
   end
   if nix_has_feature('latex') then
     table.insert(servers, 'texlab')

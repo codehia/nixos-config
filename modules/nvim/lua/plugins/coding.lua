@@ -148,12 +148,28 @@ return {
   -- ---------------------------------------------------------------------------
   {
     'copilot.lua',
-    event = { 'InsertEnter', 'CmdlineEnter' },
+    event = { 'InsertEnter' },
+    keys = {
+      {
+        '<leader>tc',
+        function()
+          if require('copilot.client').is_disabled() then
+            require('copilot.command').enable()
+            vim.notify('Copilot enabled')
+          else
+            require('copilot.command').disable()
+            vim.notify('Copilot disabled')
+          end
+        end,
+        desc = '[T]oggle [C]opilot',
+      },
+    },
     after = function()
       require('copilot').setup({
         panel = { enabled = false },
         suggestion = { enabled = false },
       })
+      require('copilot.command').disable()
     end,
   },
 
@@ -255,7 +271,7 @@ return {
         { desc = 'LSP: [R]e[N]ame (project-wide)' }
       )
       vim.keymap.set('n', '<leader>pd', '<cmd>Lspsaga peek_definition<CR>', { desc = 'LSP: [P]eek [D]efinition' })
-      vim.keymap.set('n', '<leader>o', '<cmd>Lspsaga outline<CR>', { desc = 'LSP: [O]utline' })
+      vim.keymap.set('n', '<leader>lo', '<cmd>Lspsaga outline<CR>', { desc = 'LSP: [O]utline' })
     end,
   },
 

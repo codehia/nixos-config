@@ -104,6 +104,7 @@ return {
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>x', group = 'Diagnostics/Quickfi[x]' },
         { '<leader>m', group = '[M]arkview' },
+        { '<leader>o', group = '[O]bsidian' },
         { '<leader>z', group = '[Z]en' },
       })
     end,
