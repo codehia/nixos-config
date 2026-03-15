@@ -214,4 +214,8 @@ with pkgs.vimPlugins;
     data = markview-nvim;
     lazy = false;
   };
+  obsidian = {
+    data = obsidian-nvim;
+    lazy = true;
+  };
 }

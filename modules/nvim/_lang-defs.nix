@@ -123,6 +123,23 @@
     };
   };
 
+  rust = {
+    packages = with pkgs; [
+      rust-analyzer
+      rustfmt
+      clippy
+    ];
+    formatters = {
+      fast = {
+        rust = [ "rustfmt" ];
+      };
+      slow = { };
+    };
+    linters = {
+      rust = [ "clippy" ];
+    };
+  };
+
   latex = {
     packages = with pkgs; [
       texlab
