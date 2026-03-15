@@ -3,7 +3,7 @@
 # Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
 { den, ... }:
 let
-  username = "deus";
+  username = "soumya";
 in
 {
   den.aspects.workstation = {
@@ -70,7 +70,7 @@ in
                 user = "${username}";
               };
               default_session = {
-                command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd ${session}";
+                command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd '${session}'";
                 user = "greeter";
               };
             };
