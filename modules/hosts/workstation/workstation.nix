@@ -130,7 +130,7 @@ in
       den.aspects.kitty
       den.aspects.tmux
       den.aspects.hyprland
-      (den.aspects.dms username)
+      (den.aspects.dms { inherit username; })
       den.aspects.git
       den.aspects.lazygit
       (den.aspects.nvim {
