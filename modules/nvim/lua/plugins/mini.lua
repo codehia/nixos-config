@@ -70,5 +70,8 @@ return {
 
     -- Mini.surround for surround operations
     require('mini.surround').setup()
+
+    -- Mini.animate for animating movements
+    require('mini.animate').setup()
   end,
 }

@@ -2,6 +2,8 @@
 -- EDITOR PLUGINS
 -- =============================================================================
 
+local lzextras = require('lzextras')
+
 return {
   -- ---------------------------------------------------------------------------
   -- Telescope — fuzzy finder
@@ -58,6 +60,10 @@ return {
   {
     'nvim-treesitter',
     event = 'BufReadPost',
+    -- lzextras.with_after loads both opt/nvim-treesitter/ AND its /after directory.
+    -- treesitter uses after/ for filetype-specific query overrides; the default
+    -- vim.cmd.packadd only loads the main plugin dir and misses it.
+    load = lzextras.loaders.with_after,
     after = function()
       require('nvim-treesitter.configs').setup({
         highlight = { enable = true, additional_vim_regex_highlighting = false },
@@ -178,7 +184,9 @@ return {
     'oil.nvim',
     keys = {
       { '-', desc = 'Open parent directory' },
-      { '<leader>-', desc = 'Open parent directory (float)' },
+      lzextras.key2spec('n', '<leader>-', function()
+        require('oil').toggle_float()
+      end, { desc = 'Open parent directory (float)' }),
     },
     after = function()
       require('oil').setup({
@@ -196,9 +204,6 @@ return {
         win_options = { wrap = true, winblend = 0 },
         keymaps = { ['<C-c>'] = false, ['q'] = 'actions.close' },
       })
-      vim.keymap.set('n', '<leader>-', require('oil').toggle_float, {
-        desc = 'Open parent directory (float)',
-      })
     end,
   },
 
@@ -215,22 +220,11 @@ return {
   {
     'harpoon2',
     keys = {
-      { '<leader>a', desc = '[H]arpoon add file' },
-      { '<C-e>', desc = '[H]arpoon open telescope' },
-      { '<leader>1', desc = '[H]arpoon file 1' },
-      { '<leader>2', desc = '[H]arpoon file 2' },
-      { '<leader>3', desc = '[H]arpoon file 3' },
-      { '<leader>4', desc = '[H]arpoon file 4' },
-      { '<leader>p', desc = '[H]arpoon prev' },
-      { '<leader>n', desc = '[H]arpoon next' },
-    },
-    after = function()
-      local harpoon = require('harpoon')
-      harpoon:setup()
-
-      local conf = require('telescope.config').values
-      local function toggle_telescope(harpoon_files)
-        local finder = function()
+      lzextras.key2spec('n', '<C-e>', function()
+        local harpoon = require('harpoon')
+        local conf = require('telescope.config').values
+        local harpoon_files = harpoon:list()
+        local function finder()
           local paths = {}
           for _, item in ipairs(harpoon_files.items) do
             table.insert(paths, item.value)
@@ -255,32 +249,31 @@ return {
             end,
           })
           :find()
-      end
-
-      vim.keymap.set('n', '<C-e>', function()
-        toggle_telescope(harpoon:list())
-      end, { desc = 'Open harpoon window' })
-      vim.keymap.set('n', '<leader>a', function()
-        harpoon:list():add()
-      end, { desc = '[H]arpoon add file' })
-      vim.keymap.set('n', '<leader>1', function()
-        harpoon:list():select(1)
-      end, { desc = '[H]arpoon file 1' })
-      vim.keymap.set('n', '<leader>2', function()
-        harpoon:list():select(2)
-      end, { desc = '[H]arpoon file 2' })
-      vim.keymap.set('n', '<leader>3', function()
-        harpoon:list():select(3)
-      end, { desc = '[H]arpoon file 3' })
-      vim.keymap.set('n', '<leader>4', function()
-        harpoon:list():select(4)
-      end, { desc = '[H]arpoon file 4' })
-      vim.keymap.set('n', '<leader>p', function()
-        harpoon:list():prev()
-      end, { desc = '[H]arpoon prev' })
-      vim.keymap.set('n', '<leader>n', function()
-        harpoon:list():next()
-      end, { desc = '[H]arpoon next' })
+      end, { desc = '[H]arpoon open telescope' }),
+      lzextras.key2spec('n', '<leader>a', function()
+        require('harpoon'):list():add()
+      end, { desc = '[H]arpoon add file' }),
+      lzextras.key2spec('n', '<leader>1', function()
+        require('harpoon'):list():select(1)
+      end, { desc = '[H]arpoon file 1' }),
+      lzextras.key2spec('n', '<leader>2', function()
+        require('harpoon'):list():select(2)
+      end, { desc = '[H]arpoon file 2' }),
+      lzextras.key2spec('n', '<leader>3', function()
+        require('harpoon'):list():select(3)
+      end, { desc = '[H]arpoon file 3' }),
+      lzextras.key2spec('n', '<leader>4', function()
+        require('harpoon'):list():select(4)
+      end, { desc = '[H]arpoon file 4' }),
+      lzextras.key2spec('n', '<leader>p', function()
+        require('harpoon'):list():prev()
+      end, { desc = '[H]arpoon prev' }),
+      lzextras.key2spec('n', '<leader>n', function()
+        require('harpoon'):list():next()
+      end, { desc = '[H]arpoon next' }),
+    },
+    after = function()
+      require('harpoon'):setup()
     end,
   },
 
@@ -292,26 +285,20 @@ return {
     'trouble.nvim',
     cmd = 'Trouble',
     keys = {
-      { '<leader>xx', desc = 'Trouble: diagnostics' },
-      { '<leader>xX', desc = 'Trouble: buffer diagnostics' },
-      { '<leader>cs', desc = 'Trouble: symbols' },
-      { '<leader>cl', desc = 'Trouble: LSP' },
-      { '<leader>xL', desc = 'Trouble: loclist' },
-      { '<leader>xQ', desc = 'Trouble: quickfix' },
-    },
-    after = function()
-      require('trouble').setup()
-      vim.keymap.set('n', '<leader>xx', '<cmd>Trouble diagnostics toggle<CR>', { desc = 'Trouble: diagnostics' })
-      vim.keymap.set(
+      lzextras.key2spec('n', '<leader>xx', '<cmd>Trouble diagnostics toggle<CR>', { desc = 'Trouble: diagnostics' }),
+      lzextras.key2spec(
         'n',
         '<leader>xX',
         '<cmd>Trouble diagnostics toggle filter.buf=0<CR>',
         { desc = 'Trouble: buffer diagnostics' }
-      )
-      vim.keymap.set('n', '<leader>cs', '<cmd>Trouble symbols toggle<CR>', { desc = 'Trouble: symbols' })
-      vim.keymap.set('n', '<leader>cl', '<cmd>Trouble lsp toggle<CR>', { desc = 'Trouble: LSP' })
-      vim.keymap.set('n', '<leader>xL', '<cmd>Trouble loclist toggle<CR>', { desc = 'Trouble: loclist' })
-      vim.keymap.set('n', '<leader>xQ', '<cmd>Trouble qflist toggle<CR>', { desc = 'Trouble: quickfix' })
+      ),
+      lzextras.key2spec('n', '<leader>cs', '<cmd>Trouble symbols toggle<CR>', { desc = 'Trouble: symbols' }),
+      lzextras.key2spec('n', '<leader>cl', '<cmd>Trouble lsp toggle<CR>', { desc = 'Trouble: LSP' }),
+      lzextras.key2spec('n', '<leader>xL', '<cmd>Trouble loclist toggle<CR>', { desc = 'Trouble: loclist' }),
+      lzextras.key2spec('n', '<leader>xQ', '<cmd>Trouble qflist toggle<CR>', { desc = 'Trouble: quickfix' }),
+    },
+    after = function()
+      require('trouble').setup()
     end,
   },
 
@@ -340,11 +327,12 @@ return {
   -- ---------------------------------------------------------------------------
   {
     'zen-mode.nvim',
-    keys = { { '<leader>zz', desc = '[Z]en mode' } },
+    keys = {
+      lzextras.key2spec('n', '<leader>zz', '<cmd>ZenMode<CR>', { desc = '[Z]en mode' }),
+    },
     after = function()
       require('twilight').setup()
       require('zen-mode').setup({ plugins = { twilight = { enabled = true } } })
-      vim.keymap.set('n', '<leader>zz', '<cmd>ZenMode<CR>', { desc = '[Z]en mode' })
     end,
   },
 

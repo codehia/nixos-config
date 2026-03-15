@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, lzextrasLatest }:
 with pkgs.vimPlugins;
 {
   # Startup (lazy = false)
@@ -7,7 +7,7 @@ with pkgs.vimPlugins;
     lazy = false;
   };
   lzextras = {
-    data = lzextras;
+    data = lzextrasLatest;
     lazy = false;
   };
   snacks = {
