@@ -20,9 +20,6 @@ require('config.autocmds')
 -- LSP (native Neovim 0.11)
 require('config.lsp').setup()
 
--- Load plugins (each returns a table of lze specs)
-require('lze').load(require('plugins.ui'))
-require('lze').load(require('plugins.mini'))
-require('lze').load(require('plugins.editor'))
-require('lze').load(require('plugins.coding'))
-require('lze').load(require('plugins.util-plugins'))
+-- lzextras.mod_dir_to_spec auto-discovers all files under lua/plugins/ and generates
+-- an import spec for each. New plugin files are picked up without editing init.lua.
+require('lze').load(require('lzextras').mod_dir_to_spec('plugins'))

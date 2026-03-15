@@ -1,0 +1,28 @@
+{
+  // lua-language-server project config for the Neovim config in modules/nvim/.
+  // This file serves two purposes:
+  //   1. Fixes "undefined-global" warnings for runtime-injected globals that
+  //      lua_ls cannot see statically (vim, Snacks, nix_has_feature, nix_info).
+  //   2. Acts as the LSP root marker — lua_ls uses this file (listed first in
+  //      lsp.lua root_markers) to anchor the project root at modules/nvim/
+  //      rather than the flake root, keeping Neovim API scope correct.
+  "$schema": "https://raw.githubusercontent.com/LuaLS/lua-language-server/main/meta/template/schema.json",
+  "runtime": {
+    // Neovim uses LuaJIT
+    "version": "LuaJIT"
+  },
+  "diagnostics": {
+    "globals": [
+      "vim",            // Neovim global — injected by the runtime, not visible statically
+      "nix_has_feature", // Injected in init.lua via _G.nix_has_feature (bridges Nix categories to Lua)
+      "nix_info",       // Injected in init.lua via _G.nix_info (generic Nix data accessor)
+      "Snacks"          // Injected by snacks.nvim on startup
+    ],
+    // missing-fields is noisy for plugin setup() calls that use partial option tables
+    "disable": ["missing-fields"]
+  },
+  "workspace": {
+    // Disable automatic third-party library detection prompts
+    "checkThirdParty": false
+  }
+}
