@@ -13,7 +13,7 @@ The built package is available as `vim` (alias) and `nvim` (main binary).
 ```
 modules/nvim/
 ├── nvim.nix          # Aspect definition — wires nix-wrapper-modules into den.aspects.nvim
-├── _lsps.nix         # extraPackages: LSP servers, formatters, linters, tools
+├── _lang-defs.nix    # per-language packages, formatters, linters (consumed by nvim.nix)
 ├── _plugins.nix      # specs: vim plugins with lazy/start flags
 ├── init.lua          # Entry point — loads config modules and plugins
 └── lua/

@@ -40,15 +40,14 @@ vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menu,preview,noselect'
 
--- Enhanced list characters
+-- Enhanced list characters (ASCII-safe: unicode listchars cause redraw flicker in Ghostty on thinkpad)
 vim.opt.list = true
 vim.opt.listchars = {
-  eol = '↲',
-  tab = '▏·',
-  trail = '·',
-  extends = '⟩',
-  precedes = '⟨',
-  nbsp = '␣',
+  tab = '| ',
+  trail = '.',
+  extends = '>',
+  precedes = '<',
+  nbsp = '+',
 }
 
 -- Preview substitutions live

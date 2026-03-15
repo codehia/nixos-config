@@ -4,6 +4,7 @@ let
 in
 {
   flake-file.inputs.wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
+  flake-file.inputs.lzextras.url = "github:BirdeeHub/lzextras";
 
   den.aspects.nvim =
     {
@@ -18,6 +19,8 @@ in
         let
           nvimPkg =
             inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.neovim-unwrapped;
+
+          lzextrasLatest = inputs.lzextras.packages.${pkgs.stdenv.hostPlatform.system}.lzextras-vimPlugin;
 
           langDefs = import ./_lang-defs.nix { inherit pkgs; };
           enabledLangs = [ "general" ] ++ languages;
@@ -53,7 +56,7 @@ in
                   imports = [ wlib.wrapperModules.neovim ];
                   package = nvimPkg;
                   inherit extraPackages;
-                  specs = import ./_plugins.nix { inherit pkgs; };
+                  specs = import ./_plugins.nix { inherit pkgs lzextrasLatest; };
                   info = {
                     nixdExtras.nixpkgs = "import ${pkgs.path} {}";
                     inherit categories;

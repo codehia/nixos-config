@@ -2,6 +2,8 @@
 -- CODING PLUGINS (LSP, Completion, Formatting, Linting, AI, Debug)
 -- =============================================================================
 
+local lzextras = require('lzextras')
+
 return {
   -- ---------------------------------------------------------------------------
   -- Lazydev — improved Lua LSP for neovim config editing
@@ -348,13 +350,27 @@ return {
   {
     'nvim-dap',
     keys = {
-      { '<F5>', desc = 'Debug: Start/Continue' },
-      { '<F10>', desc = 'Debug: Step Over' },
-      { '<F11>', desc = 'Debug: Step Into' },
-      { '<F12>', desc = 'Debug: Step Out' },
-      { '<leader>db', desc = 'Debug: Toggle Breakpoint' },
-      { '<leader>dB', desc = 'Debug: Set Breakpoint' },
-      { '<leader>du', desc = 'Debug: Toggle UI' },
+      lzextras.key2spec('n', '<F5>', function()
+        require('dap').continue()
+      end, { desc = 'Debug: Start/Continue' }),
+      lzextras.key2spec('n', '<F10>', function()
+        require('dap').step_over()
+      end, { desc = 'Debug: Step Over' }),
+      lzextras.key2spec('n', '<F11>', function()
+        require('dap').step_into()
+      end, { desc = 'Debug: Step Into' }),
+      lzextras.key2spec('n', '<F12>', function()
+        require('dap').step_out()
+      end, { desc = 'Debug: Step Out' }),
+      lzextras.key2spec('n', '<leader>db', function()
+        require('dap').toggle_breakpoint()
+      end, { desc = 'Debug: Toggle Breakpoint' }),
+      lzextras.key2spec('n', '<leader>dB', function()
+        require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))
+      end, { desc = 'Debug: Set Breakpoint' }),
+      lzextras.key2spec('n', '<leader>du', function()
+        require('dapui').toggle()
+      end, { desc = 'Debug: Toggle UI' }),
     },
     after = function()
       local dap = require('dap')
@@ -387,16 +403,6 @@ return {
       dap.listeners.after.event_initialized['dapui_config'] = dapui.open
       dap.listeners.before.event_terminated['dapui_config'] = dapui.close
       dap.listeners.before.event_exited['dapui_config'] = dapui.close
-
-      vim.keymap.set('n', '<F5>', dap.continue, { desc = 'Debug: Start/Continue' })
-      vim.keymap.set('n', '<F10>', dap.step_over, { desc = 'Debug: Step Over' })
-      vim.keymap.set('n', '<F11>', dap.step_into, { desc = 'Debug: Step Into' })
-      vim.keymap.set('n', '<F12>', dap.step_out, { desc = 'Debug: Step Out' })
-      vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, { desc = 'Debug: Toggle Breakpoint' })
-      vim.keymap.set('n', '<leader>dB', function()
-        dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
-      end, { desc = 'Debug: Set Breakpoint' })
-      vim.keymap.set('n', '<leader>du', dapui.toggle, { desc = 'Debug: Toggle UI' })
     end,
   },
 
