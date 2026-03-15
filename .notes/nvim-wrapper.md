@@ -224,13 +224,15 @@ require('lze').h.event.set_event_alias("MyEvent", { event = "BufEnter", pattern 
 
 lzextras adds specialized handlers and utilities on top of lze.
 
-### Setup (how our config uses it)
+### How our config uses lzextras
 
-In `init.lua` (inferred from lzextras docs):
-```lua
-require('lze').register_handlers(require('lzextras').lsp)
--- Then lze specs can use the `lsp` field
-```
+| Feature | Where used | Purpose |
+|---------|-----------|---------|
+| `mod_dir_to_spec('plugins')` | `init.lua` | Auto-discover all files under `lua/plugins/` — no manual list |
+| `with_after` | `nvim-treesitter` spec in `editor.lua` | Load plugin + its `/after` dir for filetype-specific query overrides |
+| `key2spec` | `editor.lua`, `coding.lua` | Single definition serves as both lazy trigger and keymap implementation |
+
+lzextras.lsp handler and merge handler are **not used** — see LSP comparison below.
 
 ### Extra Load Functions
 
@@ -321,14 +323,30 @@ nvim.nix
 ```
 nvim starts
   → init.lua loaded (from settings.config_directory)
-      → registers lzextras handlers (lsp, merge, etc.)
-      → calls require('lze').load({ ... specs ... })
-           Each spec: { "plugin-name", ft/event/keys/lsp = ... }
+      → require('config.lsp').setup()
+           Registers all LSP servers via native Neovim 0.11 API:
+           vim.lsp.config("*", { on_attach = ... })
+           vim.lsp.config("lua_ls", { cmd, filetypes, root_markers, settings })
+           vim.lsp.enable({ "lua_ls", "nixd", ... })
+           (gated per-server by nix_has_feature("lang"))
+      → require('lze').load(require('lzextras').mod_dir_to_spec('plugins'))
+           mod_dir_to_spec auto-discovers all files under lua/plugins/ and
+           generates an import spec for each — new plugin files picked up
+           without editing init.lua.
+           Each spec: { "plugin-name", ft/event/keys/cmd = ... }
            Handler watches for trigger
-           Trigger fires → vim.cmd.packadd("plugin-name")
+           Trigger fires → load function (default: vim.cmd.packadd, or
+                           lzextras.with_after for plugins with /after dirs)
            Plugin loads from opt/
            after() hook runs (setup calls go here)
 ```
+
+> lzextras is used for:
+> - `mod_dir_to_spec('plugins')` in init.lua — auto-discover plugin files
+> - `with_after` on nvim-treesitter — load plugin + its /after directory
+> - `key2spec` in editor.lua / coding.lua — single def for trigger + keymap
+>
+> lzextras.lsp handler is NOT used — LSP is configured natively in lua/config/lsp.lua.
 
 ### Plugin Name Mapping
 
@@ -422,12 +440,49 @@ my-plugin = {
 
 ---
 
+## lzextras.lsp Handler vs Native Neovim 0.11 LSP
+
+Our config uses **native 0.11** (`vim.lsp.config` + `vim.lsp.enable` in `lua/config/lsp.lua`).
+This was a deliberate choice. Here is the full comparison:
+
+### What lzextras.lsp does differently
+
+**Native (current):** all `vim.lsp.config()` / `vim.lsp.enable()` calls happen at startup
+(inside `require('config.lsp').setup()`). The server *process* still only starts when a
+matching file is opened — the startup cost is just cheap Lua table operations.
+
+**lzextras.lsp:** those calls are deferred until the filetype trigger fires (first file open).
+
+### Concrete advantages of lzextras.lsp
+
+1. **Auto-filetype detection** — pulls filetypes from lspconfig's server definitions; no need
+   to manually write `filetypes = { "lua" }` for well-known servers.
+2. **Deferred config evaluation** — `vim.lsp.config()` / `vim.lsp.enable()` called only on
+   first relevant file open (practically negligible gain since these are cheap Lua calls).
+3. **Servers as first-class lze specs** — consistent mental model; servers get the same
+   trigger/lifecycle/ordering primitives (`dep_of`, `on_plugin`, etc.) as plugins.
+
+### Why it's not worth switching for our config
+
+1. **`nix_has_feature()` gating** — our per-server gating pattern integrates naturally with
+   the native approach; reimplementing it with lzextras.lsp adds complexity for no gain.
+2. **lspconfig would need to be eager** — lzextras.lsp relies on lspconfig for auto-filetype
+   detection, but lspconfig is intentionally `lazy = true` and unused for config in our setup.
+3. **Explicit is better here** — every server has explicit `cmd`, `filetypes`, `root_markers`.
+   No hidden lspconfig defaults — appropriate for a fully Nix-managed config.
+4. **Zero performance difference** — server process start is lazy in both approaches.
+
+---
+
 ## Key Gotchas
 
 1. **Lua module name ≠ Nix package name** — always check the plugin's `lua/` dir name
 2. **`lazy = false` in Nix** = placed in `start/` = loaded at startup automatically (no lze needed)
 3. **`lazy = true` in Nix** = placed in `opt/` = MUST be loaded explicitly (lze does this)
 4. **lze spec name** `[1]` must match the **package pname** (packpath directory name), NOT the Nix key — use `find /nix/store -maxdepth 3 -name "<pattern>*" -type d` to find it; format is `vimplugin-<PNAME>-<version>`
-5. **lzextras.lsp handler**: function-type spec MUST be defined before table-type specs in the load() call
-6. **`before = ["INIT_MAIN"]`** in Nix spec = runs config code BEFORE init.lua
-7. **info access**: always use the function form `nix(default, "key")` — direct indexing is unsafe
+5. **`before = ["INIT_MAIN"]`** in Nix spec = runs config code BEFORE init.lua
+6. **info access**: always use the function form `nix(default, "key")` — direct indexing is unsafe
+7. **mod_dir_to_spec** — adding a new `lua/plugins/foo.lua` is enough; no need to touch `init.lua`
+8. **with_after** — use as `load = lzextras.with_after` on any plugin that has an `/after` dir (e.g. treesitter)
+9. **key2spec** — use `lzextras.key2spec(mode, lhs, rhs, opts)` in the `keys` array to avoid duplicating keymap defs in `after`; the rhs fires after `after` has already run so plugin is fully set up
+10. **lua_ls globals** — `vim`, `nix_has_feature`, `nix_info`, `Snacks` are declared in `.luarc.jsonc`; add new runtime-injected globals there
