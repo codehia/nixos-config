@@ -51,15 +51,22 @@
 │    │                                                                │
 │    └─ loads init.lua (from settings.config_directory)               │
 │         │                                                           │
-│         ├─ require('lze').register_handlers(require('lzextras').lsp)│
+│         ├─ require('config.lsp').setup()                            │
+│         │    vim.lsp.config("*", { on_attach = ... })               │
+│         │    vim.lsp.config("lua_ls", { cmd, filetypes, ... })      │
+│         │    vim.lsp.enable({ "lua_ls", "nixd", ... })              │
+│         │    (native Neovim 0.11 — lzextras.lsp handler NOT used)   │
 │         │                                                           │
-│         └─ require('lze').load({ ...specs... })                     │
-│              │                                                      │
+│         └─ require('lze').load(                                     │
+│              require('lzextras').mod_dir_to_spec('plugins'))        │
+│              │  auto-discovers lua/plugins/*.lua — no manual list   │
 │              └─ handlers watch for triggers →                       │
-│                   ft / event / keys / cmd / lsp                     │
+│                   ft / event / keys / cmd                           │
 │                        │                                            │
 │                        ▼ trigger fires                              │
-│                   vim.cmd.packadd("plugin-name")                    │
+│                   load fn (default: vim.cmd.packadd, or             │
+│                            lzextras.with_after for plugins          │
+│                            that have an /after directory)           │
 │                   → loads from opt/plugin-name/                     │
 │                   → after() hook runs (setup calls)                 │
 └─────────────────────────────────────────────────────────────────────┘
@@ -161,7 +168,10 @@ gitsigns    ──►  gitsigns-nvim    ──►  gitsigns-nvim/   ──►  r
 
 ---
 
-## 5. lzextras LSP Handler — Two Spec Shapes
+## 5. lzextras LSP Handler — Two Spec Shapes (REFERENCE ONLY — not used in our config)
+
+> Our config uses native Neovim 0.11 LSP in lua/config/lsp.lua instead.
+> lzextras IS loaded at startup but its lsp handler is NOT registered.
 
 ```
 require('lze').register_handlers(require('lzextras').lsp)
@@ -326,15 +336,23 @@ modules/nvim/
   _plugins.nix          ← ALL plugin declarations (Nix key → { data, lazy })
   _lang-defs.nix        ← Language definitions: packages, LSPs, formatters, linters
   _nvim_nixcats.nix     ← (legacy? or helper)
+  .luarc.jsonc          ← lua_ls project config: declares vim/nix_has_feature/nix_info/Snacks
+                           as known globals; anchors LSP root at modules/nvim/
   init.lua              ← Neovim entry point (settings.config_directory = ./)
+                           uses lzextras.mod_dir_to_spec('plugins') — no manual plugin list
   lua/
     config/
-      lsp.lua           ← lzextras LSP handler specs (function + table specs)
+      lsp.lua           ← Native Neovim 0.11 LSP: vim.lsp.config + vim.lsp.enable
+                           (NOT lzextras.lsp handler — see nvim-wrapper.md for rationale)
       ...
     plugins/
-      ui.lua            ← lze.load() specs for UI plugins
-      coding.lua        ← lze.load() specs for coding plugins
-      ...
+      ui.lua            ← lze specs: UI plugins
+      editor.lua        ← lze specs: editor plugins
+                           nvim-treesitter uses lzextras.with_after
+                           harpoon2 / trouble / zen-mode / oil use lzextras.key2spec
+      coding.lua        ← lze specs: coding plugins
+                           nvim-dap uses lzextras.key2spec
+      ...               ← auto-discovered by mod_dir_to_spec — new files just work
 ```
 
 ```
