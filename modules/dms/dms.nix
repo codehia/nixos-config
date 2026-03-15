@@ -1,9 +1,10 @@
 # DankMaterialShell — all-in-one Wayland shell built on Quickshell & Go.
 # Replaces waybar, notifications, lock screen, launcher, OSD, clipboard, system monitor.
-# Factory aspect (takes username) following the noctalia pattern.
+# Factory aspect following the noctalia pattern.
 #
-# To activate: add (den.aspects.dms username) to thinkpad.nix includes
-# (and remove den.aspects.noctalia if active).
+# Usage:
+#   (den.aspects.dms { username = "deus"; isLaptop = true; })   # thinkpad
+#   (den.aspects.dms { username = "deus"; })                     # desktops
 { inputs, ... }:
 {
   flake-file.inputs = {
@@ -17,61 +18,87 @@
     };
   };
 
-  den.aspects.dms = username: {
-    nixos =
-      { pkgs, ... }:
-      {
-        imports = [ inputs.dms.nixosModules.dank-material-shell ];
-        programs.dank-material-shell = {
-          enable = true;
-          dgop.package = inputs.dgop.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  den.aspects.dms =
+    {
+      username,
+      isLaptop ? false,
+    }:
+    let
+      baseSettings = builtins.fromJSON (builtins.readFile ./dms-settings.json);
+      # Filter battery widget from bar configs when not a laptop.
+      patchBarConfig =
+        bar:
+        bar
+        // {
+          rightWidgets = builtins.filter (
+            w:
+            let
+              id = if builtins.isAttrs w then w.id else w;
+            in
+            isLaptop || id != "battery"
+          ) bar.rightWidgets;
         };
-        # DMS enables power-profiles-daemon by default, which conflicts with TLP.
-        services.power-profiles-daemon.enable = false;
+      settings = baseSettings // {
+        showBattery = isLaptop;
+        osdPowerProfileEnabled = false;
+        barConfigs = map patchBarConfig baseSettings.barConfigs;
       };
-
-    homeManager =
-      {
-        lib,
-        pkgs,
-        ...
-      }:
-      {
-        imports = [ inputs.dms.homeModules.dank-material-shell ];
-
-        home.file.".config/DankMaterialShell/settings.json".source = ./dms-settings.json;
-
-        # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
-        home.activation.syncWallpapers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          wallpaperSrc="/home/${username}/nixos-config/assets/.wallpapers"
-          wallpaperDst="$HOME/Pictures/Wallpapers"
-
-          if [ -d "$wallpaperSrc" ] && [ -n "$(ls -A "$wallpaperSrc" 2>/dev/null)" ]; then
-            $DRY_RUN_CMD mkdir -p "$wallpaperDst"
-            $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete "$wallpaperSrc/" "$wallpaperDst/"
-          fi
-        '';
-
-        programs.dank-material-shell = {
-          enable = true;
-          dgop.package = inputs.dgop.packages.${pkgs.stdenv.hostPlatform.system}.default;
-          enableSystemMonitoring = true;
-          enableVPN = true;
-          enableDynamicTheming = false;
-          enableAudioWavelength = false;
-          enableCalendarEvents = false;
-          systemd = {
+    in
+    {
+      nixos =
+        { pkgs, ... }:
+        {
+          imports = [ inputs.dms.nixosModules.dank-material-shell ];
+          programs.dank-material-shell = {
             enable = true;
-            restartIfChanged = true;
+            dgop.package = inputs.dgop.packages.${pkgs.stdenv.hostPlatform.system}.default;
+          };
+          # DMS enables power-profiles-daemon by default, which conflicts with TLP.
+          services.power-profiles-daemon.enable = false;
+        };
+
+      homeManager =
+        {
+          lib,
+          pkgs,
+          ...
+        }:
+        {
+          imports = [ inputs.dms.homeModules.dank-material-shell ];
+
+          home.file.".config/DankMaterialShell/settings.json".text = builtins.toJSON settings;
+
+          # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
+          home.activation.syncWallpapers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            wallpaperSrc="/home/${username}/nixos-config/assets/.wallpapers"
+            wallpaperDst="$HOME/Pictures/Wallpapers"
+
+            if [ -d "$wallpaperSrc" ] && [ -n "$(ls -A "$wallpaperSrc" 2>/dev/null)" ]; then
+              $DRY_RUN_CMD mkdir -p "$wallpaperDst"
+              $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete "$wallpaperSrc/" "$wallpaperDst/"
+            fi
+          '';
+
+          programs.dank-material-shell = {
+            enable = true;
+            dgop.package = inputs.dgop.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            enableSystemMonitoring = true;
+            enableVPN = true;
+            enableDynamicTheming = false;
+            enableAudioWavelength = false;
+            enableCalendarEvents = false;
+            systemd = {
+              enable = true;
+              restartIfChanged = true;
+            };
+          };
+
+          # qt5ct/qt6ct config requests kvantum as the Qt style, but kvantum fails
+          # to load due to a qtsvg version mismatch, causing quickshell to deadlock.
+          # Bypass qt5ct entirely for DMS — it uses its own QML theme anyway.
+          systemd.user.services.dms = {
+            Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
           };
         };
-
-        # qt5ct/qt6ct config requests kvantum as the Qt style, but kvantum fails
-        # to load due to a qtsvg version mismatch, causing quickshell to deadlock.
-        # Bypass qt5ct entirely for DMS — it uses its own QML theme anyway.
-        systemd.user.services.dms = {
-          Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
-        };
-      };
-  };
+    };
 }
