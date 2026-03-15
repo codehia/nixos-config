@@ -31,6 +31,10 @@
             BROWSER = "zen";
           };
         };
+        programs.git.settings.user = {
+          name = "codehia";
+          email = "dev@sacharya.dev";
+        };
       };
   };
 }
