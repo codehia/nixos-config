@@ -7,43 +7,47 @@
 #   - Mod+Comma/Period consume/expel windows into/from columns (niri-unique)
 #   - Workspaces are a vertical stack (dynamic), not numbered tags
 #   - Parameterless actions use `= [];` syntax (niri-flake type requirement)
-{...}: {
+_: {
   den.aspects.niri = {
-    homeManager = {...}: {
+    homeManager = _: {
       programs.niri.settings.binds = {
         # ── Application launchers ──
-        "Mod+P".action.spawn = ["rofi" "-show" "drun"];
+        "Mod+P".action.spawn = [
+          "rofi"
+          "-show"
+          "drun"
+        ];
         "Mod+Q".action.spawn = "ghostty";
         "Mod+W".action.spawn = "zen-beta";
         "Mod+T".action.spawn = "thunar";
 
         # ── Window management ──
-        "Mod+C".action.close-window = [];
-        "Mod+F".action.maximize-column = [];
+        "Mod+C".action.close-window = [ ];
+        "Mod+F".action.maximize-column = [ ];
         "Mod+Shift+F".action.spawn = "nfsm-cli"; # nfsm: fullscreen with position restore
 
         # ── Column navigation (niri's horizontal strip) ──
-        "Mod+H".action.focus-column-left = [];
-        "Mod+L".action.focus-column-right = [];
-        "Mod+K".action.focus-window-or-workspace-up = [];
-        "Mod+J".action.focus-window-or-workspace-down = [];
+        "Mod+H".action.focus-column-left = [ ];
+        "Mod+L".action.focus-column-right = [ ];
+        "Mod+K".action.focus-window-or-workspace-up = [ ];
+        "Mod+J".action.focus-window-or-workspace-down = [ ];
 
         # ── Move windows ──
-        "Mod+Shift+H".action.move-column-left = [];
-        "Mod+Shift+L".action.move-column-right = [];
-        "Mod+Shift+K".action.move-window-up-or-to-workspace-up = [];
-        "Mod+Shift+J".action.move-window-down-or-to-workspace-down = [];
+        "Mod+Shift+H".action.move-column-left = [ ];
+        "Mod+Shift+L".action.move-column-right = [ ];
+        "Mod+Shift+K".action.move-window-up-or-to-workspace-up = [ ];
+        "Mod+Shift+J".action.move-window-down-or-to-workspace-down = [ ];
 
         # ── Resize ──
-        "Mod+R".action.switch-preset-column-width = [];
-        "Mod+Shift+R".action.switch-preset-window-height = [];
+        "Mod+R".action.switch-preset-column-width = [ ];
+        "Mod+Shift+R".action.switch-preset-window-height = [ ];
         "Mod+Ctrl+H".action.set-column-width = "-5%";
         "Mod+Ctrl+L".action.set-column-width = "+5%";
         "Mod+Ctrl+K".action.set-window-height = "-5%";
         "Mod+Ctrl+J".action.set-window-height = "+5%";
 
         # ── Workspace navigation ──
-        "Mod+Z".action.focus-workspace-previous = [];
+        "Mod+Z".action.focus-workspace-previous = [ ];
         "Mod+1".action.focus-workspace = 1;
         "Mod+2".action.focus-workspace = 2;
         "Mod+3".action.focus-workspace = 3;
@@ -58,34 +62,40 @@
         "Mod+Shift+5".action.move-column-to-workspace = 5;
 
         # ── Column operations (niri-unique) ──
-        "Mod+Comma".action.consume-window-into-column = [];
-        "Mod+Period".action.expel-window-from-column = [];
+        "Mod+Comma".action.consume-window-into-column = [ ];
+        "Mod+Period".action.expel-window-from-column = [ ];
 
         # ── Floating ──
-        "Mod+Shift+Space".action.toggle-window-floating = [];
+        "Mod+Shift+Space".action.toggle-window-floating = [ ];
 
         # ── Alt-Tab ──
-        "Alt+Tab".action.focus-column-right = [];
+        "Alt+Tab".action.focus-column-right = [ ];
 
         # ── Mouse wheel workspaces ──
-        "Mod+WheelScrollDown".action.focus-workspace-down = [];
-        "Mod+WheelScrollUp".action.focus-workspace-up = [];
+        "Mod+WheelScrollDown".action.focus-workspace-down = [ ];
+        "Mod+WheelScrollUp".action.focus-workspace-up = [ ];
 
         # ── Screenshot (niri built-in) ──
-        "Print".action.screenshot = [];
-        "Ctrl+Print".action.screenshot-screen = [];
-        "Alt+Print".action.screenshot-window = [];
+        "Print".action.screenshot = [ ];
+        "Ctrl+Print".action.screenshot-screen = [ ];
+        "Alt+Print".action.screenshot-window = [ ];
 
         # ── Scratchpad (Nirius — generic minimize) ──
         # Minimize focused window to scratchpad (bottom workspace)
-        "Mod+N".action.spawn = ["nirius" "scratchpad-toggle"];
+        "Mod+N".action.spawn = [
+          "nirius"
+          "scratchpad-toggle"
+        ];
         # Show all scratchpad windows on current workspace
-        "Mod+Shift+N".action.spawn = ["nirius" "scratchpad-show-all"];
+        "Mod+Shift+N".action.spawn = [
+          "nirius"
+          "scratchpad-show-all"
+        ];
         # Per-app scratchpad toggles are in plugins.nix (nscratch)
 
         # ── Session ──
         "Mod+Shift+Q".action.quit.skip-confirmation = true;
-        "Mod+Shift+Slash".action.show-hotkey-overlay = [];
+        "Mod+Shift+Slash".action.show-hotkey-overlay = [ ];
       };
     };
   };

@@ -1,6 +1,6 @@
-{...}: {
+_: {
   den.aspects.direnv = {
-    homeManager = {...}: {
+    homeManager = _: {
       programs.direnv = {
         enable = true;
         nix-direnv.enable = true;

@@ -13,11 +13,10 @@
     homeManager =
       {
         pkgs,
-        lib,
         ...
       }:
       let
-        system = pkgs.stdenv.hostPlatform.system;
+        inherit (pkgs.stdenv.hostPlatform) system;
         persway = inputs.persway.packages.${system}.default;
 
         # ── Center-master layout ──

@@ -5,9 +5,9 @@
 # den.default:    Applied to every host's NixOS and home-manager evaluations.
 { inputs, ... }:
 let
-  unstableOverlay = final: prev: {
+  unstableOverlay = final: _: {
     unstable = import inputs.nixpkgs-unstable {
-      system = final.stdenv.hostPlatform.system;
+      inherit (final.stdenv.hostPlatform) system;
       config.allowUnfree = true;
     };
   };

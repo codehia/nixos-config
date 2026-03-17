@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   den.aspects.dev-tools = {
     homeManager =
       { pkgs, ... }:

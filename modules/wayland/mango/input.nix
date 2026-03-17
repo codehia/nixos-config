@@ -1,8 +1,8 @@
 # MangoWC input, layout, monitor, and misc settings.
 # Merges into the mangowc aspect via the collector pattern.
-{...}: {
+_: {
   den.aspects.mangowc = {
-    homeManager = {...}: {
+    homeManager = _: {
       wayland.windowManager.mango.settings = ''
         # Layout — master-stack like Hyprland
         default_mfact=0.62

@@ -3,8 +3,7 @@
 # also define den.aspects.swayfx and their attrs are merged together by den.
 #
 # To activate: add den.aspects.swayfx to thinkpad.nix includes and set greetd session to "sway".
-{ ... }:
-{
+_: {
   den.aspects.swayfx = {
     nixos =
       { pkgs, ... }:

@@ -12,8 +12,7 @@
 #   Hyprland movetoworkspacesilent → sway move container to workspace number <n>
 #   Hyprland togglefloating → sway floating toggle
 #   Per-app scratchpads via sway-scratch (see scratchpad.nix for packaging)
-{ ... }:
-{
+_: {
   den.aspects.swayfx = {
     homeManager =
       { lib, ... }:

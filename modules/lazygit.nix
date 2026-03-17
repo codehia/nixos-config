@@ -1,6 +1,6 @@
-{...}: {
+_: {
   den.aspects.lazygit = {
-    homeManager = {...}: {
+    homeManager = _: {
       programs.lazygit = {
         enable = true;
         settings = {
