@@ -22,6 +22,11 @@
     hooks = {
       stylua.enable = true;
       nixfmt.enable = true;
+      deadnix.enable = true;
+      statix = {
+        enable = true;
+        pass_filenames = true;
+      };
       mirror-push = {
         enable = true;
         name = "Post Commit push to mirror repo";
