@@ -85,6 +85,18 @@ end
 M.setup = function()
   vim.lsp.config('*', { on_attach = M.on_attach })
 
+  -- WHY nix_has_feature() guards:
+  -- extraPackages in nvim.nix is filtered by the same `languages` list that populates
+  -- info.categories. If a language is not enabled, its server binary is NOT on PATH.
+  -- Without these guards, vim.lsp.enable('gopls') would still be called, Neovim would
+  -- try to spawn the missing binary on the first .go file open, and show an error.
+  --
+  -- Alternative: vim.fn.executable('gopls') == 1 — same safety without needing Nix metadata.
+  --
+  -- Note: each server below calls nix_has_feature twice — once for vim.lsp.config and
+  -- once to build the servers list. A table-driven loop would eliminate this duplication
+  -- (see modules/nvim/README.md for the refactor pattern).
+
   if nix_has_feature('lua') then
     vim.lsp.config('lua_ls', {
       cmd = { 'lua-language-server' },

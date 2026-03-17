@@ -11,6 +11,8 @@ return {
   -- ---------------------------------------------------------------------------
   {
     'lazydev.nvim',
+    -- Guard: lazydev enhances lua_ls for Neovim config editing; no value without the lua
+    -- category since lua-language-server won't be on PATH and lua_ls won't be configured.
     enabled = nix_has_feature('lua'),
     ft = 'lua',
     after = function()
@@ -428,6 +430,9 @@ return {
   -- ---------------------------------------------------------------------------
   {
     'nvim-dap-go',
+    -- Guard: needs dlv (Go debugger) on PATH, which is only present when go is in the
+    -- `languages` list in nvim.nix. Without this, lze would load the plugin but it
+    -- would error trying to configure an adapter whose binary doesn't exist.
     enabled = nix_has_feature('go'),
     on_plugin = { 'nvim-dap' },
     after = function()
