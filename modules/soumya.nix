@@ -7,23 +7,19 @@
       (den._.user-shell "fish")
     ];
 
-    nixos =
-      { ... }:
-      {
-        users.users.soumya = {
-          description = "Soumyaranjan Acharya";
-          initialPassword = "Soumya$321";
-        };
+    nixos = _: {
+      users.users.soumya = {
+        description = "Soumyaranjan Acharya";
+        initialPassword = "Soumya$321";
       };
+    };
 
-    homeManager =
-      { ... }:
-      {
-        home.homeDirectory = "/home/soumya";
-        programs.git.settings.user = {
-          name = "Soumyaranjan Acharya";
-          email = "";
-        };
+    homeManager = _: {
+      home.homeDirectory = "/home/soumya";
+      programs.git.settings.user = {
+        name = "Soumyaranjan Acharya";
+        email = "";
       };
+    };
   };
 }
