@@ -65,7 +65,7 @@
 │                        │                                            │
 │                        ▼ trigger fires                              │
 │                   load fn (default: vim.cmd.packadd, or             │
-│                            lzextras.with_after for plugins          │
+│                            lzextras.loaders.with_after for plugins  │
 │                            that have an /after directory)           │
 │                   → loads from opt/plugin-name/                     │
 │                   → after() hook runs (setup calls)                 │
@@ -227,20 +227,30 @@ NIX (nvim.nix)                          LUA (init.lua / plugin configs)
 ──────────────────────────────────────────────────────────────────────
 info = {                                local nix = require(
   categories = {                          vim.g.nix_info_plugin_name
-    lua = true;                         )
+    lua = true;          ──────────►    )
     nix = true;
     python = false;                     -- Safe nested access:
   };                                    -- nix(default, "key1", "key2", ...)
-  formatters = {
-    fast = { ... };     ──────────►    local cats = nix(nil, "categories")
-    slow = { ... };                    local hasLua = nix(false,
-  };                                             "categories", "lua")
-  linters = { ... };
-  nixdExtras.nixpkgs =  ──────────►    local fmts = nix({},
-    "import ${pkgs.path} {}";                   "formatters", "fast")
+
+                                        -- Boolean category check:
+  formatters = {                        nix_has_feature("lua")
+    fast = { ... };     ──────────►       → nix(false,"info","categories","lua")
+    slow = { ... };                             → true / false
+  };
+                                        -- Read any value:
+  linters = { ... };    ──────────►    nix_info("formatters","fast")
+                                          → nix(nil,"info","formatters","fast")
+  nixdExtras.nixpkgs =  ──────────►    nix_info("nixdExtras","nixpkgs")
+    "import ${pkgs.path} {}";             → "import /nix/store/...-source {}"
 };
-                                       -- nixd uses this for eval:
-                                       -- nix(nil, "nixdExtras", "nixpkgs")
+
+-- nix_has_feature / nix_info are globals set in init.lua:
+_G.nix_has_feature = function(name)
+  return _nix(false, 'info', 'categories', name) == true
+end
+_G.nix_info = function(...)
+  return _nix(nil, 'info', ...)
+end
 ```
 
 ---
@@ -348,7 +358,7 @@ modules/nvim/
     plugins/
       ui.lua            ← lze specs: UI plugins
       editor.lua        ← lze specs: editor plugins
-                           nvim-treesitter uses lzextras.with_after
+                           nvim-treesitter uses lzextras.loaders.with_after
                            harpoon2 / trouble / zen-mode / oil use lzextras.key2spec
       coding.lua        ← lze specs: coding plugins
                            nvim-dap uses lzextras.key2spec
@@ -365,4 +375,45 @@ nvim.nix
 init.lua
   └─ require('lze').load(...)  ←── lua/plugins/*.lua (what/when to load)
        └─ lsp handler          ←── lua/config/lsp.lua (LSP server configs)
+```
+
+---
+
+## 10. nix_has_feature — Category Gating Flow
+
+```
+nvim.nix  den.aspects.nvim { languages ? ["lua" "nix"] }
+┌──────────────────────────────────────────────────────────────────┐
+│  enabledLangs = ["general"] ++ languages                         │
+│               = ["general", "lua", "nix"]                        │
+│                                                                  │
+│  categories   = { general=true; lua=true; nix=true; }  ─────────┼──► info.categories
+│                                                                  │    (readable from Lua)
+│  extraPackages = concatMap .packages enabledLangs        ────────┼──► PATH contains:
+│                                                                  │    lua-language-server ✓
+│  (go not in languages)                                           │    nixd               ✓
+│                                                                  │    gopls              ✗
+└──────────────────────────────────────────────────────────────────┘
+
+AT RUNTIME (lsp.lua):
+
+  nix_has_feature("lua") == true   ──► vim.lsp.config("lua_ls", {...})   ✓
+                                       vim.lsp.enable({"lua_ls"})         ✓
+
+  nix_has_feature("go")  == false  ──► skip vim.lsp.config("gopls")      ✓
+
+  WITHOUT the guard:
+    vim.lsp.enable("gopls") would be called
+    user opens a .go file
+    Neovim tries to spawn gopls  ──► binary not on PATH ──► ERROR        ✗
+
+AT RUNTIME (coding.lua):
+
+  enabled = nix_has_feature("lua") ──► lazydev.nvim loaded by lze         ✓
+  enabled = nix_has_feature("go")  ──► false → lze skips nvim-dap-go     ✓
+  (without guard: lze loads nvim-dap-go, it errors configuring dlv)
+
+ALTERNATIVE (no Nix metadata needed):
+  vim.fn.executable("gopls") == 1   ──► same safety, runtime check
+  (but can't gate plugin `enabled` field without another approach)
 ```
