@@ -1,6 +1,6 @@
-{...}: {
+_: {
   den.aspects.shell-tools = {
-    homeManager = {...}: {
+    homeManager = _: {
       programs.fzf = {
         enable = true;
         enableFishIntegration = true;

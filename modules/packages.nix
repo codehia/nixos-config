@@ -1,39 +1,52 @@
-{...}: {
+_: {
   den.aspects.packages = {
-    homeManager = {pkgs, ...}: {
-      home.packages = with pkgs; [
-        cowsay
-        fortune
-        fastfetch
-        gearlever
-        qbittorrent
+    nixos =
+      { pkgs, ... }:
+      {
+        environment.systemPackages = with pkgs; [
+          vim
+          wget
+          git
+        ];
+      };
 
-        # system tools
-        strace
-        ltrace
-        lsof
-        sysstat
-        lm_sensors
-        ethtool
-        pciutils
-        usbutils
-        libglvnd
-        libglibutil
+    homeManager =
+      { pkgs, ... }:
+      {
+        home.packages = with pkgs; [
+          cowsay
+          fortune
+          fastfetch
+          gearlever
+          qbittorrent
 
-        # file management
-        xfce.thunar
-        xfce.thunar-volman
+          # system tools
+          strace
+          ltrace
+          lsof
+          sysstat
+          lm_sensors
+          ethtool
+          pciutils
+          usbutils
+          libglvnd
+          libglibutil
 
-        # security
-        gnupg
-        age
-        ssh-to-age
-        _1password-gui
-        _1password-cli
-        ente-auth
+          # file management
+          xfce.thunar
+          xfce.thunar-volman
 
-        brightnessctl
-      ];
-    };
+          # security
+          gnupg
+          age
+          ssh-to-age
+          _1password-gui
+          _1password-cli
+          ente-auth
+
+          brightnessctl
+          brave
+        ];
+      };
   };
 }

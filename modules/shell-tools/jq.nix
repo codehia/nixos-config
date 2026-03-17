@@ -1,7 +1,9 @@
-{...}: {
+_: {
   den.aspects.shell-tools = {
-    homeManager = {pkgs, ...}: {
-      home.packages = [pkgs.jq];
-    };
+    homeManager =
+      { pkgs, ... }:
+      {
+        home.packages = [ pkgs.jq ];
+      };
   };
 }

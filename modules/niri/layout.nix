@@ -1,8 +1,8 @@
 # Niri layout, appearance, and animations.
 # Collector pattern: merged into den.aspects.niri by den.
-{...}: {
+_: {
   den.aspects.niri = {
-    homeManager = {...}: {
+    homeManager = _: {
       programs.niri.settings = {
         layout = {
           gaps = 7;
@@ -24,11 +24,13 @@
           };
 
           preset-column-widths = [
-            {proportion = 1.0 / 3.0;}
-            {proportion = 1.0 / 2.0;}
-            {proportion = 2.0 / 3.0;}
+            { proportion = 1.0 / 3.0; }
+            { proportion = 1.0 / 2.0; }
+            { proportion = 2.0 / 3.0; }
           ];
-          default-column-width = {proportion = 1.0 / 2.0;};
+          default-column-width = {
+            proportion = 1.0 / 2.0;
+          };
 
           tab-indicator = {
             enable = true;
@@ -75,14 +77,16 @@
         # Default window rule: rounded corners + clip for Noctalia compatibility.
         window-rules = [
           {
-            geometry-corner-radius = let
-              r = 7.0;
-            in {
-              top-left = r;
-              top-right = r;
-              bottom-left = r;
-              bottom-right = r;
-            };
+            geometry-corner-radius =
+              let
+                r = 7.0;
+              in
+              {
+                top-left = r;
+                top-right = r;
+                bottom-left = r;
+                bottom-right = r;
+              };
             clip-to-geometry = true;
           }
         ];

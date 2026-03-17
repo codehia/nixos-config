@@ -14,24 +14,22 @@
       userSopsManaged = userSopsFile != null;
     in
     {
-      nixos =
-        { ... }:
-        {
-          services.openssh = {
-            enable = true;
-            hostKeys = lib.mkIf sopsManaged [ ];
-          };
+      nixos = _: {
+        services.openssh = {
+          enable = true;
+          hostKeys = lib.mkIf sopsManaged [ ];
+        };
 
-          sops.secrets = lib.mkIf sopsManaged {
-            ssh_host_ed25519_key = {
-              inherit sopsFile;
-              path = "/etc/ssh/ssh_host_ed25519_key";
-              owner = "root";
-              group = "root";
-              mode = "0600";
-            };
+        sops.secrets = lib.mkIf sopsManaged {
+          ssh_host_ed25519_key = {
+            inherit sopsFile;
+            path = "/etc/ssh/ssh_host_ed25519_key";
+            owner = "root";
+            group = "root";
+            mode = "0600";
           };
         };
+      };
 
       homeManager =
         { config, ... }:

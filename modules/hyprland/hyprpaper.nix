@@ -1,6 +1,6 @@
-{...}: {
+_: {
   den.aspects.hyprland = {
-    homeManager = {...}: {
+    homeManager = _: {
       services.hyprpaper = {
         enable = true;
         settings = {

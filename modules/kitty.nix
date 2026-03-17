@@ -1,6 +1,6 @@
-{...}: {
+_: {
   den.aspects.kitty = {
-    homeManager = {...}: {
+    homeManager = _: {
       programs.kitty = {
         enable = true;
         enableGitIntegration = true;

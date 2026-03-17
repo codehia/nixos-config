@@ -1,6 +1,6 @@
-{...}: {
+_: {
   den.aspects.shell-tools = {
-    homeManager = {...}: {
+    homeManager = _: {
       programs.nix-index = {
         enable = true;
         enableFishIntegration = true;

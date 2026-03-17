@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   den.aspects.ghostty = {
     homeManager =
       { pkgs, ... }:
@@ -10,7 +9,7 @@
           enableFishIntegration = true;
           installBatSyntax = true;
           settings = {
-            font-family = "JetBrainsMono Nerd Font";
+            font-family = "JetBrainsMono Nerd Font,JetBrainsMono NF";
             font-size = 14;
             cursor-style = "block";
             cursor-style-blink = true;

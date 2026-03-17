@@ -1,14 +1,14 @@
 # Niri input and monitor settings.
 # Collector pattern: merged into den.aspects.niri by den.
-{...}: {
+_: {
   den.aspects.niri = {
-    homeManager = {...}: {
+    homeManager = _: {
       programs.niri.settings = {
         input = {
           keyboard = {
             repeat-delay = 300;
             repeat-rate = 25;
-            xkb = {};
+            xkb = { };
           };
           touchpad = {
             tap = true;

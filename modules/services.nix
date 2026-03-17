@@ -1,6 +1,6 @@
-{...}: {
+_: {
   den.aspects.services = {
-    homeManager = {...}: {
+    homeManager = _: {
       services = {
         gnome-keyring.enable = true;
         dunst.enable = false;

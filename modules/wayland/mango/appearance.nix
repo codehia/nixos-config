@@ -1,8 +1,8 @@
 # MangoWC appearance — gaps, borders, colors, blur, shadows, animations.
 # Merges into the mangowc aspect via the collector pattern.
-{...}: {
+_: {
   den.aspects.mangowc = {
-    homeManager = {...}: {
+    homeManager = _: {
       wayland.windowManager.mango.settings = ''
         # Gaps (matching Hyprland: gaps_in=5, gaps_out=7)
         gappih=7

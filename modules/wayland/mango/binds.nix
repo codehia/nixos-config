@@ -1,8 +1,8 @@
 # MangoWC keybindings — merges into the mangowc aspect via the collector pattern.
 # den.aspects.mangowc is also defined in mangowc.nix; den merges both definitions.
-{...}: {
+_: {
   den.aspects.mangowc = {
-    homeManager = {...}: {
+    homeManager = _: {
       wayland.windowManager.mango.settings = ''
         # Application launchers
         bind=SUPER,p,spawn,rofi -show drun
