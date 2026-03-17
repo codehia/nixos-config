@@ -33,32 +33,43 @@ install:
 	  echo "==> User age key placed at ${USER_KEY}."
 	fi
 
-	nixos-rebuild switch --flake . --sudo
+	nh os switch
 
+# Build and activate temporarily (no boot entry)
+test:
+	nh os test
+
+# Build and set boot default without activating
+boot:
+	nh os boot
+
+# Dry run — show what would change without applying
+dry:
+	nh os switch -n
+
+# Apply with trace for debugging
 debug:
-	nixos-rebuild switch --flake . --sudo --show-trace --verbose
+	nh os switch -- --show-trace --verbose
 
 write-flake:
 	nix run ".#write-flake"
 
+# Update all flake inputs and rebuild. To update without rebuilding: nix flake update
 up:
-	nix flake update
+	nh os switch -u
 
-# Update specific input
-# usage: make upp i=home-manager
+# Update a single flake input and rebuild: just upp i=home-manager
+# To update without rebuilding: nix flake update <input>
 upp:
-	nix flake update $(i)
+	nh os switch -U $(i)
 
+# Show generation history
 history:
-	nix profile history --profile /nix/var/nix/profiles/system
+	nh os info
 
 repl:
-	nix repl -f flake:nixpkgs
+	nh os repl
 
+# Garbage collect — remove old generations and unused store entries
 clean:
-	# remove all generations older than 7 days
-	sudo nix profile wipe-history --profile /nix/var/nix/profiles/system  --older-than 7d
-
-gc:
-	# garbage collect all unused nix store entries
-	sudo nix-collect-garbage --delete-old
+	nh clean all

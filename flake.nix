@@ -48,6 +48,10 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     niri-scratchpad.url = "github:gvolpe/niri-scratchpad";
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-lib.follows = "nixpkgs";
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
