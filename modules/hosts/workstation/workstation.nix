@@ -4,48 +4,23 @@
 { den, ... }:
 let
   username = "soumya";
+  session = "/home/${username}/.nix-profile/bin/start-hyprland";
 in
 {
   den.aspects.workstation = {
     nixos =
       { pkgs, ... }:
-      let
-        tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
-        session = "/home/${username}/.nix-profile/bin/start-hyprland";
-      in
       {
         imports = [
           ./_hardware-configuration.nix
           ./_disko-config.nix
         ];
 
-        networking = {
-          hostName = "workstation";
-          networkmanager.enable = true;
-          firewall = {
-            trustedInterfaces = [ "tailscale0" ];
-            checkReversePath = "loose";
-          };
-        };
-
         time.timeZone = "Asia/Kolkata";
 
         i18n = {
           defaultLocale = "en_US.UTF-8";
           extraLocales = [ "all" ];
-        };
-
-        security.sudo.wheelNeedsPassword = false;
-
-        environment.systemPackages = with pkgs; [
-          vim
-          wget
-          git
-          fish
-        ];
-
-        programs = {
-          fish.enable = true;
         };
 
         services = {
@@ -62,29 +37,12 @@ in
               };
             };
           };
-          greetd = {
-            enable = true;
-            settings = {
-              initial_session = {
-                command = "${session}";
-                user = "${username}";
-              };
-              default_session = {
-                command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd '${session}'";
-                user = "greeter";
-              };
-            };
-          };
           gvfs.enable = true;
           tailscale = {
             enable = true;
             package = pkgs.unstable.tailscale;
             openFirewall = true;
             port = 7498;
-          };
-          pipewire = {
-            enable = true;
-            pulse.enable = true;
           };
           udev.extraRules = ''
             KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
@@ -96,19 +54,11 @@ in
           bluetooth = {
             enable = false;
             powerOnBoot = false;
-            settings = {
-              General = {
-                Experimental = false;
-              };
-            };
+            settings.General.Experimental = false;
           };
-          graphics = {
-            enable = true;
-            extraPackages = with pkgs; [
-              mesa
-              rocmPackages.clr.icd
-            ];
-          };
+          graphics.extraPackages = with pkgs; [
+            rocmPackages.clr.icd
+          ];
         };
 
         systemd.services.kanata-internalKeyboard.serviceConfig = {
@@ -120,7 +70,13 @@ in
       };
 
     includes = [
-      (den.aspects.nix-config username)
+      (den.aspects.nix-config { inherit username; })
+      (den.aspects.networking { hostname = "workstation"; })
+      (den.aspects.greetd { inherit username session; })
+      den.aspects.pipewire
+      den.aspects.graphics
+      den.aspects.sudo
+      den.aspects.dconf
       den.aspects.boot
       den.aspects.catppuccin
       den.aspects.stylix

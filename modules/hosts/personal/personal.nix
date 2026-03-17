@@ -4,15 +4,12 @@
 { den, ... }:
 let
   username = "deus";
+  session = "/home/${username}/.nix-profile/bin/sway";
 in
 {
   den.aspects.personal = {
     nixos =
       { pkgs, ... }:
-      let
-        tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
-        session = "/home/${username}/.nix-profile/bin/sway";
-      in
       {
         imports = [
           ./_hardware-configuration.nix
@@ -21,22 +18,6 @@ in
 
         boot.initrd.kernelModules = [ "amdgpu" ];
 
-        zramSwap = {
-          enable = true;
-          priority = 100;
-          algorithm = "lz4";
-          memoryPercent = 50;
-        };
-
-        networking = {
-          hostName = "personal";
-          networkmanager.enable = true;
-          firewall = {
-            trustedInterfaces = [ "tailscale0" ];
-            checkReversePath = "loose";
-          };
-        };
-
         time.timeZone = "Asia/Kolkata";
 
         i18n = {
@@ -44,29 +25,15 @@ in
           extraLocales = [ "all" ];
         };
 
-        security.sudo.wheelNeedsPassword = false;
-
         environment.systemPackages = with pkgs; [
-          vim
-          wget
-          git
-          fish
-          libimobiledevice
-          ifuse
-          idevicerestore
           webkitgtk_6_0
           webkitgtk_4_1
           gtk4
         ];
 
-        programs = {
-          dconf.enable = true;
-          appimage.enable = true;
-          fish.enable = true;
-        };
+        programs.appimage.enable = true;
 
         services = {
-          usbmuxd.enable = true;
           flatpak.enable = true;
           gvfs.enable = true;
           tailscale.enable = true;
@@ -80,37 +47,19 @@ in
             nssmdns6 = true;
             openFirewall = true;
           };
-          greetd = {
-            enable = true;
-            settings = {
-              initial_session = {
-                command = "${session}";
-                user = "${username}";
-              };
-              default_session = {
-                command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd '${session}'";
-                user = "greeter";
-              };
-            };
-          };
-          pipewire = {
-            enable = true;
-            pulse.enable = true;
-            alsa = {
-              enable = true;
-              support32Bit = true;
-            };
-          };
-        };
-
-        hardware.graphics = {
-          enable = true;
-          extraPackages = with pkgs; [ mesa ];
         };
       };
 
     includes = [
-      (den.aspects.nix-config username)
+      (den.aspects.nix-config { inherit username; })
+      (den.aspects.networking { hostname = "personal"; })
+      (den.aspects.greetd { inherit username session; })
+      den.aspects.pipewire
+      den.aspects.graphics
+      den.aspects.ios-devices
+      den.aspects.zram
+      den.aspects.sudo
+      den.aspects.dconf
       den.aspects.boot
       den.aspects.catppuccin
       den.aspects.stylix
