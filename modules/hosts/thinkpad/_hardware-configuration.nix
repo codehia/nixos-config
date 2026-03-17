@@ -4,7 +4,6 @@
 {
   config,
   lib,
-  pkgs,
   modulesPath,
   ...
 }:
@@ -21,9 +20,9 @@
         "usb_storage"
         "usbhid"
         "sd_mod"
-        "rtsx_usb_sdmmc"
+        "rtsx_pci_sdmmc"
       ];
-      kernelModules = [ ];
+      kernelModules = [ "amdgpu" ];
     };
     kernelModules = [ "kvm-amd" ];
     extraModulePackages = [ ];
