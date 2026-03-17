@@ -149,107 +149,6 @@ The function signature is `nix(default, "key1", "key2", ...)` — returns defaul
 
 ---
 
-## nix_has_feature and nix_info — Lua-Nix Bridge
-
-`nix_has_feature` and `nix_info` are globals injected in `init.lua`. They are the primary
-way Lua config reads values baked in at build time.
-
-### Definitions (`init.lua`)
-
-```lua
-local _nix = require(vim.g.nix_info_plugin_name)
-
-_G.nix_has_feature = function(name)
-  return _nix(false, 'info', 'categories', name) == true
-end
-
-_G.nix_info = function(...)
-  return _nix(nil, 'info', ...)
-end
-```
-
-Both are declared as known globals in `.luarc.jsonc` so lua_ls doesn't flag them.
-
-### How categories are built
-
-Categories come from `enabledLangs` in `nvim.nix`. The aspect takes a `languages` parameter:
-
-```nix
-den.aspects.nvim = { languages ? [ "lua" "nix" ], }: {
-  ...
-  enabledLangs = [ "general" ] ++ languages;
-  categories   = lib.listToAttrs (map (l: lib.nameValuePair l true) enabledLangs);
-  # → { general = true; lua = true; nix = true; }
-  extraPackages = lib.concatMap (l: langDefs.${l}.packages) enabledLangs;
-  # ↑ also filtered — only enabled languages' binaries go on PATH
-```
-
-The critical coupling: **`extraPackages` and `categories` are both derived from the same
-`enabledLangs` list.** If `go` is not in `languages`, `gopls` is not on PATH AND
-`nix_has_feature("go")` returns false.
-
-### Why the guards in lsp.lua are necessary
-
-Without `nix_has_feature`, `vim.lsp.enable('gopls')` would be called unconditionally.
-On the first `.go` file open, Neovim tries to spawn `gopls`, the binary is missing from
-PATH, and an error is shown. The guard prevents this.
-
-Same reasoning for `enabled = nix_has_feature('go')` on `nvim-dap-go` in `coding.lua` —
-the plugin needs `dlv` on PATH; without the guard, lze would load it and it would error
-trying to configure a missing adapter.
-
-### Can we remove/replace them?
-
-| Option | Trade-off |
-|--------|-----------|
-| Keep `nix_has_feature` | Single source of truth (`languages` list). Requires Nix metadata. |
-| `vim.fn.executable('gopls') == 1` | Runtime check, no Nix coupling. More portable but doesn't prevent plugin load for coding.lua cases. |
-| Remove entirely | Neovim 0.11 `vim.lsp.enable` won't hard-error on missing binaries, but user sees "server failed to start" notifications. Only acceptable if all hosts always have all tools. |
-
-### nix_info for non-boolean data
-
-`nix_info` retrieves richer structured data — not just booleans:
-
-```lua
--- coding.lua / conform.nvim setup
-local fast_info = nix_info('formatters', 'fast')  -- { lua = {"stylua"}, nix = {"nixfmt"}, ... }
-local slow_info = nix_info('formatters', 'slow')
-local linters   = nix_info('linters')             -- { lua = {"luacheck"}, ... }
-
--- lsp.lua / nixd config
-nix_info('nixdExtras', 'nixpkgs')  -- "import /nix/store/...-source {}"
-```
-
-Always use the function form — never direct indexing — so missing keys return the default
-rather than erroring.
-
-### The duplication issue in lsp.lua
-
-Each server calls `nix_has_feature` twice: once for `vim.lsp.config`, once to add to the
-`servers` list for `vim.lsp.enable`. A table-driven loop eliminates this:
-
-```lua
-local server_configs = {
-  lua    = { name = 'lua_ls',       cmd = {'lua-language-server'}, ... },
-  nix    = { name = 'nixd',         cmd = {'nixd'}, ... },
-  python = { name = 'basedpyright', cmd = {'basedpyright-langserver','--stdio'}, ... },
-}
-local servers = {}
-for lang, cfg in pairs(server_configs) do
-  if nix_has_feature(lang) then
-    local name = cfg.name
-    vim.lsp.config(name, cfg)
-    table.insert(servers, name)
-  end
-end
-vim.lsp.enable(servers)
-```
-
-This is not currently done — the current per-server `if` blocks are explicit and easier
-to read individually, but the pattern is available if the list grows.
-
----
-
 ## lze — Lazy Loading Library
 
 lze is a **pure Lua** lazy-loading library. It does NOT manage the packpath — that's
@@ -325,24 +224,22 @@ require('lze').h.event.set_event_alias("MyEvent", { event = "BufEnter", pattern 
 
 lzextras adds specialized handlers and utilities on top of lze.
 
-### How our config uses lzextras
+### Setup (how our config uses it)
 
-| Feature | Where used | Purpose |
-|---------|-----------|---------|
-| `mod_dir_to_spec('plugins')` | `init.lua` | Auto-discover all files under `lua/plugins/` — no manual list |
-| `loaders.with_after` | `nvim-treesitter` spec in `editor.lua` | Load plugin + its `/after` dir for filetype-specific query overrides |
-| `key2spec` | `editor.lua`, `coding.lua` | Single definition serves as both lazy trigger and keymap implementation |
-
-lzextras.lsp handler and merge handler are **not used** — see LSP comparison below.
+In `init.lua` (inferred from lzextras docs):
+```lua
+require('lze').register_handlers(require('lzextras').lsp)
+-- Then lze specs can use the `lsp` field
+```
 
 ### Extra Load Functions
 
 | Function | Purpose |
 |----------|---------|
-| `lzextras.loaders.with_after` | Loads plugin + its `/after` directory |
-| `lzextras.loaders.multi` | Loads multiple plugins from a list |
-| `lzextras.loaders.multi_w_after` | Loads multiple plugins with `/after` dirs |
-| `lzextras.loaders.debug_load` | Warns if plugins not found |
+| `lzextras.with_after` | Loads plugin + its `/after` directory |
+| `lzextras.multi` | Loads multiple plugins from a list |
+| `lzextras.multi_w_after` | Loads multiple plugins with `/after` dirs |
+| `lzextras.debug_load` | Warns if plugins not found |
 
 ### Utilities
 
@@ -424,30 +321,14 @@ nvim.nix
 ```
 nvim starts
   → init.lua loaded (from settings.config_directory)
-      → require('config.lsp').setup()
-           Registers all LSP servers via native Neovim 0.11 API:
-           vim.lsp.config("*", { on_attach = ... })
-           vim.lsp.config("lua_ls", { cmd, filetypes, root_markers, settings })
-           vim.lsp.enable({ "lua_ls", "nixd", ... })
-           (gated per-server by nix_has_feature("lang"))
-      → require('lze').load(require('lzextras').mod_dir_to_spec('plugins'))
-           mod_dir_to_spec auto-discovers all files under lua/plugins/ and
-           generates an import spec for each — new plugin files picked up
-           without editing init.lua.
-           Each spec: { "plugin-name", ft/event/keys/cmd = ... }
+      → registers lzextras handlers (lsp, merge, etc.)
+      → calls require('lze').load({ ... specs ... })
+           Each spec: { "plugin-name", ft/event/keys/lsp = ... }
            Handler watches for trigger
-           Trigger fires → load function (default: vim.cmd.packadd, or
-                           lzextras.loaders.with_after for plugins with /after dirs)
+           Trigger fires → vim.cmd.packadd("plugin-name")
            Plugin loads from opt/
            after() hook runs (setup calls go here)
 ```
-
-> lzextras is used for:
-> - `mod_dir_to_spec('plugins')` in init.lua — auto-discover plugin files
-> - `loaders.with_after` on nvim-treesitter — load plugin + its /after directory
-> - `key2spec` in editor.lua / coding.lua — single def for trigger + keymap
->
-> lzextras.lsp handler is NOT used — LSP is configured natively in lua/config/lsp.lua.
 
 ### Plugin Name Mapping
 
@@ -541,49 +422,12 @@ my-plugin = {
 
 ---
 
-## lzextras.lsp Handler vs Native Neovim 0.11 LSP
-
-Our config uses **native 0.11** (`vim.lsp.config` + `vim.lsp.enable` in `lua/config/lsp.lua`).
-This was a deliberate choice. Here is the full comparison:
-
-### What lzextras.lsp does differently
-
-**Native (current):** all `vim.lsp.config()` / `vim.lsp.enable()` calls happen at startup
-(inside `require('config.lsp').setup()`). The server *process* still only starts when a
-matching file is opened — the startup cost is just cheap Lua table operations.
-
-**lzextras.lsp:** those calls are deferred until the filetype trigger fires (first file open).
-
-### Concrete advantages of lzextras.lsp
-
-1. **Auto-filetype detection** — pulls filetypes from lspconfig's server definitions; no need
-   to manually write `filetypes = { "lua" }` for well-known servers.
-2. **Deferred config evaluation** — `vim.lsp.config()` / `vim.lsp.enable()` called only on
-   first relevant file open (practically negligible gain since these are cheap Lua calls).
-3. **Servers as first-class lze specs** — consistent mental model; servers get the same
-   trigger/lifecycle/ordering primitives (`dep_of`, `on_plugin`, etc.) as plugins.
-
-### Why it's not worth switching for our config
-
-1. **`nix_has_feature()` gating** — our per-server gating pattern integrates naturally with
-   the native approach; reimplementing it with lzextras.lsp adds complexity for no gain.
-2. **lspconfig would need to be eager** — lzextras.lsp relies on lspconfig for auto-filetype
-   detection, but lspconfig is intentionally `lazy = true` and unused for config in our setup.
-3. **Explicit is better here** — every server has explicit `cmd`, `filetypes`, `root_markers`.
-   No hidden lspconfig defaults — appropriate for a fully Nix-managed config.
-4. **Zero performance difference** — server process start is lazy in both approaches.
-
----
-
 ## Key Gotchas
 
 1. **Lua module name ≠ Nix package name** — always check the plugin's `lua/` dir name
 2. **`lazy = false` in Nix** = placed in `start/` = loaded at startup automatically (no lze needed)
 3. **`lazy = true` in Nix** = placed in `opt/` = MUST be loaded explicitly (lze does this)
 4. **lze spec name** `[1]` must match the **package pname** (packpath directory name), NOT the Nix key — use `find /nix/store -maxdepth 3 -name "<pattern>*" -type d` to find it; format is `vimplugin-<PNAME>-<version>`
-5. **`before = ["INIT_MAIN"]`** in Nix spec = runs config code BEFORE init.lua
-6. **info access**: always use the function form `nix(default, "key")` — direct indexing is unsafe
-7. **mod_dir_to_spec** — adding a new `lua/plugins/foo.lua` is enough; no need to touch `init.lua`
-8. **`loaders.with_after`** — use as `load = lzextras.loaders.with_after` on any plugin that has an `/after` dir (e.g. treesitter). Note: `lzextras.with_after` does NOT exist — only top-level src modules are accessible directly via `lzextras.X`; loaders live under `lzextras.loaders.*`
-9. **key2spec** — use `lzextras.key2spec(mode, lhs, rhs, opts)` in the `keys` array to avoid duplicating keymap defs in `after`; the rhs fires after `after` has already run so plugin is fully set up
-10. **lua_ls globals** — `vim`, `nix_has_feature`, `nix_info`, `Snacks` are declared in `.luarc.jsonc`; add new runtime-injected globals there
+5. **lzextras.lsp handler**: function-type spec MUST be defined before table-type specs in the load() call
+6. **`before = ["INIT_MAIN"]`** in Nix spec = runs config code BEFORE init.lua
+7. **info access**: always use the function form `nix(default, "key")` — direct indexing is unsafe
