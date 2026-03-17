@@ -26,7 +26,7 @@ in
           enabledLangs = [ "general" ] ++ languages;
 
           # Collect packages from all enabled languages
-          extraPackages = lib.concatMap (l: (langDefs.${l}).packages) enabledLangs;
+          extraPackages = lib.concatMap (l: langDefs.${l}.packages) enabledLangs;
 
           # Merge formatter maps (fast and slow) across enabled languages
           mergeFmtMaps =

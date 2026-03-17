@@ -60,7 +60,7 @@ return {
   {
     'nvim-treesitter',
     event = 'BufReadPost',
-    -- lzextras.with_after loads both opt/nvim-treesitter/ AND its /after directory.
+    -- lzextras.loaders.with_after loads both opt/nvim-treesitter/ AND its /after directory.
     -- treesitter uses after/ for filetype-specific query overrides; the default
     -- vim.cmd.packadd only loads the main plugin dir and misses it.
     load = lzextras.loaders.with_after,
