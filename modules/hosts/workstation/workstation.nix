@@ -56,9 +56,6 @@ in
             powerOnBoot = false;
             settings.General.Experimental = false;
           };
-          graphics.extraPackages = with pkgs; [
-            rocmPackages.clr.icd
-          ];
         };
 
         systemd.services.kanata-internalKeyboard.serviceConfig = {
@@ -86,7 +83,7 @@ in
       den.aspects.kitty
       den.aspects.tmux
       den.aspects.hyprland
-      (den.aspects.dms { inherit username; })
+      den.aspects.dms
       den.aspects.git
       den.aspects.lazygit
       (den.aspects.nvim {

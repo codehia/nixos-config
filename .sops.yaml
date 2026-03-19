@@ -22,6 +22,8 @@ creation_rules:
     key_groups:
       - age:
           - *rclone
+          - *personal
+          - *thinkpad
   - path_regex: secrets/deus\.yaml$
     key_groups:
       - age:

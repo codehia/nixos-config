@@ -51,11 +51,17 @@ in
       };
 
     includes = [
-      (den.aspects.nix-config { inherit username; })
+      (den.aspects.nix-config {
+        inherit username;
+        nhCleanEnabled = true;
+      })
       (den.aspects.networking { hostname = "personal"; })
       (den.aspects.greetd { inherit username session; })
+      den.aspects.nh
+      den.aspects.nix-tools
       den.aspects.pipewire
       den.aspects.graphics
+      (den.aspects.lact { gpuKey = "1002:7340-1043:04e6-0000:2d:00.0"; })
       den.aspects.ios-devices
       den.aspects.zram
       den.aspects.sudo
@@ -69,7 +75,7 @@ in
       den.aspects.kitty
       den.aspects.tmux
       den.aspects.swayfx
-      (den.aspects.dms { inherit username; })
+      den.aspects.dms
       den.aspects.git
       den.aspects.lazygit
       (den.aspects.nvim {
