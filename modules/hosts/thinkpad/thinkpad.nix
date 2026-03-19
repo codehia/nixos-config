@@ -201,10 +201,7 @@ in
       den.aspects.kitty
       den.aspects.tmux
       den.aspects.swayfx
-      (den.aspects.dms {
-        inherit username;
-        isLaptop = true;
-      })
+      den.aspects.dms
       den.aspects.git
       den.aspects.lazygit
       (den.aspects.nvim {
@@ -238,7 +235,7 @@ in
       den.aspects.zoom
       den.aspects.cursor
       den.aspects.disko
-      den.aspects.rclone
+      (den.aspects.rclone { inherit username; })
       den.aspects.gnome-keyring
       den.aspects.work
     ];
