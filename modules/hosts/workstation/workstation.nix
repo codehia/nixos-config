@@ -2,10 +2,6 @@
 # The `includes` list at the bottom composes all feature aspects into this host.
 # Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
 { den, ... }:
-let
-  username = "soumya";
-  session = "/home/${username}/.nix-profile/bin/start-hyprland";
-in
 {
   den.aspects.workstation = {
     nixos =
@@ -67,9 +63,9 @@ in
       };
 
     includes = [
-      (den.aspects.nix-config { inherit username; })
-      (den.aspects.networking { hostname = "workstation"; })
-      (den.aspects.greetd { inherit username session; })
+      den.aspects.nix-config
+      den.aspects.networking
+      den.aspects.greetd
       den.aspects.pipewire
       den.aspects.graphics
       den.aspects.sudo
@@ -86,20 +82,11 @@ in
       den.aspects.dms
       den.aspects.git
       den.aspects.lazygit
-      (den.aspects.nvim {
-        languages = [
-          "lua"
-          "nix"
-          "python"
-        ];
-      })
+      den.aspects.nvim
       den.aspects.direnv
       den.aspects.browser
       den.aspects.secrets
-      (den.aspects.ssh {
-        sopsFile = ../../../secrets/workstation.yaml;
-        userSopsFile = ../../../secrets/deus.yaml;
-      })
+      den.aspects.ssh
       den.aspects.packages
       den.aspects.services
       den.aspects.shell-tools

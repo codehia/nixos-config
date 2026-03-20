@@ -2,10 +2,6 @@
 # The `includes` list at the bottom composes all feature aspects into this host.
 # Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
 { den, ... }:
-let
-  username = "deus";
-  session = "/home/${username}/.nix-profile/bin/sway";
-in
 {
   den.aspects.personal = {
     nixos =
@@ -51,17 +47,14 @@ in
       };
 
     includes = [
-      (den.aspects.nix-config {
-        inherit username;
-        nhCleanEnabled = true;
-      })
-      (den.aspects.networking { hostname = "personal"; })
-      (den.aspects.greetd { inherit username session; })
+      den.aspects.nix-config
+      den.aspects.networking
+      den.aspects.greetd
       den.aspects.nh
       den.aspects.nix-tools
       den.aspects.pipewire
       den.aspects.graphics
-      (den.aspects.lact { gpuKey = "1002:7340-1043:04e6-0000:2d:00.0"; })
+      den.aspects.lact
       den.aspects.ios-devices
       den.aspects.zram
       den.aspects.sudo
@@ -78,23 +71,11 @@ in
       den.aspects.dms
       den.aspects.git
       den.aspects.lazygit
-      (den.aspects.nvim {
-        languages = [
-          "lua"
-          "nix"
-          "python"
-          "typescript"
-          "go"
-          "latex"
-        ];
-      })
+      den.aspects.nvim
       den.aspects.direnv
       den.aspects.browser
       den.aspects.secrets
-      (den.aspects.ssh {
-        sopsFile = ../../../secrets/personal.yaml;
-        userSopsFile = ../../../secrets/deus.yaml;
-      })
+      den.aspects.ssh
       den.aspects.packages
       den.aspects.services
       den.aspects.shell-tools

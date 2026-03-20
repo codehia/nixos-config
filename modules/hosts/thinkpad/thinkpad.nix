@@ -2,10 +2,6 @@
 # The `includes` list at the bottom composes all feature aspects into this host.
 # Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
 { den, ... }:
-let
-  username = "deus";
-  session = "/home/${username}/.nix-profile/bin/sway";
-in
 {
   den.aspects.thinkpad = {
     nixos =
@@ -179,13 +175,10 @@ in
       };
 
     includes = [
-      (den.aspects.nix-config {
-        inherit username;
-        nhCleanEnabled = true;
-      })
+      den.aspects.nix-config
       den.aspects.nh
-      (den.aspects.networking { hostname = "thinkpad"; })
-      (den.aspects.greetd { inherit username session; })
+      den.aspects.networking
+      den.aspects.greetd
       den.aspects.pipewire
       den.aspects.graphics
       den.aspects.ios-devices
@@ -204,23 +197,11 @@ in
       den.aspects.dms
       den.aspects.git
       den.aspects.lazygit
-      (den.aspects.nvim {
-        languages = [
-          "lua"
-          "nix"
-          "python"
-          "typescript"
-          "go"
-          "latex"
-        ];
-      })
+      den.aspects.nvim
       den.aspects.direnv
       den.aspects.browser
       den.aspects.secrets
-      (den.aspects.ssh {
-        sopsFile = ../../../secrets/thinkpad.yaml;
-        userSopsFile = ../../../secrets/deus.yaml;
-      })
+      den.aspects.ssh
       den.aspects.nix-tools
       den.aspects.packages
       den.aspects.services
@@ -235,7 +216,7 @@ in
       den.aspects.zoom
       den.aspects.cursor
       den.aspects.disko
-      (den.aspects.rclone { inherit username; })
+      den.aspects.rclone
       den.aspects.gnome-keyring
       den.aspects.work
     ];
