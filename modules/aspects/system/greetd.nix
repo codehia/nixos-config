@@ -1,30 +1,39 @@
 # Greeter aspect: tuigreet-backed greetd session manager.
-# Parameters:
-#   username — the auto-login and greeter user
-#   session  — path to the compositor/session binary
+# greetdUser and greetdSessionBin are freeform host attributes (set in hosts.nix).
+# The full session path is derived as /home/<greetdUser>/.nix-profile/bin/<greetdSessionBin>.
+{ den, ... }:
 {
-  den.aspects.greetd =
-    { username, session }:
-    {
-      nixos =
-        { pkgs, ... }:
+  den.aspects.greetd = {
+    includes = [
+      (den.lib.perHost (
+        { host }:
         let
-          tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
+          user = host.greetdUser;
+          session = "/home/${user}/.nix-profile/bin/${host.greetdSessionBin}";
         in
         {
-          services.greetd = {
-            enable = true;
-            settings = {
-              initial_session = {
-                command = session;
-                user = username;
-              };
-              default_session = {
-                command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd '${session}'";
-                user = "greeter";
+          nixos =
+            { pkgs, ... }:
+            let
+              tuigreet = "${pkgs.tuigreet}/bin/tuigreet";
+            in
+            {
+              services.greetd = {
+                enable = true;
+                settings = {
+                  initial_session = {
+                    command = session;
+                    inherit user;
+                  };
+                  default_session = {
+                    command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --cmd '${session}'";
+                    user = "greeter";
+                  };
+                };
               };
             };
-          };
-        };
-    };
+        }
+      ))
+    ];
+  };
 }

@@ -2,69 +2,83 @@
 # Provides fan control, power cap, and clock monitoring for AMD discrete GPUs.
 # NOT useful for laptop APUs (fan is EC-controlled, not GPU-controlled).
 #
-# Usage:
-#   den.aspects.lact {}                       # daemon only, configure via GUI
-#   den.aspects.lact { gpuKey = "..."; }      # declarative silent fan curve
+# gpuKey is a freeform host attribute (set in hosts.nix) — read via perHost.
+# Usage: den.aspects.lact
 #
 # gpuKey format: "<vendor>:<device>-<subvendor>:<subdevice>-<pci_addr>"
-# To find your key:
-#   1. lspci -nn | grep -i vga
-#      → e.g. "2d:00.0 ... [1002:7340]" gives vendor=1002, device=7340, pci_addr=0000:2d:00.0
-#   2. cat /sys/class/drm/card1/device/subsystem_vendor   → e.g. 0x1043
-#      cat /sys/class/drm/card1/device/subsystem_device   → e.g. 0x04e6
-#      (strip the 0x prefix)
-#   3. Combine: "1002:7340-1043:04e6-0000:2d:00.0"
+# To find your key: sudo lact cli list
+#   → e.g. "1002:7340-1043:04E6-0000:2d:00.0 (AMD Radeon RX 5500 XT)"
+#   Use the key exactly as lact reports it — lact normalizes hex to uppercase,
+#   so sysfs values (e.g. 0x04e6) won't match; the key must be uppercase.
 # Known keys:
-#   personal  (RX 5500 XT, Navi 14): "1002:7340-1043:04e6-0000:2d:00.0"
+#   personal  (RX 5500 XT, Navi 14): "1002:7340-1043:04E6-0000:2d:00.0"
 #
-# NOTE: When settings.gpus is set, /etc/lact/config.yaml becomes a read-only symlink.
-#       The LACT GUI cannot save changes — all tuning must be done declaratively here.
+# NOTE: curve keys must be integers in YAML — Nix attrset keys are always strings,
+#       so services.lact.settings cannot be used for the fan curve.
+#
+# NOTE: environment.etc cannot be used for config.yaml — lact writes to its config at
+#       startup, so a read-only Nix store symlink causes an immediate crash. Config is
+#       written via ExecStartPre (pkgs.writeText → cp) to a writable /etc/lact/config.yaml.
+#       The LACT GUI cannot save changes (config is overwritten on each service start).
+{ den, ... }:
 {
-  den.aspects.lact =
-    {
-      gpuKey ? null,
-    }:
-    {
-      nixos =
-        { lib, ... }:
-        {
-          # Overdrive required for fan control to work on RDNA1+
-          hardware.amdgpu.overdrive.enable = true;
-
-          services.lact = {
-            enable = true;
-            settings = lib.mkMerge [
-              {
-                daemon = {
-                  log_level = "warn";
-                  admin_group = "wheel";
-                };
-              }
-              (lib.mkIf (gpuKey != null) {
-                gpus = {
-                  ${gpuKey} = {
-                    fan_control_enabled = true;
-                    fan_control_settings = {
-                      mode = "curve";
-                      temperature_key = "edge";
-                      interval_ms = 500;
-                      # Silent curve — fans off until 50°C, ramp gently, full speed only at 90°C
-                      curve = {
-                        "40" = 0.0;
-                        "50" = 0.0;
-                        "60" = 0.2;
-                        "70" = 0.35;
-                        "80" = 0.6;
-                        "90" = 1.0;
-                      };
-                      spindown_delay_ms = 5000; # 5s delay before spinning down (avoids flapping)
-                      change_threshold = 3; # only change speed if delta > 3% (reduces noise)
-                    };
-                  };
-                };
-              })
-            ];
-          };
-        };
+  den.aspects.lact = {
+    nixos = {
+      # Overdrive required for fan control to work on RDNA1+
+      hardware.amdgpu.overdrive.enable = true;
+      services.lact.enable = true;
     };
+
+    includes = [
+      (den.lib.perHost (
+        { host }:
+        let
+          gpuKey = host.gpuKey or null;
+        in
+        {
+          nixos =
+            { lib, pkgs, ... }:
+            let
+              configText = ''
+                daemon:
+                  log_level: warn
+                  admin_group: wheel
+              ''
+              + lib.optionalString (gpuKey != null) ''
+                gpus:
+                  ${gpuKey}:
+                    fan_control_enabled: true
+                    fan_control_settings:
+                      mode: curve
+                      temperature_key: edge
+                      interval_ms: 500
+                      spindown_delay_ms: 6000
+                      change_threshold: 2
+                      curve:
+                        35: 0.0
+                        50: 0.0
+                        60: 0.20
+                        70: 0.35
+                        78: 0.52
+                        85: 0.72
+                        95: 1.0
+              '';
+              # Store config in the Nix store; ExecStartPre copies it to a writable path.
+              configFile = pkgs.writeText "lact-config.yaml" configText;
+            in
+            {
+              systemd.services.lactd.serviceConfig.ExecStartPre = [
+                # Remove stale socket from previous run (- prefix = ignore failure if missing).
+                "-/run/current-system/sw/bin/rm /run/lactd.sock"
+                # Write Nix-managed config to writable /etc/lact/config.yaml before start.
+                "${pkgs.writeShellScript "lact-write-config" ''
+                  mkdir -p /etc/lact
+                  cp ${configFile} /etc/lact/config.yaml
+                ''}"
+              ];
+            };
+        }
+      ))
+    ];
+  };
 }
