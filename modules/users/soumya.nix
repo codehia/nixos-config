@@ -5,8 +5,8 @@
 {
   den.aspects.soumya = {
     includes = [
-      den._.primary-user
-      (den._.user-shell "fish")
+      den.provides.primary-user
+      (den.provides.user-shell "fish")
 
       # Theming
       den.aspects.catppuccin

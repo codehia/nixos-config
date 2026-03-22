@@ -3,11 +3,25 @@
 # Feature aspects live here so their homeManager config flows via ctx.user → HM.
 # Host-specific aspect selection (wm, extraAspects) is driven by freeform host attrs.
 { den, ... }:
+let
+  inherit (den.lib) perUser;
+
+  wmSelector =
+    { host, ... }:
+    {
+      includes = [ den.aspects.${host.wm} ];
+    };
+  extraAspectsSelector =
+    { host, ... }:
+    {
+      includes = map (a: den.aspects.${a}) (host.extraAspects or [ ]);
+    };
+in
 {
   den.aspects.deus = {
     includes = [
-      den._.primary-user
-      (den._.user-shell "fish")
+      den.provides.primary-user
+      (den.provides.user-shell "fish")
 
       # Theming
       den.aspects.catppuccin
@@ -20,13 +34,8 @@
       den.aspects.kitty
       den.aspects.tmux
 
-      # Window manager — host.wm is a string key ("swayfx" / "hyprland")
-      (den.lib.perUser (
-        { host, ... }:
-        {
-          includes = [ den.aspects.${host.wm} ];
-        }
-      ))
+      # Window manager — host.wm selects the aspect by name
+      (perUser wmSelector)
 
       # Editor / dev
       den.aspects.git
@@ -59,12 +68,7 @@
       den.aspects.rclone
 
       # Host-specific extras — host.extraAspects is a list of aspect name strings
-      (den.lib.perUser (
-        { host, ... }:
-        {
-          includes = map (a: den.aspects.${a}) (host.extraAspects or [ ]);
-        }
-      ))
+      (perUser extraAspectsSelector)
     ];
 
     nixos.users.users.deus = {
