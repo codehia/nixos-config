@@ -45,7 +45,7 @@
       den.aspects.zoom
 
       # Desktop shell
-      den.aspects.dms
+      den.aspects.dms-home
     ];
 
     nixos.users.users.soumya = {

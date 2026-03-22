@@ -1,8 +1,29 @@
-# Host aspect for workstation — desktop with Hyprland + DMS.
-# The `includes` list at the bottom composes all feature aspects into this host.
+# Workstation host — aspect definition + host declaration.
 # Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
 { den, ... }:
 {
+  den.hosts.x86_64-linux.workstation = {
+    home-manager.enable = true;
+    greetdUser = "soumya";
+    greetdSessionBin = "start-hyprland";
+    wm = "hyprland";
+    extraAspects = [ ];
+    nvimLanguages = [
+      "lua"
+      "nix"
+      "python"
+    ];
+    users.deus = { };
+    users.soumya = {
+      nvimLanguages = [
+        "nix"
+        "lua"
+        "python"
+        "typescript"
+      ];
+    };
+  };
+
   den.aspects.workstation = {
     nixos =
       { ... }:
@@ -75,6 +96,7 @@
       den.aspects.zram
 
       # Desktop
+      den.aspects.dms
       den.aspects.greetd
       den.aspects.dconf
       den.aspects.fonts

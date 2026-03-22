@@ -53,7 +53,7 @@
       den.aspects.creative
       den.aspects.chat
       den.aspects.calibre
-      den.aspects.dms
+      den.aspects.dms-home
 
       # User-level services
       den.aspects.rclone
