@@ -14,7 +14,7 @@
 
   flake-file.inputs = {
     den = {
-      url = "github:vic/den";
+      url = "github:vic/den/latest";
     };
     flake-file = {
       url = "github:vic/flake-file";
