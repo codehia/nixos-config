@@ -83,7 +83,7 @@
       "id": "brightnessSlider",
       "enabled": true,
       "width": 50,
-      "deviceName": "leds:mmc0::"
+      "deviceName": "backlight:amdgpu_bl1"
     },
     {
       "id": "wifi",
@@ -359,7 +359,8 @@
     "poweroff",
     "lock",
     "suspend",
-    "hibernate"
+    "hibernate",
+    "restart"
   ],
   "powerMenuDefaultAction": "logout",
   "powerMenuGridLayout": false,
@@ -389,9 +390,7 @@
       "name": "Main Bar",
       "enabled": true,
       "position": 0,
-      "screenPreferences": [
-        "all"
-      ],
+      "screenPreferences": ["all"],
       "showOnLastDisplay": true,
       "leftWidgets": [
         {
@@ -399,7 +398,19 @@
           "enabled": true
         },
         {
+          "id": "separator",
+          "enabled": true
+        },
+        {
+          "id": "separator",
+          "enabled": true
+        },
+        {
           "id": "dankPomodoroTimer",
+          "enabled": true
+        },
+        {
+          "id": "separator",
           "enabled": true
         },
         {
@@ -407,31 +418,50 @@
           "enabled": true
         },
         {
+          "id": "separator",
+          "enabled": true
+        },
+        {
           "id": "focusedWindow",
-          "enabled": true,
-          "focusedWindowCompactMode": false
+          "enabled": true
         }
       ],
-      "centerWidgets": [
-        "clock"
-      ],
+      "centerWidgets": ["clock"],
       "rightWidgets": [
-        "systemTray",
-        "clipboard",
+        {
+          "id": "systemTray",
+          "enabled": true
+        },
+        {
+          "id": "clipboard",
+          "enabled": true
+        },
         {
           "id": "memUsage",
-          "enabled": true,
-          "minimumWidth": false,
-          "showSwap": false
+          "enabled": true
         },
-        "notificationButton",
-        "battery",
+        {
+          "id": "notificationButton",
+          "enabled": true
+        },
+        {
+          "id": "battery",
+          "enabled": true
+        },
         {
           "id": "controlCenterButton",
           "enabled": true,
           "showBrightnessIcon": true,
           "showBrightnessPercent": true,
           "showBatteryIcon": false
+        },
+        {
+          "id": "separator",
+          "enabled": true
+        },
+        {
+          "id": "separator",
+          "enabled": true
         },
         {
           "id": "powerMenuButton",
@@ -500,9 +530,7 @@
   "desktopClockY": -1,
   "desktopClockWidth": 280,
   "desktopClockHeight": 180,
-  "desktopClockDisplayPreferences": [
-    "all"
-  ],
+  "desktopClockDisplayPreferences": ["all"],
   "systemMonitorEnabled": false,
   "systemMonitorShowHeader": true,
   "systemMonitorTransparency": 0.8,
@@ -539,9 +567,7 @@
   "systemMonitorY": -1,
   "systemMonitorWidth": 320,
   "systemMonitorHeight": 480,
-  "systemMonitorDisplayPreferences": [
-    "all"
-  ],
+  "systemMonitorDisplayPreferences": ["all"],
   "systemMonitorVariants": [],
   "desktopWidgetPositions": {},
   "desktopWidgetGridSettings": {},

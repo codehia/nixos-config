@@ -11,6 +11,7 @@
             dates = [ "03:45" ];
           };
           settings = {
+            download-buffer-size = 524288000; # 500 MiB
             experimental-features = [
               "nix-command"
               "flakes"
