@@ -75,6 +75,7 @@
       den.aspects.zram
 
       # Desktop
+      den.aspects.dms
       den.aspects.greetd
       den.aspects.dconf
       den.aspects.fonts

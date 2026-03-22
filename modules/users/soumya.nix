@@ -21,7 +21,6 @@
 
       # Window manager — hardcoded to hyprland across all hosts
       den.aspects.hyprland
-      den.aspects.dms
 
       # Editor / dev
       den.aspects.git

@@ -28,7 +28,6 @@
           includes = [ den.aspects.${host.wm} ];
         }
       ))
-      den.aspects.dms
 
       # Editor / dev
       den.aspects.git
