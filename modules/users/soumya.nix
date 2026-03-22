@@ -14,6 +14,7 @@
       den.aspects.cursor
 
       # Terminal / shell
+      den.aspects.fish
       den.aspects.ghostty
       den.aspects.kitty
       den.aspects.tmux
