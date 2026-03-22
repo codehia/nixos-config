@@ -1,8 +1,35 @@
-# Host aspect for personal — desktop NixOS system configuration.
-# The `includes` list at the bottom composes all feature aspects into this host.
+# Personal host — aspect definition + host declaration.
 # Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
 { den, ... }:
 {
+  den.hosts.x86_64-linux.personal = {
+    home-manager.enable = true;
+    gpuKey = "1002:7340-1043:04E6-0000:2d:00.0";
+    nhCleanEnabled = true;
+    greetdUser = "deus";
+    greetdSessionBin = "sway";
+    wm = "swayfx";
+    extraAspects = [ "qbittorrent" ];
+    nvimLanguages = [
+      "lua"
+      "nix"
+      "python"
+      "typescript"
+      "go"
+      "latex"
+    ];
+    users.deus = { };
+    # Temporary: soumya added for multi-user DMS testing — remove after fix confirmed
+    users.soumya = {
+      nvimLanguages = [
+        "nix"
+        "lua"
+        "python"
+        "typescript"
+      ];
+    };
+  };
+
   den.aspects.personal = {
     nixos =
       { pkgs, ... }:
@@ -66,6 +93,7 @@
       den.aspects.zram
 
       # Desktop
+      den.aspects.dms
       den.aspects.greetd
       den.aspects.dconf
       den.aspects.fonts

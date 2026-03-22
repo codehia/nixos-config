@@ -1,8 +1,38 @@
-# Host aspect for thinkpad — the main NixOS system configuration.
-# The `includes` list at the bottom composes all feature aspects into this host.
+# Thinkpad host — aspect definition + host declaration.
 # Hardware and disko configs are _-prefixed (excluded from import-tree) and imported explicitly.
 { den, ... }:
 {
+  den.hosts.x86_64-linux.thinkpad = {
+    home-manager.enable = true;
+    isLaptop = true;
+    nhCleanEnabled = true;
+    greetdUser = "deus";
+    greetdSessionBin = "sway";
+    wm = "swayfx";
+    extraAspects = [
+      "work"
+      "zoom"
+      "qbittorrent"
+    ];
+    nvimLanguages = [
+      "lua"
+      "nix"
+      "python"
+      "typescript"
+      "go"
+      "latex"
+    ];
+    users.deus = { };
+    users.soumya = {
+      nvimLanguages = [
+        "nix"
+        "lua"
+        "python"
+        "typescript"
+      ];
+    };
+  };
+
   den.aspects.thinkpad = {
     nixos =
       { pkgs, ... }:
@@ -193,6 +223,7 @@
       den.aspects.zram
 
       # Desktop
+      den.aspects.dms
       den.aspects.greetd
       den.aspects.dconf
       den.aspects.fonts
