@@ -21,6 +21,7 @@ in
       extraAspects = [
         "work"
         "zoom"
+        "qbittorrent"
       ];
       nvimLanguages = [
         "lua"
@@ -45,7 +46,7 @@ in
       greetdUser = "deus";
       greetdSessionBin = "sway";
       wm = "swayfx";
-      extraAspects = [ ];
+      extraAspects = [ "qbittorrent" ];
       nvimLanguages = [
         "lua"
         "nix"
