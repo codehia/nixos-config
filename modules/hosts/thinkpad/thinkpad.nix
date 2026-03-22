@@ -114,7 +114,6 @@
           };
           flatpak.enable = true;
           gvfs.enable = true;
-          tailscale.enable = true;
           upower.enable = true;
           fwupd.enable = true;
           mullvad-vpn = {
@@ -187,6 +186,7 @@
       den.aspects.nix-tools
 
       # Hardware
+      den.aspects.tailscale
       den.aspects.pipewire
       den.aspects.graphics
       den.aspects.ios-devices
