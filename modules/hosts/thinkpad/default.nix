@@ -22,7 +22,6 @@
       "go"
       "latex"
     ];
-    users.deus = { };
     users.soumya = {
       nvimLanguages = [
         "nix"
@@ -31,6 +30,7 @@
         "typescript"
       ];
     };
+    users.deus = { };
   };
 
   den.aspects.thinkpad = {
