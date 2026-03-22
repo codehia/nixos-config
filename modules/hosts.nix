@@ -37,6 +37,12 @@ in
       };
       users.soumya = {
         sopsFile = "${secrets}/soumya.yaml";
+        nvimLanguages = [
+          "nix"
+          "lua"
+          "python"
+          "typescript"
+        ];
       };
     };
     personal = {
@@ -77,6 +83,12 @@ in
       };
       users.soumya = {
         sopsFile = "${secrets}/soumya.yaml";
+        nvimLanguages = [
+          "nix"
+          "lua"
+          "python"
+          "typescript"
+        ];
       };
     };
   };

@@ -15,10 +15,10 @@ in
     # perUser so homeManager forwarding reaches ctx.hm-user, and host.nvimLanguages is accessible.
     includes = [
       (den.lib.perUser (
-        { host, ... }:
+        { host, user, ... }:
         let
           languages =
-            host.nvimLanguages or [
+            user.nvimLanguages or host.nvimLanguages or [
               "lua"
               "nix"
             ];
