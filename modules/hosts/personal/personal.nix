@@ -47,48 +47,28 @@
       };
 
     includes = [
+      # Core system
       den.aspects.nix-config
       den.aspects.networking
-      den.aspects.greetd
+      den.aspects.boot
+      den.aspects.sudo
+      den.aspects.disko
+
+      # Nix tooling
       den.aspects.nh
       den.aspects.nix-tools
+
+      # Hardware
       den.aspects.pipewire
       den.aspects.graphics
       den.aspects.lact
       den.aspects.ios-devices
       den.aspects.zram
-      den.aspects.sudo
+
+      # Desktop
+      den.aspects.greetd
       den.aspects.dconf
-      den.aspects.boot
-      den.aspects.catppuccin
-      den.aspects.stylix
       den.aspects.fonts
-      den.aspects.fish
-      den.aspects.ghostty
-      den.aspects.kitty
-      den.aspects.tmux
-      den.aspects.swayfx
-      den.aspects.dms
-      den.aspects.git
-      den.aspects.lazygit
-      den.aspects.nvim
-      den.aspects.direnv
-      den.aspects.browser
-      den.aspects.secrets
-      den.aspects.ssh
-      den.aspects.packages
-      den.aspects.services
-      den.aspects.shell-tools
-      den.aspects.tui
-      den.aspects.cli-utils
-      den.aspects.dev-tools
-      den.aspects.productivity
-      den.aspects.media
-      den.aspects.creative
-      den.aspects.chat
-      den.aspects.cursor
-      den.aspects.disko
-      den.aspects.rclone
       den.aspects.gnome-keyring
     ];
   };
