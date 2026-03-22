@@ -11,7 +11,6 @@
       # Theming
       den.aspects.catppuccin
       den.aspects.stylix
-      den.aspects.fonts
       den.aspects.cursor
 
       # Terminal / shell
@@ -45,8 +44,8 @@
       den.aspects.work
       den.aspects.zoom
 
-      # User-level services
-      den.aspects.gnome-keyring
+      # Desktop shell
+      den.aspects.dms
     ];
 
     nixos.users.users.soumya = {
