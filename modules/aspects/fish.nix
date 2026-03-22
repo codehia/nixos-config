@@ -47,7 +47,9 @@
               __direnv_unload_all
 
               # import env vars from direnv (safe: this only evaluates direnv's exported env)
-              # direnv export fish | source
+              if command -q direnv
+                direnv export fish | source
+              end
 
               # if project set FISH_DIR_ENV in .envrc, source it
               if set -q FISH_DIR_ENV
