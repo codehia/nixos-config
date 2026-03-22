@@ -32,7 +32,6 @@
         services = {
           flatpak.enable = true;
           gvfs.enable = true;
-          tailscale.enable = true;
           mullvad-vpn = {
             enable = true;
             package = pkgs.mullvad-vpn;
@@ -59,6 +58,7 @@
       den.aspects.nix-tools
 
       # Hardware
+      den.aspects.tailscale
       den.aspects.pipewire
       den.aspects.graphics
       den.aspects.lact

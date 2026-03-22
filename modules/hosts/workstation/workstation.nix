@@ -5,7 +5,7 @@
 {
   den.aspects.workstation = {
     nixos =
-      { pkgs, ... }:
+      { ... }:
       {
         imports = [
           ./_hardware-configuration.nix
@@ -34,12 +34,6 @@
             };
           };
           gvfs.enable = true;
-          tailscale = {
-            enable = true;
-            package = pkgs.unstable.tailscale;
-            openFirewall = true;
-            port = 7498;
-          };
           udev.extraRules = ''
             KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
           '';
@@ -75,6 +69,7 @@
       den.aspects.nix-tools
 
       # Hardware
+      den.aspects.tailscale
       den.aspects.pipewire
       den.aspects.graphics
       den.aspects.zram
