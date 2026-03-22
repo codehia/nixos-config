@@ -12,7 +12,6 @@
       # Theming
       den.aspects.catppuccin
       den.aspects.stylix
-      den.aspects.fonts
       den.aspects.cursor
 
       # Terminal / shell
@@ -53,10 +52,11 @@
       den.aspects.media
       den.aspects.creative
       den.aspects.chat
+      den.aspects.calibre
+      den.aspects.dms
 
       # User-level services
       den.aspects.rclone
-      den.aspects.gnome-keyring
 
       # Host-specific extras — host.extraAspects is a list of aspect name strings
       (den.lib.perUser (

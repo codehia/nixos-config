@@ -6,10 +6,13 @@
     nixos.system.stateVersion = "25.11";
     homeManager.home.stateVersion = "25.11";
     includes = [
-      den._.mutual-provider
       den.provides.define-user
       den.provides.hostname
       den.provides.inputs'
     ];
   };
+
+  # Enable mutual-provider at the user context so provides.to-users /
+  # provides.to-hosts routing works across host <-> user boundaries.
+  den.ctx.user.includes = [ den.provides.mutual-provider ];
 }
