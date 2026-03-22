@@ -1,24 +1,20 @@
-# SSH service and host key management.
-# Host key (ssh_host_ed25519_key) sourced from secrets/<hostname>.yaml → /etc/ssh/
-# User key (ssh_user_ed25519_key) sourced from secrets/<username>.yaml → ~/.ssh/id_ed25519
-# Paths are derived by convention. If the secrets file doesn't exist for a host/user,
-# that key is silently unmanaged (same behaviour as the old sopsFile ? null default).
-{
-  lib,
-  den,
-  self,
-  ...
-}:
+# SSH service and host/user key management.
+# Host key (ssh_host_ed25519_key): sourced from host.sopsFile → /etc/ssh/
+# User key (ssh_user_ed25519_key): sourced from user.sopsFile → ~/.ssh/id_ed25519
+# sopsFile paths are set explicitly as freeform attributes in hosts.nix.
+# Both blocks use perUser so they fire at ctx.user {host, user} —
+# nixos config from perUser still flows to the NixOS system.
+{ lib, den, ... }:
 {
   den.aspects.ssh = {
     nixos.services.openssh.enable = true;
 
     includes = [
-      (den.lib.perHost (
-        { host }:
+      (den.lib.perUser (
+        { host, ... }:
         let
-          sopsFile = "${self}/secrets/${host.hostName}.yaml";
-          managed = builtins.pathExists sopsFile;
+          sopsFile = host.sopsFile or null;
+          managed = sopsFile != null && builtins.pathExists sopsFile;
         in
         {
           nixos =
@@ -40,8 +36,8 @@
       (den.lib.perUser (
         { user, ... }:
         let
-          sopsFile = "${self}/secrets/${user.userName}.yaml";
-          managed = builtins.pathExists sopsFile;
+          sopsFile = user.sopsFile or null;
+          managed = sopsFile != null && builtins.pathExists sopsFile;
         in
         {
           homeManager =
