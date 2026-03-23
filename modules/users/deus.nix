@@ -62,6 +62,7 @@ in
       den.aspects.creative
       den.aspects.chat
       den.aspects.calibre
+      den.aspects.qbittorrent
       den.aspects.dms-home
 
       # User-level services
