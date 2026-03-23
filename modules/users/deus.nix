@@ -65,10 +65,11 @@ in
       den.aspects.qbittorrent
       den.aspects.dms-home
 
-      # User-level services
-      den.aspects.rclone
-
-      # Host-specific extras — host.extraAspects is a list of aspect name strings
+      # Host-specific extras — aspects needed on only some hosts, not all.
+      # Add aspect name strings to host.extraAspects; extraAspectsSelector resolves
+      # them to den.aspects.${name} at eval time. Aspects needed on ALL hosts must
+      # be listed directly in includes above — putting them in extraAspects instead
+      # silently omits them from any host that doesn't declare the name.
       (perUser extraAspectsSelector)
     ];
 
