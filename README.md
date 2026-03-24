@@ -1,328 +1,777 @@
-# NixOS Configuration
+# NixOS Config
 
-Multi-machine NixOS flake configuration using the **dendritic pattern** — a feature-centric alternative to traditional host-centric NixOS configs. Currently manages:
+Multi-machine NixOS config using the dendritic pattern — features are defined once and
+composed into hosts/users. No repeating the same thing per machine.
 
-| Host | Arch | Desktop | Description |
-|---|---|---|---|
-| `thinkpad` | x86\_64-linux | SwayFX + DMS | ThinkPad laptop |
-| `personal` | x86\_64-linux | SwayFX + DMS | Personal desktop |
+**Machines:** `personal` (desktop, AMD GPU, swayfx), `thinkpad` (laptop, swayfx + hyprland),
+`workstation` (shared desktop, hyprland)
 
-- **User**: deus (Soumya)
-- **Theme**: Catppuccin Mocha (system-wide via catppuccin + stylix)
-- **Editor**: Neovim (via nix-wrapper-modules)
+**Users:** `deus` (primary on personal/thinkpad), `soumya` (primary on workstation, secondary
+on thinkpad)
+
+---
 
 ## Commands
 
-All commands are run via [just](https://github.com/casey/just):
-
-| Command | Description |
-|---|---|
-| `just install` | Apply config: `nixos-rebuild switch --flake . --use-remote-sudo` |
-| `just debug` | Apply with `--show-trace --verbose` |
-| `just up` | Update all flake inputs |
-| `just upp i=<name>` | Update a single flake input (e.g. `just upp i=home-manager`) |
-| `just history` | Show NixOS generation history |
-| `just clean` | Wipe generations older than 7 days |
-| `just gc` | Garbage collect unused Nix store entries |
-| `just write-flake` | Regenerate `flake.nix` from `flake-file` declarations |
-
-## Installation
-
-Fresh installs use [`disko-install`](https://github.com/nix-community/disko) which handles partitioning and NixOS installation in a single step.
-
-### 1. Boot the NixOS installer ISO
-
-Boot the target machine from a [NixOS installer ISO](https://nixos.org/download). An internet connection is required.
-
-### 2. Run the install script
-
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/codehia/nixos-config/master/install.sh)
+just install         # build and apply — also auto-restores the sops age key if missing
+just test            # activate temporarily, no boot entry
+just dry             # preview what would change, nothing applied
+just debug           # apply with full trace (good for debugging build failures)
+just up              # update all flake inputs and rebuild
+just upp i=NAME      # update one input, e.g. just upp i=home-manager
+just clean           # garbage collect old generations
+just write-flake     # regenerate flake.nix after adding/removing flake inputs
+just history         # list past generations
 ```
 
-Or download first:
+> Never use `nix eval` or `nix repl` directly — causes a RAM spike. Use `just dry` instead.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/codehia/nixos-config/master/install.sh -o install.sh
-bash install.sh
-```
+---
 
-The script will:
-1. Ask which host to install (`thinkpad` or `personal`)
-2. Show available block devices and ask for disk device path(s)
-3. Print a summary and ask for confirmation before touching anything
-4. Run `disko-install` — partitions disks and installs NixOS from the flake
+## How it works
 
-**Disk layout by host:**
-
-| Host | Disk | Layout |
-|---|---|---|
-| `thinkpad` | `main` (1 disk) | ESP + LUKS → Btrfs (`/`, `/home`, `/nix`, `/var/log`) |
-| `personal` | `main` (fast) | ESP + LUKS → Btrfs (`/`, `/home`, `/nix`, `/var/log`) |
-| `personal` | `slow` (archive) | LUKS → Btrfs (`/var/lib/btrbk`) |
-
-Both hosts use `zramSwap` instead of a disk swap partition.
-
-### 3. Set up secrets (sops-nix)
-
-Secrets are encrypted with [sops-nix](https://github.com/Mic92/sops-nix) using an age key tied to each machine. Before rebooting:
-
-```bash
-# Generate a new age key for this machine
-mkdir -p /mnt/home/deus/.config/sops/age
-age-keygen -o /mnt/home/deus/.config/sops/age/keys.txt
-
-# Print the public key — you'll need it for the next step
-cat /mnt/home/deus/.config/sops/age/keys.txt
-```
-
-Then, from the repo on another machine, add the new public key to `.sops.yaml` and re-encrypt any secrets that should be accessible on the new host:
-
-```bash
-# In the repo
-sops updatekeys secrets/common.yaml
-sops updatekeys secrets/<hostname>.yaml
-```
-
-### 4. Reboot
-
-```bash
-reboot
-```
-
-## Architecture
-
-This config uses the **dendritic pattern** built on four pillars:
-
-| Component | Role |
-|---|---|
-| [den](https://github.com/vic/den) | Declarative host/user management. Provides `aspects`, `hosts`, `provides`, and `default` for composing NixOS + home-manager config. |
-| [flake-file](https://github.com/vic/flake-file) | Lets individual modules declare their own flake inputs inline. Aggregated into `flake.nix` by `nix run ".#write-flake"`. |
-| [import-tree](https://github.com/vic/import-tree) | Auto-discovers all `.nix` files under `modules/`. Files prefixed with `_` are excluded. |
-| [flake-parts](https://github.com/hercules-ci/flake-parts) | Module system that ties everything together via `mkFlake`. |
-
-### Bootstrap Flow
+The whole thing is built around **aspects** — each aspect is a `.nix` file that owns one
+feature. Hosts and users list which aspects they want in their `includes`. That's it.
 
 ```
-flake.nix
-  └─ outputs = inputs: flake-parts.lib.mkFlake { inherit inputs; } (import-tree ./modules)
-       │
-       ├─ import-tree discovers every .nix file in modules/ (except _-prefixed)
-       ├─ Each file is a flake-parts module receiving { inputs, den, ... }
-       ├─ den merges all aspects, hosts, defaults, and provides
-       └─ Final output: NixOS system config for each declared host
+fish.nix   git.nix   catppuccin.nix   nvim/   hyprland/   rclone.nix   ...
+                                ↓
+  personal: includes fish, git, catppuccin, nvim, swayfx, rclone, ...
+  thinkpad: includes the same + hyprland in extraAspects
+  workstation: soumya gets fish, git, catppuccin, nvim, hyprland, ...
 ```
 
-The `flake.nix` is **auto-generated** — never edit it manually. Instead, declare inputs in individual modules via `flake-file.inputs` and run `just write-flake` to regenerate.
+The framework that wires this together is [den](https://github.com/vic/den). It runs a pipeline:
 
-## Directory Structure
+1. Each host gets a context → the host aspect applies (all `nixos.*` config goes here)
+2. Each user declared on that host gets their own context → the user aspect applies
+3. All `homeManager.*` config from any included aspect flows to that user's home-manager
+4. `nixos.*` config from user aspects also flows up to the system (via `mutual-provider`)
+
+**Auto-discovery:** All `.nix` files under `modules/` are picked up automatically via git
+(using `import-tree`). Files or folders prefixed with `_` are excluded. After creating a
+new `.nix` file, `git add` it before building — otherwise the build won't see it.
+
+**`flake.nix` is auto-generated.** Each module declares its own flake inputs with
+`flake-file.inputs`. After adding or removing any of those, run `just write-flake`.
+
+---
+
+## Folder structure
 
 ```
-modules/
-├── dendritic.nix           # Core infrastructure: den, flake-file, import-tree, flake-parts, nixpkgs
-├── hosts.nix               # Host declarations (thinkpad + user deus)
-├── default.nix             # Global defaults (stateVersion)
-├── unstable-overlay.nix    # Overlay: pkgs.unstable.* from nixpkgs-unstable
-├── unfree.nix              # Allowlisted unfree packages
-├── home-manager.nix        # home-manager setup + den helpers
-├── deus.nix                # User aspect: primary-user, shell, home settings
+nixos-config/
+├── flake.nix               # auto-generated, never edit by hand
+├── Justfile                # all the just commands
+├── .sops.yaml              # which age keys can decrypt which secrets files
 │
-├── thinkpad/
-│   ├── thinkpad.nix        # Host aspect: NixOS system config + includes all feature aspects
-│   ├── _hardware-configuration.nix  # Hardware config (excluded from import-tree)
-│   ├── _disko-config.nix   # Disk partitioning (excluded from import-tree)
-│   └── kinesis.kbd         # Kanata keyboard layout
+├── secrets/                # sops-encrypted files
+│   ├── deus.yaml           # deus's SSH private key (accessible on all 3 hosts)
+│   ├── workstation.yaml    # SSH host key for workstation
+│   ├── rclone.yaml         # rclone.conf (personal + thinkpad only)
+│   └── ...
 │
-├── hyprland/
-│   ├── hyprland.nix        # Compositor config + packages (collector pattern: other files merge in)
-│   ├── binds.nix           # Keybindings (merges into hyprland aspect)
-│   ├── hyprpaper.nix       # Wallpaper manager
-│   ├── pyprland.nix        # Pyprland scratchpads
-│   └── pyprland.toml       # Pyprland config
+├── assets/.wallpapers/     # synced to ~/Pictures/Wallpapers on activation
+├── notes/                  # reference docs (see table at end of this file)
 │
-├── waybar/
-│   ├── waybar.nix          # Status bar aspect
-│   ├── waybar.json         # Bar layout
-│   └── waybar.css          # Bar styles
-│
-├── nvim/
-│   ├── nvim.nix            # Neovim aspect via nix-wrapper-modules
-│   ├── _lsps.nix           # extraPackages: LSP servers, formatters, tools (excluded from import-tree)
-│   ├── _plugins.nix        # specs: vim plugins with lazy/start flags (excluded from import-tree)
-│   ├── _nvim_nixcats.nix   # Backup of old nixCats config (excluded from import-tree)
-│   ├── init.lua            # All runtime Lua config (single entry point)
-│   ├── README.md           # Nvim setup docs: plugins, LSPs, how to add/remove/edit
-│   └── lua/                # NOT loaded — legacy subdirectory
-│
-├── catppuccin.nix          # Catppuccin Mocha theme (system-wide)
-├── stylix.nix              # Stylix base16 theming
-├── fonts.nix               # Font configuration
-├── fish.nix                # Fish shell config
-├── ghostty.nix             # Ghostty terminal
-├── kitty.nix               # Kitty terminal
-├── tmux.nix                # Tmux config
-├── rofi.nix                # Application launcher
-├── git.nix                 # Git config
-├── lazygit.nix             # Lazygit TUI
-├── direnv.nix              # direnv for per-project shells
-├── browser.nix             # Zen browser
-├── secrets.nix             # sops-nix secrets management
-├── packages.nix            # Additional system/user packages
-├── services.nix            # User services (blueman, nm-applet, etc.)
-├── programs.nix            # Misc programs (thunar, btop, etc.)
-├── cursor.nix              # Cursor theme
-├── disko.nix               # Disko flake input
-└── apple-fonts.nix         # Apple fonts
+└── modules/
+    ├── den.nix             # bootstraps den + flake-file + import-tree
+    ├── defaults.nix        # applied to every host and user
+    ├── schema.nix          # unstable overlay, activates home-manager globally
+    │
+    ├── hosts/
+    │   ├── personal/default.nix       # host declaration + personal aspect
+    │   ├── thinkpad/default.nix       # host declaration + thinkpad aspect
+    │   └── workstation/default.nix
+    │
+    ├── users/
+    │   ├── deus.nix        # deus's feature includes, WM selector, identity
+    │   └── soumya.nix      # soumya's feature includes, identity
+    │
+    └── aspects/
+        ├── fish.nix
+        ├── git.nix
+        ├── ssh.nix
+        ├── rclone.nix
+        ├── nvim/           # split across multiple files (collector pattern)
+        ├── hyprland/
+        ├── swayfx/
+        ├── system/         # system-level aspects (greetd, networking, ...)
+        └── ...
 ```
 
-## Module Layers
+---
 
-Configuration is organized in three layers:
+## Adding a package
 
-### 1. Infrastructure (`dendritic.nix`, `hosts.nix`, `default.nix`, `unstable-overlay.nix`, `unfree.nix`, `home-manager.nix`)
-
-Sets up the build system: flake inputs, host declarations, overlays, unfree allowlisting, home-manager integration. These are the plumbing.
-
-### 2. User and Host (`deus.nix`, `thinkpad/thinkpad.nix`)
-
-Define *who* and *what machine*. The user aspect sets identity and shell. The host aspect configures hardware, boot, networking, and — critically — **includes** all the feature aspects it wants.
-
-### 3. Feature Aspects (everything else)
-
-Self-contained features like `catppuccin.nix`, `hyprland/`, `nvim/`, etc. Each defines a `den.aspects.<name>` with `nixos` and/or `homeManager` config. They are inert until a host aspect includes them via `includes`.
-
-## Aspect Patterns
-
-### Simple aspect (home-manager only)
+**User package** (goes in home-manager, only for that user):
 
 ```nix
-{ den, ... }: {
-  den.aspects.direnv = {
-    homeManager = { ... }: {
-      programs.direnv.enable = true;
-    };
+# modules/aspects/packages.nix
+den.aspects.packages = {
+  homeManager = { pkgs, ... }: {
+    home.packages = with pkgs; [
+      btop
+      unstable.some-new-app   # pkgs.unstable.* is always available via overlay
+    ];
   };
-}
+};
 ```
 
-### Aspect with its own flake input
-
-Modules can declare flake inputs inline via `flake-file.inputs`. These get aggregated into `flake.nix` when you run `just write-flake`.
+**System package** (available for all users):
 
 ```nix
-{ inputs, ... }: {
-  flake-file.inputs.catppuccin = {
-    url = "github:catppuccin/nix/release-25.11";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-
-  den.aspects.catppuccin = {
-    homeManager = { ... }: {
-      imports = [ inputs.catppuccin.homeModules.catppuccin ];
-      catppuccin.enable = true;
-    };
-  };
-}
+nixos = { pkgs, ... }: {
+  environment.systemPackages = [ pkgs.htop ];
+};
 ```
 
-### Aspect using unstable packages
+For host-specific packages, put it directly in the host's `nixos` block in
+`modules/hosts/<hostname>/default.nix` instead of a shared aspect.
 
-No `specialArgs` needed — unstable packages are available everywhere via the overlay:
+---
+
+## Adding a new aspect
+
+An aspect is just a `.nix` file. It can have a `nixos` block (system config), a
+`homeManager` block (user config), or both. Den routes them to the right place.
+
+**Step 1 — create the file:**
 
 ```nix
-{ den, ... }: {
-  den.aspects.example = {
+# modules/aspects/myapp.nix
+{ den, ... }:
+{
+  den.aspects.myapp = {
     homeManager = { pkgs, ... }: {
-      home.packages = [ pkgs.unstable.some-package ];
+      home.packages = [ pkgs.myapp ];
+      programs.myapp = {
+        enable = true;
+        settings.theme = "dark";
+      };
     };
   };
 }
 ```
 
-### Collector pattern (multiple files, one aspect)
+**Step 2 — stage it:**
 
-Several files can contribute to the same aspect and their attrs merge. This is how `hyprland/` works — `hyprland.nix` defines the base config while `binds.nix` adds keybindings to the same `den.aspects.hyprland`:
+```bash
+git add modules/aspects/myapp.nix
+```
+
+import-tree discovers files through git, so it won't exist to the build until staged.
+
+**Step 3 — include it:**
+
+For a user feature, add it to the user aspect's `includes`:
 
 ```nix
-# hyprland/binds.nix — merges into the hyprland aspect defined in hyprland.nix
-{ ... }: {
-  den.aspects.hyprland = {
-    homeManager = { ... }: {
-      wayland.windowManager.hyprland.settings.bind = [ ... ];
-    };
+# modules/users/deus.nix
+den.aspects.deus = {
+  includes = [
+    ...
+    den.aspects.myapp   # add this line
+  ];
+};
+```
+
+For a system feature, add it to the host's `includes`:
+
+```nix
+# modules/hosts/personal/default.nix
+den.aspects.personal = {
+  includes = [
+    ...
+    den.aspects.myapp
+  ];
+};
+```
+
+### System config + user config in the same aspect
+
+Both `nixos` and `homeManager` blocks can live in the same aspect. Den routes each to
+the right place automatically:
+
+```nix
+{ den, ... }:
+{
+  den.aspects.myapp = {
+    nixos.services.myapp.enable = true;       # goes to NixOS system config
+    homeManager.programs.myapp.enable = true; # goes to each user's home-manager
   };
 }
 ```
 
-### Aspect composition via `includes`
+### Config that differs per host
 
-The host aspect pulls in features by listing them in `includes`:
+Use `den.lib.perHost` with a named function. The function receives the host context and
+returns config only for hosts where it makes sense.
+
+Real example from `lact.nix` — GPU fan control only applies when a host has a `gpuKey`:
 
 ```nix
-{ den, ... }: {
-  den.aspects.thinkpad = {
-    nixos = { ... }: { /* system config */ };
+{ den, ... }:
+let
+  gpuConfig = { host, ... }:
+    let gpuKey = host.gpuKey or null;
+    in {
+      nixos = { lib, ... }: lib.optionalAttrs (gpuKey != null) {
+        services.lact.settings.gpus.${gpuKey}.fan_control_enabled = true;
+      };
+    };
+in
+{
+  den.aspects.lact = {
+    nixos.services.lact.enable = true;
+    includes = [ (den.lib.perHost gpuConfig) ];
+  };
+}
+```
+
+The key rule: **always give the function a name** (here `gpuConfig`). Never write
+`includes = [ (den.lib.perHost ({ host, ... }: { ... })) ]` — the anonymous form
+makes traces impossible to read.
+
+Another common pattern — config that differs for laptop vs desktop:
+
+```nix
+let
+  laptopConfig = { host, ... }:
+    {
+      nixos = { lib, ... }: lib.optionalAttrs (host.isLaptop or false) {
+        services.tlp.enable = true;
+      };
+    };
+in
+den.aspects.power = {
+  includes = [ (den.lib.perHost laptopConfig) ];
+};
+```
+
+### Aspect that only runs on specific hosts (for deus)
+
+`deus.nix` has an `extraAspectsSelector` that reads `host.extraAspects`. Add the aspect
+name to the host's declaration and deus gets it only there:
+
+```nix
+# modules/hosts/thinkpad/default.nix
+den.hosts.x86_64-linux.thinkpad = {
+  extraAspects = [
+    "hyprland"   # deus gets hyprland HM config on thinkpad only
+    "rclone"     # deus gets rclone on thinkpad only
+  ];
+};
+```
+
+`soumya.nix` doesn't use this — soumya's includes are a fixed list.
+
+### Split an aspect across multiple files
+
+Multiple files can define the same aspect name — den merges them. This is called the
+collector pattern and is how `hyprland/`, `nvim/`, `swayfx/` etc. work.
+
+```nix
+# modules/aspects/myapp/myapp.nix
+den.aspects.myapp = {
+  nixos.programs.myapp.enable = true;
+};
+
+# modules/aspects/myapp/myapp-keybinds.nix
+den.aspects.myapp = {
+  homeManager.programs.myapp.keybinds = { ... };
+};
+```
+
+Stage both, include `den.aspects.myapp` once — both files contribute automatically.
+
+---
+
+## Adding a new host
+
+### 1. Create the files
+
+```bash
+mkdir -p modules/hosts/newhost
+```
+
+Files needed:
+- `modules/hosts/newhost/default.nix` — tracked by git, contains the host declaration
+- `modules/hosts/newhost/_hardware-configuration.nix` — generated by `nixos-generate-config`, `_`-prefixed so import-tree ignores it
+- `modules/hosts/newhost/_disko-config.nix` — disk layout
+
+### 2. Write `default.nix`
+
+```nix
+{ den, ... }:
+{
+  den.hosts.x86_64-linux.newhost = {
+    home-manager.enable = true;
+    wm = "swayfx";               # which WM deus uses on this host
+    greetdUser = "deus";         # who gets auto-logged in at boot
+    greetdSessionBin = "sway";   # session command for auto-login
+    nhCleanEnabled = true;
+    isLaptop = false;
+    nvimLanguages = [ "lua" "nix" "python" ];
+    users.deus = { };
+  };
+
+  den.aspects.newhost = {
+    nixos = { ... }: {
+      imports = [ ./_hardware-configuration.nix ./_disko-config.nix ];
+      time.timeZone = "Asia/Kolkata";
+      i18n.defaultLocale = "en_US.UTF-8";
+    };
+
     includes = [
-      den.aspects.catppuccin
-      den.aspects.hyprland
-      den.aspects.nvim
-      # ...
+      den.aspects.nix-config
+      den.aspects.networking
+      den.aspects.boot
+      den.aspects.sudo
+      den.aspects.disko
+      den.aspects.nh
+      den.aspects.nix-tools
+      den.aspects.tailscale
+      den.aspects.pipewire
+      den.aspects.graphics
+      den.aspects.zram
+      den.aspects.dms
+      den.aspects.greetd
+      den.aspects.fonts
+      den.aspects.gnome-keyring
     ];
   };
 }
 ```
 
-## Adding a New Aspect
+### 3. Generate an age key on the new machine
 
-1. Create `modules/<name>.nix`:
-   ```nix
-   { den, ... }: {
-     den.aspects.<name> = {
-       homeManager = { pkgs, ... }: {
-         # your config
-       };
-     };
-   }
-   ```
-2. If it needs a flake input, add `flake-file.inputs.<input-name> = { ... };` and run `just write-flake`.
-3. Add `den.aspects.<name>` to the `includes` list in the relevant host aspect (`modules/thinkpad/thinkpad.nix`, `modules/personal/personal.nix`, or both).
-4. Apply: `just install`.
+```bash
+# Run on the new machine:
+sudo mkdir -p /var/lib/sops/age
+sudo age-keygen -o /var/lib/sops/age/keys.txt
+sudo chmod 600 /var/lib/sops/age/keys.txt
 
-## Adding a New Host
+# Print the public key — needed for .sops.yaml:
+sudo age-keygen -y /var/lib/sops/age/keys.txt
+# → age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
 
-1. Add the host declaration in `modules/hosts.nix`:
-   ```nix
-   den.hosts.x86_64-linux.<hostname>.users.deus = {};
-   ```
-2. Create `modules/<hostname>/<hostname>.nix` with a `den.aspects.<hostname>` containing the hardware config and `includes` list.
-3. Prefix hardware-specific files with `_` so import-tree ignores them (import them explicitly in the host aspect).
-4. Apply: `just install`.
+### 4. Register the key in `.sops.yaml`
 
-## Key Conventions
+```yaml
+keys:
+  - &thinkpad age1...
+  - &personal age1...
+  - &workstation age1...
+  - &newhost age1...    # paste the public key from the step above
 
-- **`_` prefix** — Files starting with `_` are ignored by import-tree. Use for hardware configs and disko configs that need explicit imports.
-- **`den._` shorthand** — `den._` is an alias for `den.provides` (e.g. `den._.unfree`, `den._.primary-user`, `den._.home-manager`).
-- **No `specialArgs`** — Unstable packages via `pkgs.unstable.*` overlay; flake inputs via flake-parts module args (`{ inputs, ... }`).
-- **Never edit `flake.nix`** — It's auto-generated. Declare inputs in modules and run `just write-flake`.
-- **`den.default`** — Config applied to all hosts/users (overlays, stateVersion, etc.).
-- **`den.base.conf`** — Applied to the flake-parts `perSystem` level (e.g. for overlays in devShells).
+creation_rules:
+  # Secrets file for this host's SSH host key:
+  - path_regex: secrets/newhost\.yaml$
+    key_groups:
+      - age:
+          - *newhost
 
-## Neovim
+  # If deus is on this host, add *newhost to deus.yaml so deus's secrets
+  # (SSH user key) can be decrypted on this machine:
+  - path_regex: secrets/deus\.yaml$
+    key_groups:
+      - age:
+          - *thinkpad
+          - *personal
+          - *workstation
+          - *newhost    # add this line
+```
 
-Uses [nix-wrapper-modules](https://github.com/BirdeeHub/nix-wrapper-modules) — plugins and LSP tools are declared in Nix, runtime config is standard Lua in a single `init.lua`. The built package binary is `nvim`, aliased to `vim`.
+After updating the rules for `deus.yaml`, re-encrypt it so the new host key is added:
 
-| File | Purpose |
-|---|---|
-| `modules/nvim/nvim.nix` | Aspect definition — `evalPackage`, categories, aliases |
-| `modules/nvim/_plugins.nix` | vim plugin specs (`data`, `lazy`, `pluginDeps`) |
-| `modules/nvim/_lsps.nix` | `extraPackages`: LSP servers, formatters, linters |
-| `modules/nvim/init.lua` | All runtime config — options, keymaps, plugin setup |
+```bash
+sops updatekeys secrets/deus.yaml
+```
 
-See [`modules/nvim/README.md`](modules/nvim/README.md) for full docs: adding/removing plugins, LSP tools, categories, and the nix→Lua data API.
+### 5. Create the SSH host key secret
 
-## Dev Environment
+```bash
+# Generate a key for the host:
+ssh-keygen -t ed25519 -f /tmp/newhost_hostkey -N "" -C "root@newhost"
 
-A `devenv.nix` configures:
-- **alejandra** — Nix formatter (pre-commit hook)
-- **lua-ls** — Lua language server + linter (pre-commit hook)
-- **Nix LSP** — Language support for `.nix` files
+# Create the sops secrets file:
+sops secrets/newhost.yaml
+```
+
+In the editor, add:
+```yaml
+ssh_host_ed25519_key: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    <paste private key content here>
+    -----END OPENSSH PRIVATE KEY-----
+```
+
+Clean up the temp key:
+```bash
+rm /tmp/newhost_hostkey /tmp/newhost_hostkey.pub
+```
+
+### 6. Stage and build
+
+```bash
+git add modules/hosts/newhost/ secrets/newhost.yaml
+just install
+```
+
+### 7. Enable rclone on the new host (optional, deus only)
+
+rclone.yaml is only decryptable by hosts listed in its creation rule. To add a new host:
+
+```yaml
+# .sops.yaml
+- path_regex: secrets/rclone\.yaml$
+  key_groups:
+    - age:
+        - *rclone
+        - *personal
+        - *thinkpad
+        - *newhost    # add this
+```
+
+```bash
+sops updatekeys secrets/rclone.yaml
+```
+
+Then add `"rclone"` to `extraAspects` in the host declaration.
+
+---
+
+## Adding a new user
+
+### 1. Create the user aspect
+
+```bash
+touch modules/users/newuser.nix
+git add modules/users/newuser.nix
+```
+
+```nix
+# modules/users/newuser.nix
+{ den, ... }:
+{
+  den.aspects.newuser = {
+    includes = [
+      den.provides.primary-user       # uid 1000 + wheel — drop this for secondary users
+      (den.provides.user-shell "fish")
+
+      den.aspects.catppuccin
+      den.aspects.stylix
+      den.aspects.fish
+      den.aspects.ghostty
+      den.aspects.git
+      den.aspects.nvim
+      den.aspects.secrets
+      den.aspects.ssh
+      den.aspects.shell-tools
+      den.aspects.dms-home
+      # add whatever else the user needs
+    ];
+
+    nixos.users.users.newuser = {
+      description = "Full Name";
+      initialPassword = "changeme";
+    };
+
+    homeManager.home.homeDirectory = "/home/newuser";
+    homeManager.programs.git.settings.user = {
+      name = "Full Name";
+      email = "user@example.com";
+    };
+  };
+}
+```
+
+### 2. Add the user to the relevant hosts
+
+```nix
+# modules/hosts/workstation/default.nix
+den.hosts.x86_64-linux.workstation = {
+  ...
+  users.newuser = {
+    nvimLanguages = [ "nix" "python" ];
+  };
+};
+```
+
+### 3. Set up their SSH key (see Secrets section below)
+
+### 4. Build
+
+```bash
+just install
+```
+
+---
+
+## Secrets and SSH
+
+### How it works
+
+Secrets are encrypted with [sops](https://github.com/getsops/sops) + age keys, and
+decrypted at activation time by sops-nix. `.sops.yaml` says which age keys can decrypt
+which files.
+
+Each host has one age key. It lives in two places (same file, two paths) because
+NixOS-level and home-manager-level services run as different users:
+
+| Path | Owner | Used for |
+|------|-------|----------|
+| `/var/lib/sops/age/keys.txt` | root | SSH host keys, system secrets |
+| `~/.config/sops/age/keys.txt` | user | SSH user keys, rclone.conf |
+
+`just install` auto-syncs the user copy from the system copy if it's missing.
+
+### Add a user SSH key
+
+`ssh.nix` automatically places a user's SSH key at `~/.ssh/id_ed25519` if a file at
+`secrets/<username>.yaml` exists. It checks for the file with `builtins.pathExists` —
+so creating the file is all that's needed.
+
+See `notes/secrets-user-ssh.md` for the full step-by-step. Short version for soumya
+on workstation as an example:
+
+**1. Add a creation rule to `.sops.yaml`**
+
+```yaml
+creation_rules:
+  - path_regex: secrets/soumya\.yaml$
+    key_groups:
+      - age:
+          - *workstation    # workstation's age key can decrypt this
+```
+
+**2. Generate an SSH key**
+
+```bash
+ssh-keygen -t ed25519 -f /tmp/soumya_key -N "" -C "soumya@workstation"
+cat /tmp/soumya_key    # copy this
+```
+
+**3. Create the sops file**
+
+```bash
+sops secrets/soumya.yaml
+```
+
+Paste into the editor:
+```yaml
+ssh_user_ed25519_key: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    <paste the private key here>
+    -----END OPENSSH PRIVATE KEY-----
+```
+
+**4. Clean up and apply**
+
+```bash
+rm /tmp/soumya_key /tmp/soumya_key.pub
+git add secrets/soumya.yaml
+just install
+```
+
+sops-nix places the key at `/home/soumya/.ssh/id_ed25519` (mode 0600) on activation.
+
+### Edit an existing secrets file
+
+```bash
+sops secrets/deus.yaml    # decrypts, opens in $EDITOR, re-encrypts on save
+```
+
+### Add a new secret and use it in config
+
+Add a key to the sops file, then reference it in a homeManager or nixos block:
+
+```nix
+# Home-manager secret — placed in the user's home
+homeManager = { config, ... }: {
+  sops.secrets.github_token = {
+    sopsFile = ../../secrets/deus.yaml;
+    path = "${config.home.homeDirectory}/.config/gh/token";
+    mode = "0600";
+  };
+};
+
+# System secret — placed in /etc
+nixos.sops.secrets.service_key = {
+  sopsFile = ../../secrets/workstation.yaml;
+  path = "/etc/myservice/key";
+  owner = "myservice";
+  mode = "0400";
+};
+```
+
+### Re-encrypt a file after adding a new key recipient
+
+```bash
+# After updating .sops.yaml to add a new age key to a file's rules:
+sops updatekeys secrets/rclone.yaml
+```
+
+### Restore the age key on a fresh install
+
+```bash
+# The encrypted backup lives in the repo:
+age --decrypt secrets/<hostname>-age-key.age > /tmp/keys.txt
+
+sudo mkdir -p /var/lib/sops/age
+sudo install -m 600 -o root -g root /tmp/keys.txt /var/lib/sops/age/keys.txt
+
+mkdir -p ~/.config/sops/age
+install -m 600 /tmp/keys.txt ~/.config/sops/age/keys.txt
+
+rm /tmp/keys.txt
+# Then just install
+```
+
+---
+
+## Neovim: adding a plugin
+
+There are two parts: the Nix side (declare the plugin, make it available) and the Lua
+side (configure when and how it loads).
+
+### Step 1 — add the plugin to `_plugins.nix`
+
+```nix
+# modules/aspects/nvim/_plugins.nix
+hardtime = {
+  data = hardtime-nvim;   # this is pkgs.vimPlugins.hardtime-nvim
+  lazy = false;           # false = loads at startup; true = loaded on demand by lze
+};
+```
+
+The key (here `hardtime`) is just a label — it doesn't matter for loading. The `data`
+value is the attribute name from `pkgs.vimPlugins`. Search for it at
+[search.nixos.org](https://search.nixos.org/packages?channel=unstable&type=packages)
+with `vimPlugins.` prefix.
+
+`lazy = false` puts the plugin in the `start/` packpath directory — Neovim loads it
+automatically at startup. `lazy = true` puts it in `opt/` — lze loads it on demand.
+Use `lazy = true` for everything except plugins that must be available immediately
+(like the colorscheme, snacks, or the lazy loader itself).
+
+### Step 2 — find the exact pname
+
+The pname is the directory name Nix gives the plugin in the store. It's what lze uses
+to identify the plugin. It does **not** always match the nixpkgs attribute name.
+
+After building (or after `nix build`), search the store:
+
+```bash
+find /nix/store -maxdepth 3 -name "vimplugin-*hardtime*" -type d
+# → /nix/store/xxxxxxxx-vimplugin-hardtime.nvim-2024-11-25
+```
+
+The pname is what comes after `vimplugin-`: `hardtime.nvim`.
+
+A few examples of how the pname differs from the nixpkgs name:
+
+| nixpkgs attr (`pkgs.vimPlugins.*`) | pname (use in lze) |
+|------------------------------------|---------------------|
+| `hardtime-nvim` | `hardtime.nvim` |
+| `markview-nvim` | `markview.nvim` |
+| `snacks-nvim` | `snacks.nvim` |
+| `nvim-lspconfig` | `nvim-lspconfig` |
+| `blink-cmp` | `blink-cmp` |
+| `telescope-nvim` | `telescope.nvim` |
+
+### Step 3 — add the Lua spec in `lua/plugins/`
+
+```lua
+-- lua/plugins/editor.lua  (or wherever it fits)
+{
+  'hardtime.nvim',        -- this must match the pname from step 2
+  event = 'VeryLazy',     -- or ft, cmd, keys — whatever trigger makes sense
+  after = function()
+    require('hardtime').setup({ enabled = true })
+  end,
+},
+```
+
+Common triggers:
+
+| Trigger | When it loads |
+|---------|--------------|
+| `event = 'DeferredUIEnter'` | after the UI is ready — good for most plugins |
+| `event = 'VeryLazy'` | very late startup — for things that don't need to be fast |
+| `ft = { 'lua', 'python' }` | when a specific filetype opens |
+| `cmd = 'Telescope'` | when a user command is invoked |
+| `keys = { '<leader>f' }` | when a keybind is triggered |
+
+### Step 4 — rebuild
+
+```bash
+just install    # or just test if you want to try without touching the boot entry
+```
+
+### Adding an LSP / language tool
+
+For LSPs and formatters, add the language to `_lang-defs.nix` instead of `_plugins.nix`.
+Then add the language name to `nvimLanguages` in the host declaration.
+
+```nix
+# modules/aspects/nvim/_lang-defs.nix
+rust = {
+  packages = with pkgs; [ rust-analyzer rustfmt clippy ];
+  formatters.fast = { rust = [ "rustfmt" ]; };
+  linters = { rust = [ "clippy" ]; };
+};
+```
+
+```nix
+# modules/hosts/personal/default.nix
+nvimLanguages = [ "lua" "nix" "python" "rust" ];
+```
+
+Then add the LSP config to `lua/config/lsp.lua` guarded by a category check:
+
+```lua
+local nix = require(vim.g.nix_info_plugin_name)
+if nix(false, 'categories', 'rust') then
+  vim.lsp.config('rust_analyzer', {
+    cmd = { 'rust-analyzer' },
+    filetypes = { 'rust' },
+    root_markers = { 'Cargo.toml' },
+  })
+end
+```
+
+---
+
+## Neovim languages
+
+`nvimLanguages` is set per host (applies to all users on that host) and can be overridden
+per user:
+
+```nix
+den.hosts.x86_64-linux.thinkpad = {
+  nvimLanguages = [ "lua" "nix" "python" "typescript" "go" "latex" ];
+
+  users.soumya = {
+    nvimLanguages = [ "nix" "lua" "python" "typescript" ];  # overrides for soumya
+  };
+};
+```
+
+---
+
+## Reference notes
+
+| File | What's in it |
+|------|--------------|
+| `notes/den.md` | den API — all options, batteries, context pipeline |
+| `notes/dendritic-pattern.md` | the dendritic pattern and all seven aspect shapes |
+| `notes/neovim.md` | nix-wrapper-modules, lze, lzextras, LSP setup in detail |
+| `notes/secrets-user-ssh.md` | full walkthrough: sops-managed SSH key for a new user |
+| `notes/avahi.md` | mDNS / local hostname resolution |
+| `notes/tailscale.md` | Tailscale VPN |
+| `notes/avahi-tailscale.md` | making Tailscale and Avahi coexist |
+| `notes/thinkpad-graphics.md` | AMD GPU / hardware notes for thinkpad |

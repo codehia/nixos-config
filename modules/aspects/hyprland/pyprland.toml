@@ -16,3 +16,27 @@ animation = "fromBottom"
 command = "thunar"
 class = "thunar"
 size = "70% 70%"
+
+[scratchpads.pw]
+animation = "fromTop"
+command = "1password --silent"
+class = "1Password"
+size = "30% 50%"
+
+[scratchpads.spotify]
+animation = "fromTop"
+command = "spotify"
+class = "Spotify"
+size = "40% 60%"
+
+[scratchpads.slack]
+animation = "fromTop"
+command = "slack"
+class = "Slack"
+size = "70% 70%"
+
+[scratchpads.ente]
+animation = "fromTop"
+command = "ente-auth"
+class = "io.ente.auth"
+size = "10% 80%"

@@ -48,8 +48,23 @@
             ghostty.fonts.enable = false;
             rofi.fonts.enable = false;
             zen-browser.profileNames = [ "Default Profile" ];
+            # Kvantum (stylix Qt target) has a qtsvg version mismatch that breaks
+            # Qt apps (broken fonts, no dark theme). Use gtk3 platform theme instead
+            # so Qt apps inherit the GTK dark theme directly.
+            qt.enable = false;
           };
         };
+        qt = {
+          enable = true;
+          platformTheme.name = "gtk3";
+          style = {
+            name = "adwaita-dark";
+            package = pkgs.adwaita-qt;
+          };
+        };
+        # Prevent Qt from re-querying XWayland DPI on output topology changes
+        # (e.g. KVM switch), which causes font cache mismatches and broken rendering.
+        home.sessionVariables.QT_AUTO_SCREEN_SCALE_FACTOR = "0";
       };
   };
 }

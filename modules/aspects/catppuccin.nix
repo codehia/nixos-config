@@ -31,6 +31,7 @@
           lazygit.enable = false;
           rofi.enable = false;
           tmux.enable = false;
+          kvantum.enable = false;
         };
       };
   };

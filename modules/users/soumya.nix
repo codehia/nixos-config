@@ -1,6 +1,6 @@
 # User aspect — defines the "soumya" user identity and selects feature aspects.
 # Soumya is the primary user on workstation and a secondary user on thinkpad.
-# WM is hardcoded to hyprland (consistent across all her hosts).
+# WM is hardcoded to hyprland (consistent across all hosts).
 { den, ... }:
 {
   den.aspects.soumya = {

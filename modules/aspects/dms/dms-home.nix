@@ -29,14 +29,47 @@ let
         showBattery = isLaptop;
         osdPowerProfileEnabled = false;
         barConfigs = map patchBarConfig baseSettings.barConfigs;
+
+        # Disable matugen — not installed (enableDynamicTheming = false).
+        runUserMatugenTemplates = false;
+        runDmsMatugenTemplates = false;
+        matugenTemplateGtk = false;
+        matugenTemplateNiri = false;
+        matugenTemplateHyprland = false;
+        matugenTemplateMangowc = false;
+        matugenTemplateQt5ct = false;
+        matugenTemplateQt6ct = false;
+        matugenTemplateFirefox = false;
+        matugenTemplatePywalfox = false;
+        matugenTemplateZenBrowser = false;
+        matugenTemplateVesktop = false;
+        matugenTemplateEquibop = false;
+        matugenTemplateGhostty = false;
+        matugenTemplateKitty = false;
+        matugenTemplateFoot = false;
+        matugenTemplateAlacritty = false;
+        matugenTemplateNeovim = false;
+        matugenTemplateWezterm = false;
+        matugenTemplateDgop = false;
+        matugenTemplateKcolorscheme = false;
+        matugenTemplateVscode = false;
+        matugenTemplateEmacs = false;
+
+        # Disable audio visualizer — cava not installed (enableAudioWavelength = false).
+        audioVisualizerEnabled = false;
       };
     in
     {
       homeManager =
-        { pkgs, lib, ... }:
+        {
+          pkgs,
+          lib,
+          ...
+        }:
         {
           imports = [ inputs.dms.homeModules.dank-material-shell ];
 
+          # home.file.".config/DankMaterialShell/settings.json".text = builtins.toJSON settings;
           # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
           home.activation.syncWallpapers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
             wallpaperSrc="${self}/assets/.wallpapers"
@@ -51,25 +84,24 @@ let
           programs.dank-material-shell = {
             enable = true;
             dgop.package = inputs.dgop.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            quickshell.package = inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.quickshell;
             enableSystemMonitoring = true;
             enableVPN = true;
             enableDynamicTheming = false;
             enableAudioWavelength = false;
             enableCalendarEvents = false;
+            settings = settings;
             systemd = {
               enable = true;
               restartIfChanged = true;
             };
           };
+          # home.file.".config/DankMaterialShell/settings.json".text = builtins.toJSON settings;
 
           # qt5ct/qt6ct config requests kvantum as the Qt style, but kvantum fails
           # to load due to a qtsvg version mismatch, causing quickshell to deadlock.
           # Bypass qt5ct entirely for DMS — it uses its own QML theme anyway.
-          systemd.user.services.dms = {
-            Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
-          };
-
-          home.file.".config/DankMaterialShell/settings.json".text = builtins.toJSON settings;
+          systemd.user.services.dms.Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
         };
     }
   );

@@ -42,12 +42,12 @@
           xwayland.enable = true;
           plugins = [ pkgs.pyprland ];
           settings = {
+            exec = [ "pkill -x pypr; pypr &" ];
             exec-once = [
-              "pypr &"
-              "1password --silent &"
-              "spotify &"
+              "[workspace special:pw silent] 1password --silent"
+              "[workspace special:spotify silent] spotify"
+              "[workspace special:ente silent] ente-auth"
               "mullvad-gui &"
-              "enteauth &"
             ];
             env = [
               "HYPRCURSOR_THEME, MyCursor"

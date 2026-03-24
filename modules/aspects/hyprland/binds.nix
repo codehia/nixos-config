@@ -64,14 +64,14 @@
         "$modifier CONTROL, 4, movetoworkspacesilent, 4"
         "$modifier CONTROL, 5, movetoworkspacesilent, 5"
 
-        # PYPR
+        # PYPR scratchpads
         "$modifier SHIFT, K, exec, pypr toggle term"
         "$modifier SHIFT, T, exec, pypr toggle filemanager"
+        "$modifier SHIFT, O, exec, pypr toggle pw"
+        "$modifier SHIFT, M, exec, pypr toggle spotify"
+        "$modifier SHIFT, S, exec, pypr toggle slack"
+        "$modifier SHIFT, E, exec, pypr toggle ente"
         "$modifier SHIFT, N, togglespecialworkspace, minimized"
-        "$modifier SHIFT, O, togglespecialworkspace, drop-1pw"
-        "$modifier SHIFT, M, togglespecialworkspace, drop-spotify"
-        "$modifier SHIFT, S, togglespecialworkspace, drop-slack"
-        "$modifier SHIFT, E, togglespecialworkspace, drop-ente"
         "$modifier, N, exec, pypr toggle_special minimized"
 
         "ALT,Tab,cyclenext"
