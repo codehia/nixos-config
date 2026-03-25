@@ -1,4 +1,7 @@
-{ pkgs, lzextrasLatest }:
+{
+  pkgs,
+  lzextrasLatest,
+}:
 with pkgs.vimPlugins;
 {
   # Startup (lazy = false)
@@ -14,10 +17,10 @@ with pkgs.vimPlugins;
     data = snacks-nvim;
     lazy = false;
   };
-  catppuccin = {
-    data = catppuccin-nvim;
-    lazy = false;
-  };
+  # catppuccin = {
+  #   data = catppuccin-nvim;
+  #   lazy = false;
+  # };
   plenary = {
     data = plenary-nvim;
     lazy = false;
@@ -217,5 +220,9 @@ with pkgs.vimPlugins;
   obsidian = {
     data = obsidian-nvim;
     lazy = true;
+  };
+  tokyonight = {
+    data = tokyonight-nvim;
+    lazy = false;
   };
 }

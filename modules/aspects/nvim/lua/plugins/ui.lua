@@ -4,55 +4,80 @@
 
 return {
   -- ---------------------------------------------------------------------------
-  -- Catppuccin — colorscheme (loaded immediately)
+  -- Colorscheme — tokyonight (active) / catppuccin (commented out)
   -- ---------------------------------------------------------------------------
   {
-    'catppuccin-nvim',
+    'tokyonight.nvim',
     lazy = false,
     priority = 1000,
     after = function()
-      require('catppuccin').setup({
-        flavour = 'mocha',
-        transparent_background = false,
-        show_end_of_buffer = false,
-        term_colors = false,
-        dim_inactive = { enabled = false },
+      require('tokyonight').setup({
+        style = 'night',
+        transparent = false,
+        terminal_colors = false,
+        dim_inactive = false,
         styles = {
-          comments = { 'italic' },
-          conditionals = { 'italic' },
+          comments = { italic = true },
+          keywords = { italic = true },
+          functions = {},
+          variables = {},
+          sidebars = 'dark',
+          floats = 'dark',
         },
-        integrations = {
-          blink_cmp = true,
-          gitsigns = true,
-          mini = { enabled = true },
-          treesitter = true,
-          which_key = true,
-          native_lsp = {
-            enabled = true,
-            virtual_text = {
-              errors = { 'italic' },
-              hints = { 'italic' },
-              warnings = { 'italic' },
-              information = { 'italic' },
-            },
-            underlines = {
-              errors = { 'underline' },
-              hints = { 'underline' },
-              warnings = { 'underline' },
-              information = { 'underline' },
-            },
-            inlay_hints = { background = true },
-          },
-          telescope = { enabled = true },
-          lsp_trouble = true,
-          indent_blankline = { enabled = true },
-          navic = { enabled = true },
-          noice = true,
-        },
+        -- plugins.all defaults to true when lazy.nvim is not loaded (we use lze).
+        -- All 80+ integrations (navic, telescope, blink-cmp, treesitter, gitsigns,
+        -- which-key, noice, trouble, indent-blankline, mini, etc.) auto-enabled.
       })
-      vim.cmd.colorscheme('catppuccin')
+      vim.cmd.colorscheme('tokyonight')
     end,
   },
+  -- {
+  --   'catppuccin-nvim',
+  --   lazy = false,
+  --   priority = 1000,
+  --   after = function()
+  --     require('catppuccin').setup({
+  --       flavour = 'mocha',
+  --       transparent_background = false,
+  --       show_end_of_buffer = false,
+  --       term_colors = false,
+  --       dim_inactive = { enabled = false },
+  --       styles = {
+  --         comments = { 'italic' },
+  --         conditionals = { 'italic' },
+  --       },
+  --       integrations = {
+  --         blink_cmp = true,
+  --         gitsigns = true,
+  --         mini = { enabled = true },
+  --         treesitter = true,
+  --         which_key = true,
+  --         native_lsp = {
+  --           enabled = true,
+  --           virtual_text = {
+  --             errors = { 'italic' },
+  --             hints = { 'italic' },
+  --             warnings = { 'italic' },
+  --             information = { 'italic' },
+  --           },
+  --           underlines = {
+  --             errors = { 'underline' },
+  --             hints = { 'underline' },
+  --             warnings = { 'underline' },
+  --             information = { 'underline' },
+  --           },
+  --           inlay_hints = { background = true },
+  --         },
+  --         telescope = { enabled = true },
+  --         lsp_trouble = true,
+  --         indent_blankline = { enabled = true },
+  --         navic = { enabled = true },
+  --         noice = true,
+  --       },
+  --     })
+  --     vim.cmd.colorscheme('catppuccin')
+  --   end,
+  -- },
   -- ---------------------------------------------------------------------------
   -- Snacks — notifier, lazygit, bigfile (NOT picker/explorer)
   -- ---------------------------------------------------------------------------
