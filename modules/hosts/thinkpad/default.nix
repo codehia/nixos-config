@@ -105,11 +105,6 @@
               WIFI_PWR_ON_BAT = "on";
               WOL_DISABLE = "Y";
 
-              # ----- Bluetooth -----
-              # Disable BT on battery when no device is connected; re-enable on AC.
-              DEVICES_TO_DISABLE_ON_BAT_NOT_IN_USE = "bluetooth";
-              DEVICES_TO_ENABLE_ON_AC = "bluetooth";
-
               # ----- USB -----
               USB_AUTOSUSPEND = 1;
               USB_EXCLUDE_AUDIO = 1;
