@@ -52,6 +52,9 @@
     nixos.users.users.soumya = {
       description = "Soumyaranjan Acharya";
       initialPassword = "REDACTED";
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB15hq8HqBbgw3PspZ6O0iegrqMbqahPj0udLuf2eZ9f soumya@flockjay.com"
+      ];
     };
 
     homeManager.home = {

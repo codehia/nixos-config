@@ -30,3 +30,8 @@ creation_rules:
           - *thinkpad
           - *personal
           - *workstation
+  - path_regex: secrets/soumya\.yaml$
+    key_groups:
+      - age:
+          - *thinkpad
+          - *workstation
