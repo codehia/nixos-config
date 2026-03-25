@@ -24,6 +24,12 @@ creation_rules:
           - *rclone
           - *personal
           - *thinkpad
+  - path_regex: secrets/common\.yaml$
+    key_groups:
+      - age:
+          - *thinkpad
+          - *personal
+          - *workstation
   - path_regex: secrets/deus\.yaml$
     key_groups:
       - age:

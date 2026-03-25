@@ -2,8 +2,16 @@
 {
   den.aspects.nix-config = {
     nixos =
-      { pkgs, ... }:
+      { pkgs, config, ... }:
       {
+        sops.secrets.github_token = {
+          sopsFile = ../../secrets/common.yaml;
+        };
+
+        systemd.services.nix-daemon.serviceConfig.EnvironmentFiles = [
+          config.sops.secrets.github_token.path
+        ];
+
         environment.binsh = "${pkgs.bash}/bin/bash";
         nix = {
           optimise = {
