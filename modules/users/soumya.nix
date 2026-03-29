@@ -9,24 +9,17 @@
       (den.provides.user-shell "fish")
 
       # Theming
-      den.aspects.catppuccin
-      den.aspects.stylix
-      den.aspects.cursor
+      den.aspects.appearance
 
       # Terminal / shell
-      den.aspects.fish
-      den.aspects.ghostty
-      den.aspects.kitty
-      den.aspects.tmux
+      den.aspects.terminal
 
       # Window manager — hardcoded to hyprland across all hosts
       den.aspects.hyprland
 
       # Editor / dev
-      den.aspects.git
-      den.aspects.lazygit
-      den.aspects.nvim
-      den.aspects.direnv
+      den.aspects.vcs
+      den.aspects.editor
 
       # Browser
       den.aspects.browser
@@ -39,23 +32,34 @@
       den.aspects.shell-tools
       den.aspects.tui
       den.aspects.cli-utils
-      den.aspects.productivity
+      den.aspects.packages
+      den.aspects.dev-tools
+      den.aspects.services
+      den.aspects.apps
 
       # Work
       den.aspects.work
-      den.aspects.zoom
 
       # Desktop shell
       den.aspects.dms-home
     ];
 
-    nixos.users.users.soumya = {
-      description = "Soumyaranjan Acharya";
-      initialPassword = "REDACTED";
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB15hq8HqBbgw3PspZ6O0iegrqMbqahPj0udLuf2eZ9f soumya@flockjay.com"
-      ];
-    };
+    nixos =
+      { config, ... }:
+      {
+        sops.secrets.soumya_password = {
+          sopsFile = ../../secrets/soumya.yaml;
+          key = "user_password";
+          neededForUsers = true;
+        };
+        users.users.soumya = {
+          description = "Soumyaranjan Acharya";
+          hashedPasswordFile = config.sops.secrets.soumya_password.path;
+          openssh.authorizedKeys.keys = [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB15hq8HqBbgw3PspZ6O0iegrqMbqahPj0udLuf2eZ9f soumya@flockjay.com"
+          ];
+        };
+      };
 
     homeManager.home = {
       homeDirectory = "/home/soumya";

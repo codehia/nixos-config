@@ -24,24 +24,17 @@ in
       (den.provides.user-shell "fish")
 
       # Theming
-      den.aspects.catppuccin
-      den.aspects.stylix
-      den.aspects.cursor
+      den.aspects.appearance
 
       # Terminal / shell
-      den.aspects.fish
-      den.aspects.ghostty
-      den.aspects.kitty
-      den.aspects.tmux
+      den.aspects.terminal
 
       # Window manager — host.wm selects the aspect by name
       (perUser wmSelector)
 
       # Editor / dev
-      den.aspects.git
-      den.aspects.lazygit
-      den.aspects.nvim
-      den.aspects.direnv
+      den.aspects.vcs
+      den.aspects.editor
       den.aspects.dev-tools
 
       # Browser
@@ -57,11 +50,7 @@ in
       den.aspects.shell-tools
       den.aspects.tui
       den.aspects.cli-utils
-      den.aspects.productivity
-      den.aspects.media
-      den.aspects.creative
-      den.aspects.chat
-      den.aspects.calibre
+      den.aspects.apps
       den.aspects.qbittorrent
       den.aspects.dms-home
 
@@ -73,13 +62,22 @@ in
       (perUser extraAspectsSelector)
     ];
 
-    nixos.users.users.deus = {
-      description = "Soumyaranjan Acharya";
-      initialPassword = "REDACTED";
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF8QcSgwXXrWmVdjcDcKZbBPkQWybWAZih/8YjFno+cK dev@sacharya.dev"
-      ];
-    };
+    nixos =
+      { config, ... }:
+      {
+        sops.secrets.deus_password = {
+          sopsFile = ../../secrets/deus.yaml;
+          key = "user_password";
+          neededForUsers = true;
+        };
+        users.users.deus = {
+          description = "Soumyaranjan Acharya";
+          hashedPasswordFile = config.sops.secrets.deus_password.path;
+          openssh.authorizedKeys.keys = [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF8QcSgwXXrWmVdjcDcKZbBPkQWybWAZih/8YjFno+cK dev@sacharya.dev"
+          ];
+        };
+      };
 
     homeManager.home = {
       homeDirectory = "/home/deus";
