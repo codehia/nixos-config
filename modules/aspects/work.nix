@@ -1,7 +1,10 @@
 { den, ... }:
 {
   den.aspects.work = {
-    includes = [ den.aspects.zoom ];
+    includes = [
+      den.aspects.zoom
+      (den._.unfree [ "slack" ])
+    ];
     homeManager =
       { pkgs, ... }:
       {
