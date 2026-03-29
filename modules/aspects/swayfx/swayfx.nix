@@ -12,6 +12,13 @@
           enable = true;
           package = pkgs.swayfx;
         };
+        environment.etc."wayland-sessions/sway.desktop".text = ''
+          [Desktop Entry]
+          Name=SwayFX
+          Comment=An i3-compatible Wayland compositor with visual effects
+          Exec=sway
+          Type=Application
+        '';
 
         xdg.portal = {
           enable = true;
@@ -25,8 +32,23 @@
     homeManager =
       { pkgs, ... }:
       {
+        services.swayidle = {
+          enable = true;
+          events = [
+            {
+              event = "before-sleep";
+              command = "${pkgs.playerctl}/bin/playerctl -a pause";
+            }
+            {
+              event = "lock";
+              command = "${pkgs.playerctl}/bin/playerctl -a pause";
+            }
+          ];
+        };
+
         home = {
           packages = with pkgs; [
+            playerctl
             wl-clipboard
             grim
             slurp
@@ -86,10 +108,6 @@
             focus = {
               followMouse = "no";
               wrapping = "yes";
-            };
-
-            seat."*" = {
-              xcursor_theme = "default 32";
             };
           };
         };

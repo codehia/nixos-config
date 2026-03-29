@@ -9,10 +9,21 @@
   };
 
   den.aspects.hyprland = {
-    nixos.programs.hyprland = {
-      enable = true;
-      withUWSM = true;
-    };
+    nixos =
+      { ... }:
+      {
+        programs.hyprland = {
+          enable = true;
+          withUWSM = true;
+        };
+        environment.etc."wayland-sessions/hyprland.desktop".text = ''
+          [Desktop Entry]
+          Name=Hyprland
+          Comment=A dynamic tiling Wayland compositor
+          Exec=Hyprland
+          Type=Application
+        '';
+      };
 
     homeManager =
       { pkgs, ... }:
