@@ -16,7 +16,9 @@
       "nix"
       "python"
     ];
-    users.deus = { };
+    users.deus = {
+      personalApps = true;
+    };
     users.soumya = {
       nvimLanguages = [
         "nix"
@@ -89,7 +91,6 @@
       den.aspects.disko
 
       # Nix tooling
-      den.aspects.nh
       den.aspects.nix-tools
 
       # Hardware

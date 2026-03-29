@@ -1,5 +1,8 @@
 # just is a command runner, Justfile is very similar to Makefile, but simpler.
 
+# Always point nh at the flake in this directory, regardless of where it's cloned.
+export NH_FLAKE := justfile_directory()
+
 ############################################################################
 #
 #  Nix commands related to the local machine

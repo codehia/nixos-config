@@ -31,7 +31,9 @@
         "typescript"
       ];
     };
-    users.deus = { };
+    users.deus = {
+      personalApps = true;
+    };
   };
 
   den.aspects.thinkpad = {
@@ -200,6 +202,11 @@
       };
 
     includes = [
+      (den._.unfree [
+        "mullvad"
+        "mullvad-vpn"
+      ])
+
       # Core system
       den.aspects.nix-config
       den.aspects.networking
@@ -208,7 +215,6 @@
       den.aspects.disko
 
       # Nix tooling
-      den.aspects.nh
       den.aspects.nix-tools
 
       # Hardware

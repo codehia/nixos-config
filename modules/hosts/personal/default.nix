@@ -20,15 +20,8 @@
       "go"
       "latex"
     ];
-    users.deus = { };
-    # Temporary: soumya added for multi-user DMS testing — remove after fix confirmed
-    users.soumya = {
-      nvimLanguages = [
-        "nix"
-        "lua"
-        "python"
-        "typescript"
-      ];
+    users.deus = {
+      personalApps = true;
     };
   };
 
@@ -75,6 +68,11 @@
       };
 
     includes = [
+      (den._.unfree [
+        "mullvad"
+        "mullvad-vpn"
+      ])
+
       # Core system
       den.aspects.nix-config
       den.aspects.networking
@@ -83,7 +81,6 @@
       den.aspects.disko
 
       # Nix tooling
-      den.aspects.nh
       den.aspects.nix-tools
 
       # Hardware
