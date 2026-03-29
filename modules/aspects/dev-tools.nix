@@ -1,17 +1,17 @@
+{ den, ... }:
 {
   den.aspects.dev-tools = {
+    includes = [ (den._.unfree [ "httpie-desktop" ]) ];
+
     homeManager =
       { pkgs, ... }:
       {
         home.packages =
           (with pkgs; [
             just
-            nixfmt-classic
-            nix-output-monitor
+            devenv
           ])
           ++ (with pkgs.unstable; [
-            devenv
-            vscode
             claude-code
             httpie-desktop
           ]);

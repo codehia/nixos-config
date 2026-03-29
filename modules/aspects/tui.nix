@@ -11,6 +11,18 @@
           ncdu
           pulsemixer
           bluetui
+
+          # system diagnostics
+          strace
+          ltrace
+          lsof
+          sysstat
+          lm_sensors
+          ethtool
+          pciutils
+          usbutils
+          libglvnd
+          libglibutil
         ];
       };
   };

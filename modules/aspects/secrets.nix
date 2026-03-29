@@ -7,12 +7,17 @@
 
   den.aspects.secrets = {
     nixos =
-      { ... }:
+      { pkgs, ... }:
       {
         imports = [ inputs.sops-nix.nixosModules.sops ];
         sops = {
           age.keyFile = "/var/lib/sops/age/keys.txt";
         };
+        environment.systemPackages = with pkgs; [
+          age
+          ssh-to-age
+          sops
+        ];
       };
 
     homeManager =
