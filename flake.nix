@@ -80,6 +80,10 @@
       url = "github:aokellermann/sway-scratch";
       flake = false;
     };
+    tuigreet = {
+      url = "github:NotAShelf/tuigreet";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
   };
