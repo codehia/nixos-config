@@ -25,8 +25,8 @@
               "flakes"
             ];
             auto-optimise-store = true;
-            # root is always trusted; each user is appended via perUser below.
-            trusted-users = [ "root" ];
+            # root is always trusted by nix daemon.
+            # Per-user entries are added via perUser in defaults.nix.
             max-jobs = "auto";
             http-connections = 50;
             max-substitution-jobs = 128;
@@ -44,14 +44,6 @@
         { host }:
         {
           nixos.nix.gc.automatic = !(host.nhCleanEnabled or false);
-        }
-      ))
-
-      # Add each host user to trusted-users (listOf merges by concatenation).
-      (den.lib.perUser (
-        { user, ... }:
-        {
-          nixos.nix.settings.trusted-users = [ user.userName ];
         }
       ))
     ];

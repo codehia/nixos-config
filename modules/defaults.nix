@@ -13,6 +13,12 @@
       den.provides.define-user
       den.provides.hostname
       den.provides.inputs'
+      (den.lib.perUser (
+        { user, ... }:
+        {
+          nixos.nix.settings.trusted-users = [ user.userName ];
+        }
+      ))
     ];
   };
 
