@@ -763,6 +763,72 @@ den.hosts.x86_64-linux.thinkpad = {
 
 ---
 
+## Gotchas
+
+### Ghostty service fails with `Result: protocol`
+
+**Symptom:** `systemctl --user status app-com.mitchellh.ghostty.service` shows
+`Active: failed (Result: protocol)`.
+
+**Cause:** A stray Ghostty process (launched directly, not via the service) holds the
+D-Bus name `com.mitchellh.ghostty`. When the service starts with
+`--gtk-single-instance=true`, it detects the name is taken and exits cleanly (status=0)
+without sending `READY=1`. Since the service is `Type=notify-reload`, systemd waits for
+that signal and reports `protocol` failure when it never arrives.
+
+**Debug steps:**
+```bash
+systemctl --user status app-com.mitchellh.ghostty.service   # confirm protocol failure
+pgrep -a ghostty                                             # look for a stray process
+```
+
+**Fix:** Kill the stray process (or close Ghostty), then start via the service:
+```bash
+pkill ghostty          # or close the window
+systemctl --user start app-com.mitchellh.ghostty.service
+```
+
+**Prevention:** Always launch Ghostty via the service or D-Bus activation, never
+directly from a launcher or shell. The service is enabled by `programs.ghostty.systemd.enable = true`.
+
+---
+
+### Ghostty shows random black/blank lines (text blacked out)
+
+**Symptom:** Specific rows in the terminal randomly go completely black, obscuring all
+text on those lines. The same rows are affected consistently within a session.
+
+**Cause:** Stale fontconfig cache entries pointing to old nix store paths (garbage
+collected after a `just clean` or `nix-collect-garbage`). Ghostty looks up a codepoint,
+fontconfig returns a path from the stale cache, FreeType fails to open the font file,
+and the entire row goes blank. The error shows up in journald as:
+
+```
+warning(generic_renderer): error building row y=N err=error.CannotOpenResource
+```
+
+**Debug steps:**
+```bash
+# Check journald for the telltale error:
+journalctl --user -u app-com.mitchellh.ghostty.service --no-pager -n 50 | grep CannotOpen
+
+# Rebuild the fontconfig cache (look for "invalid cache file" lines):
+fc-cache -f -v
+```
+
+**Fix:** Rebuild the fontconfig cache and restart Ghostty:
+```bash
+fc-cache -f
+systemctl --user restart app-com.mitchellh.ghostty.service
+```
+
+This typically happens after garbage collection removes old nix store paths that the
+fontconfig cache still referenced. Running `just clean` followed by `just install`
+should trigger a cache rebuild automatically, but if it doesn't, run `fc-cache -f`
+manually.
+
+---
+
 ## Reference notes
 
 | File | What's in it |
