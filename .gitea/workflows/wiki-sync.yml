@@ -1,0 +1,39 @@
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'wiki/**'
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync to Codeberg wiki
+        env:
+          TOKEN: ${{ secrets.WIKI_TOKEN_CODEBERG }}
+        run: |
+          REMOTE="https://codehia:$TOKEN@codeberg.org/codehia/nixos-config.wiki.git"
+          git clone "$REMOTE" /tmp/cb-wiki || (mkdir /tmp/cb-wiki && git -C /tmp/cb-wiki init && git -C /tmp/cb-wiki remote add origin "$REMOTE")
+          rsync -av --delete wiki/ /tmp/cb-wiki/
+          cd /tmp/cb-wiki
+          git config user.name "codehia"
+          git config user.email "dev@sacharya.dev"
+          git add -A
+          git diff --cached --quiet || git commit -m "Sync wiki from main repo"
+          git push -u origin HEAD
+
+      - name: Sync to GitHub wiki
+        env:
+          TOKEN: ${{ secrets.WIKI_TOKEN_GITHUB }}
+        run: |
+          REMOTE="https://codehia:$TOKEN@github.com/codehia/nixos-config.wiki.git"
+          git clone "$REMOTE" /tmp/gh-wiki || (mkdir /tmp/gh-wiki && git -C /tmp/gh-wiki init && git -C /tmp/gh-wiki remote add origin "$REMOTE")
+          rsync -av --delete wiki/ /tmp/gh-wiki/
+          cd /tmp/gh-wiki
+          git config user.name "codehia"
+          git config user.email "dev@sacharya.dev"
+          git add -A
+          git diff --cached --quiet || git commit -m "Sync wiki from main repo"
+          git push -u origin HEAD
