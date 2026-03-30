@@ -10,6 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: apt-get update -qq && apt-get install -y -qq rsync
+
       - name: Sync to Codeberg wiki
         env:
           TOKEN: ${{ secrets.WIKI_TOKEN_CODEBERG }}
