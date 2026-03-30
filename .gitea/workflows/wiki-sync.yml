@@ -10,16 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: apt-get update -qq && apt-get install -y -qq rsync
-
       - name: Sync to Codeberg wiki
         env:
           TOKEN: ${{ secrets.WIKI_TOKEN_CODEBERG }}
         run: |
           REMOTE="https://codehia:$TOKEN@codeberg.org/codehia/nixos-config.wiki.git"
           git clone "$REMOTE" /tmp/cb-wiki || (mkdir /tmp/cb-wiki && git -C /tmp/cb-wiki init && git -C /tmp/cb-wiki remote add origin "$REMOTE")
-          rsync -av --delete wiki/ /tmp/cb-wiki/
+          find /tmp/cb-wiki -mindepth 1 -not -path '/tmp/cb-wiki/.git' -not -path '/tmp/cb-wiki/.git/*' -delete
+          cp -r wiki/. /tmp/cb-wiki/
           cd /tmp/cb-wiki
           git config user.name "codehia"
           git config user.email "dev@sacharya.dev"
@@ -33,7 +31,8 @@ jobs:
         run: |
           REMOTE="https://codehia:$TOKEN@github.com/codehia/nixos-config.wiki.git"
           git clone "$REMOTE" /tmp/gh-wiki || (mkdir /tmp/gh-wiki && git -C /tmp/gh-wiki init && git -C /tmp/gh-wiki remote add origin "$REMOTE")
-          rsync -av --delete wiki/ /tmp/gh-wiki/
+          find /tmp/gh-wiki -mindepth 1 -not -path '/tmp/gh-wiki/.git' -not -path '/tmp/gh-wiki/.git/*' -delete
+          cp -r wiki/. /tmp/gh-wiki/
           cd /tmp/gh-wiki
           git config user.name "codehia"
           git config user.email "dev@sacharya.dev"
