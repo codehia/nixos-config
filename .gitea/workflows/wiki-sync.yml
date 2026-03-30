@@ -3,6 +3,7 @@ on:
     branches: [master]
     paths:
       - 'wiki/**'
+      - '.gitea/workflows/wiki-sync.yml'
 
 jobs:
   sync-wiki:
