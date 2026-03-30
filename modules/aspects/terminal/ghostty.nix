@@ -8,6 +8,7 @@
           enable = true;
           enableFishIntegration = true;
           installBatSyntax = true;
+          systemd.enable = true;
           settings = {
             font-family = "JetBrainsMono Nerd Font,JetBrainsMono NF";
             font-size = 14;
