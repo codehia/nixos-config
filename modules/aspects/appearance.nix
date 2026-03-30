@@ -46,9 +46,17 @@
           flavor = "mocha";
           enable = true;
           nvim.enable = false; # configured directly in init.lua
-          # tmux.enable = false; # dotbar handles tmux theming
           kvantum.enable = true; # Qt theming via Kvantum
           cursors.enable = false; # stylix.cursor handles this
+          # stylix handles these — catppuccin would double-theme them
+          ghostty.enable = false;
+          kitty.enable = false;
+          lazygit.enable = false;
+          delta.enable = false; # managed via git.nix with mellow-barbet
+          tmux.enable = false;
+          hyprland.enable = false;
+          rofi.enable = false;
+          fish.enable = true; # no stylix fish target
         };
 
         stylix = {
@@ -87,7 +95,7 @@
             hyprland.enable = false;
             hyprlock.enable = false;
             kitty.fonts.enable = false; # Iosevka font set directly in kitty config
-            ghostty.fonts.enable = false; # JetBrainsMono set directly in ghostty config
+            ghostty.enable = false; # JetBrainsMono set directly in ghostty config
             rofi.fonts.enable = false;
             # catppuccin/nix handles these with purpose-built mocha colors
             bat.enable = false;
@@ -120,7 +128,6 @@
           platformTheme.name = "kvantum";
           style.name = "kvantum";
         };
-
       };
   };
 }

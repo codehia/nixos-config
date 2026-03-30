@@ -2,6 +2,7 @@
   den.aspects.vcs = {
     homeManager.programs.lazygit = {
       enable = true;
+      enableFishIntegration = true;
       settings = {
         disableStartupPopups = true;
         confirmOnQuit = false;
@@ -9,14 +10,10 @@
         git.pagers = [
           {
             colorArg = "always";
-            pager = "delta --paging=never --features='mellow-barbet' --syntax-theme='Catppuccin Mocha'";
+            pager = "delta --paging=never --features='mellow-barbet'";
             useConfig = false;
           }
         ];
-        gui = {
-          showRootItemInFileTree = false;
-          sidePanelWidth = 0.2;
-        };
       };
     };
   };
