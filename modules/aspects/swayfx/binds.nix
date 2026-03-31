@@ -25,7 +25,7 @@
             lib.mkOptionDefault {
               # ── App launchers ──
               "${mod}+space" = "exec dms ipc launcher toggle";
-              "${mod}+q" = "exec ghostty";
+              "${mod}+Return" = "exec ghostty";
               "${mod}+w" = "exec zen-beta";
 
               # ── Window management ──
@@ -125,7 +125,7 @@
 
               # ── Layout management (persway) ──
               "${mod}+m" = "exec layout-switch";
-              "${mod}+Return" = "exec promote-master";
+              # "${mod}+Return" = "exec promote-master";
               "${mod}+Tab" = "exec persway stack-focus-next";
               "${mod}+Shift+Tab" = "exec persway stack-focus-prev";
               "${mod}+bracketright" = "exec persway stack-main-rotate-next";
