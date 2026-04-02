@@ -9,6 +9,10 @@
       url = "github:catppuccin/nix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     den.url = "github:vic/den/latest";
     dgop = {
       url = "github:AvengeMedia/dgop";

@@ -12,8 +12,8 @@
             devenv
           ])
           ++ (with pkgs.unstable; [
-            claude-code
             httpie-desktop
+            github-copilot-cli
           ]);
       };
   };
