@@ -7,24 +7,25 @@
   modulesPath,
   ...
 }:
-
 {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
   boot = {
-    kernelModules = [ "kvm-amd" ];
-    extraModulePackages = [ ];
     initrd = {
-      kernelModules = [ "amdgpu" ];
       availableKernelModules = [
-        "nvme"
-        "xhci_pci_renesas"
         "xhci_pci"
+        "ehci_pci"
+        "nvme"
+        "ahci"
         "usb_storage"
+        "usbhid"
         "sd_mod"
         "rtsx_pci_sdmmc"
       ];
+      kernelModules = [ "amdgpu" ];
     };
+    kernelModules = [ "kvm-amd" ];
+    extraModulePackages = [ ];
   };
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
@@ -37,11 +38,5 @@
   # networking.interfaces.wlp3s0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware = {
-    cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-    graphics.enable = true;
-    amdgpu = {
-      initrd.enable = true;
-    };
-  };
+  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

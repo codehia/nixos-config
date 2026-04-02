@@ -46,6 +46,8 @@
         };
 
         services = {
+          gvfs.enable = true;
+          fwupd.enable = true;
           kanata = {
             enable = false;
             keyboards = {
@@ -59,12 +61,10 @@
               };
             };
           };
-          gvfs.enable = true;
           udev.extraRules = ''
             KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
           '';
         };
-
         hardware = {
           uinput.enable = true;
           bluetooth = {
