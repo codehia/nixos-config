@@ -71,49 +71,7 @@ let
           ...
         }:
         let
-          catppuccinTheme = {
-            dark = {
-              name = "Catppuccin Mocha";
-              primary = "#cba6f7"; # Mauve
-              primaryText = "#1e1e2e"; # Base
-              primaryContainer = "#89b4fa"; # Blue
-              secondary = "#f9e2af"; # Yellow
-              surface = "#1e1e2e"; # Base (one level above Mantle background)
-              surfaceText = "#cdd6f4"; # Text
-              surfaceVariant = "#313244"; # Surface0
-              surfaceVariantText = "#cdd6f4"; # Text
-              surfaceTint = "#cba6f7"; # Mauve
-              background = "#181825"; # Mantle
-              backgroundText = "#cdd6f4"; # Text
-              outline = "#6c7086"; # Overlay0
-              surfaceContainer = "#313244"; # Surface0
-              surfaceContainerHigh = "#45475a"; # Surface1
-              error = "#f38ba8"; # Red
-              warning = "#f9e2af"; # Yellow
-              info = "#94e2d5"; # Teal
-            };
-            light = {
-              name = "Catppuccin Latte";
-              primary = "#8839ef"; # Mauve
-              primaryText = "#eff1f5"; # Base
-              primaryContainer = "#1e66f5"; # Blue
-              secondary = "#df8e1d"; # Yellow
-              surface = "#e6e9ef"; # Mantle
-              surfaceText = "#4c4f69"; # Text
-              surfaceVariant = "#ccd0da"; # Surface0
-              surfaceVariantText = "#4c4f69"; # Text
-              surfaceTint = "#8839ef"; # Mauve
-              background = "#eff1f5"; # Base
-              backgroundText = "#4c4f69"; # Text
-              outline = "#acb0be"; # Surface2
-              surfaceContainer = "#ccd0da"; # Surface0
-              surfaceContainerHigh = "#bcc0cc"; # Surface1
-              error = "#d20f39"; # Red
-              warning = "#df8e1d"; # Yellow
-              info = "#179299"; # Teal
-            };
-          };
-          themeFile = "${config.home.homeDirectory}/.config/DankMaterialShell/catppuccin-mocha.json";
+          themeFile = "${config.home.homeDirectory}/.config/DankMaterialShell/themes/catppuccin/theme.json";
           finalSettings = lib.recursiveUpdate settings {
             customThemeFile = themeFile;
             currentThemeName = "custom"; # DMS Theme.qml only loads customThemeFile when name === "custom"
@@ -123,9 +81,14 @@ let
         {
           imports = [ inputs.dms.homeModules.dank-material-shell ];
 
-          home.file.".config/DankMaterialShell/catppuccin-mocha.json".text = builtins.toJSON catppuccinTheme;
+          home.file.".config/DankMaterialShell/themes/catppuccin/theme.json".source = ./catppuccin-theme.json;
+
+          home.file.".face".source = "${self}/assets/profile.jpg";
 
           # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
+          # Also seeds session.json wallpaperPath on first install (only if file absent).
+          # Note: session.json is owned by DMS at runtime — we must NOT use the HM
+          # session option which would replace it with a read-only nix store symlink.
           home.activation.syncWallpapers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
             wallpaperSrc="${self}/assets/.wallpapers"
             wallpaperDst="$HOME/Pictures/Wallpapers"
@@ -133,6 +96,13 @@ let
             if [ -d "$wallpaperSrc" ] && [ -n "$(ls -A "$wallpaperSrc" 2>/dev/null)" ]; then
               $DRY_RUN_CMD mkdir -p "$wallpaperDst"
               $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete "$wallpaperSrc/" "$wallpaperDst/"
+            fi
+
+            sessionFile="$HOME/.local/state/DankMaterialShell/session.json"
+            defaultWallpaper="$HOME/Pictures/Wallpapers/ultrawide/hello-world-pixel-3440x1440-15168.png"
+            if [ -z "$DRY_RUN_CMD" ] && [ ! -f "$sessionFile" ]; then
+              mkdir -p "$(dirname "$sessionFile")"
+              echo "{\"wallpaperPath\":\"$defaultWallpaper\"}" > "$sessionFile"
             fi
           '';
 
@@ -146,6 +116,17 @@ let
             enableAudioWavelength = false;
             enableCalendarEvents = false;
             settings = finalSettings;
+            plugins.dankPomodoroTimer = {
+              src =
+                pkgs.fetchFromGitHub {
+                  owner = "AvengeMedia";
+                  repo = "dms-plugins";
+                  rev = "141841fc85e01494df6d217bd5a27c65da87256d";
+                  hash = "sha256-/155wFIotV9xiZzX9XRGs3ANjBcLJwS4kNDDNO6WkF0=";
+                }
+                + "/DankPomodoroTimer";
+            };
+            managePluginSettings = true;
             systemd = {
               enable = true;
               restartIfChanged = true;
