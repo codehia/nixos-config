@@ -2,9 +2,10 @@
 # Host key (ssh_host_ed25519_key): sourced from secrets/<hostname>.yaml → /etc/ssh/
 # User key (ssh_user_ed25519_key): sourced from secrets/<username>.yaml → ~/.ssh/id_ed25519
 # Paths are derived by convention — no freeform sopsFile attr needed.
-{ lib, den, ... }:
+{ den, ... }:
 let
   inherit (den.lib) perUser;
+  inherit (den.lib) perHost;
 
   secrets = ../../secrets;
 
@@ -23,6 +24,7 @@ let
           sops.secrets.ssh_host_ed25519_key = {
             inherit sopsFile;
             path = "/etc/ssh/ssh_host_ed25519_key";
+            type = "ed25519";
             owner = "root";
             group = "root";
             mode = "0600";
@@ -38,7 +40,11 @@ let
     in
     {
       homeManager =
-        { config, lib, ... }:
+        {
+          config,
+          lib,
+          ...
+        }:
         lib.mkIf managed {
           sops.secrets.ssh_user_ed25519_key = {
             inherit sopsFile;
@@ -51,9 +57,8 @@ in
 {
   den.aspects.ssh = {
     nixos.services.openssh.enable = true;
-
     includes = [
-      (perUser hostKey)
+      (perHost hostKey)
       (perUser userKey)
     ];
   };
