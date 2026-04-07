@@ -106,6 +106,11 @@ let
             fi
           '';
 
+          # force=true replaces the stale real directory (from a pre-nix manual DMS install)
+          # with the nix-managed symlink. DMS only reads plugin dirs — state goes to
+          # ~/.local/state/DankMaterialShell/plugins/ — so read-only nix store is fine.
+          xdg.configFile."DankMaterialShell/plugins/dankPomodoroTimer".force = true;
+
           programs.dank-material-shell = {
             enable = true;
             dgop.package = inputs.dgop.packages.${pkgs.stdenv.hostPlatform.system}.default;
