@@ -160,7 +160,7 @@
   "appsDockEnlargePercentage": 125,
   "appsDockIconSizePercentage": 100,
   "keyboardLayoutNameCompactMode": false,
-  "runningAppsCurrentWorkspace": true,
+  "runningAppsCurrentWorkspace": false,
   "runningAppsGroupByApp": false,
   "runningAppsCurrentMonitor": false,
   "appIdSubstitutions": [],

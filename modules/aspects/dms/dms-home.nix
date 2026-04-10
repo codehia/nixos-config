@@ -8,6 +8,10 @@
   ...
 }:
 let
+  # dms-settings.json has runningAppsCurrentWorkspace = false.
+  # Hyprland special workspaces (pyprland scratchpads) have negative workspace IDs, so they
+  # never match the current regular workspace and would be permanently hidden from the running
+  # apps list if this were true.
   baseSettings = builtins.fromJSON (builtins.readFile ./dms-settings.json);
 
   dmsPerUser = den.lib.perUser (
@@ -142,6 +146,10 @@ let
           # to load due to a qtsvg version mismatch, causing quickshell to deadlock.
           # Bypass qt5ct entirely for DMS — it uses its own QML theme anyway.
           systemd.user.services.dms.Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
+
+          # UWSM owns the session (hyprland.systemd.enable = false), so hyprland-session.target
+          # is never created. Override to graphical-session.target which UWSM activates instead.
+          systemd.user.services.dms.Install.WantedBy = lib.mkForce [ "graphical-session.target" ];
         };
     }
   );
