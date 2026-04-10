@@ -1,47 +1,47 @@
 # Hyprland keybindings — merges into the hyprland aspect via the collector pattern.
 # den.aspects.hyprland is also defined in hyprland.nix; den merges both definitions.
 { den, ... }:
-let
-  # Minimize/restore toggle: if special:minimized is visible restore focused window,
-  # otherwise send current window to special:minimized.
-  hyprMinimizeRestore =
-    pkgs:
-    pkgs.writeShellScript "hypr-minimize-restore" ''
-      ws=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .specialWorkspace.name')
-      if [ "$ws" = "special:minimized" ]; then
-        id=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .activeWorkspace.id')
-        hyprctl --batch "dispatch movetoworkspace $id ; dispatch togglespecialworkspace minimized"
-      else
-        cws=$(hyprctl activewindow -j | jq -r .workspace.name)
-        case "$cws" in
-          special:*) ;;
-          *) hyprctl dispatch movetoworkspacesilent special:minimized ;;
-        esac
-      fi
-    '';
-
-  # Restore focused window from special:minimized to the active regular workspace.
-  # monitors[].activeWorkspace reflects the underlying regular workspace even when a
-  # special workspace is overlaid on top.
-  hyprRestoreMinimized =
-    pkgs:
-    pkgs.writeShellScript "hypr-restore-minimized" ''
-      id=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .activeWorkspace.id')
-      hyprctl --batch "dispatch movetoworkspace $id ; dispatch togglespecialworkspace minimized"
-    '';
-
-  # Dismiss whichever special workspace is currently visible on the focused monitor.
-  hyprDismissScratchpad =
-    pkgs:
-    pkgs.writeShellScript "hypr-dismiss-scratchpad" ''
-      ws=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .specialWorkspace.name' | sed 's/special://')
-      [ -n "$ws" ] && hyprctl dispatch togglespecialworkspace "$ws"
-    '';
-in
 {
   den.aspects.hyprland = {
     homeManager =
       { pkgs, ... }:
+      let
+        # Minimize/restore toggle: if special:minimized is visible restore focused window,
+        # otherwise dismiss any other visible scratchpad and send current window to special:minimized.
+        hyprMinimizeRestore = pkgs.writeShellScript "hypr-minimize-restore" ''
+          current=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .specialWorkspace.name' | sed 's/special://')
+          if [ "$current" = "minimized" ]; then
+            id=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .activeWorkspace.id')
+            hyprctl --batch "dispatch movetoworkspace $id ; dispatch togglespecialworkspace minimized"
+          else
+            [ -n "$current" ] && hyprctl dispatch togglespecialworkspace "$current"
+            cws=$(hyprctl activewindow -j | jq -r .workspace.name)
+            case "$cws" in
+              special:*) ;;
+              *) hyprctl dispatch movetoworkspacesilent special:minimized ;;
+            esac
+          fi
+        '';
+
+        # Dismiss whichever special workspace is currently visible on the focused monitor.
+        hyprDismissScratchpad = pkgs.writeShellScript "hypr-dismiss-scratchpad" ''
+          ws=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .specialWorkspace.name' | sed 's/special://')
+          [ -n "$ws" ] && hyprctl dispatch togglespecialworkspace "$ws"
+        '';
+
+        # Toggle a named scratchpad, hiding any other visible special workspace first.
+        hyprToggleScratchpad = pkgs.writeShellScript "hypr-toggle-scratchpad" ''
+          target="$1"
+          current=$(hyprctl monitors -j | jq -r '.[] | select(.focused==true) | .specialWorkspace.name' | sed 's/special://')
+          if [ "$current" = "$target" ]; then
+            hyprctl dispatch togglespecialworkspace "$target"
+          elif [ -n "$current" ]; then
+            hyprctl --batch "dispatch togglespecialworkspace $current ; dispatch togglespecialworkspace $target"
+          else
+            hyprctl dispatch togglespecialworkspace "$target"
+          fi
+        '';
+      in
       {
         wayland.windowManager.hyprland.settings.bind = [
           "$modifier, SPACE, exec, dms ipc launcher toggle"
@@ -104,16 +104,16 @@ in
           "$modifier CONTROL, 4, movetoworkspacesilent, 4"
           "$modifier CONTROL, 5, movetoworkspacesilent, 5"
 
-          # Scratchpads — native special workspaces
-          "$modifier, grave, togglespecialworkspace, term"
-          "$modifier SHIFT, T, togglespecialworkspace, filemanager"
-          "$modifier SHIFT, O, togglespecialworkspace, pw"
-          "$modifier SHIFT, M, togglespecialworkspace, spotify"
-          "$modifier SHIFT, S, togglespecialworkspace, slack"
-          "$modifier SHIFT, E, togglespecialworkspace, ente"
-          "$modifier, N, exec, ${hyprMinimizeRestore pkgs}"
-          "$modifier SHIFT, N, exec, ${hyprRestoreMinimized pkgs}"
-          "$modifier SHIFT, U, exec, ${hyprDismissScratchpad pkgs}"
+          # Scratchpads — native special workspaces (only one visible at a time)
+          "$modifier, grave, exec, ${hyprToggleScratchpad} term"
+          "$modifier SHIFT, T, exec, ${hyprToggleScratchpad} filemanager"
+          "$modifier SHIFT, O, exec, ${hyprToggleScratchpad} pw"
+          "$modifier SHIFT, M, exec, ${hyprToggleScratchpad} spotify"
+          "$modifier SHIFT, S, exec, ${hyprToggleScratchpad} slack"
+          "$modifier SHIFT, E, exec, ${hyprToggleScratchpad} ente"
+          "$modifier, N, exec, ${hyprMinimizeRestore}"
+          "$modifier SHIFT, N, exec, ${hyprToggleScratchpad} minimized"
+          "$modifier SHIFT, U, exec, ${hyprDismissScratchpad}"
 
           "ALT,Tab,cyclenext"
 
