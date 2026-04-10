@@ -5,7 +5,6 @@
 {
   flake-file.inputs.hyprland = {
     url = "github:hyprwm/hyprland";
-    inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
   den.aspects.hyprland = {
