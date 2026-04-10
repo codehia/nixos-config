@@ -103,10 +103,6 @@
               name = "colored-man-pages";
               src = colored-man-pages;
             }
-            {
-              name = "github-copilot-cli-fish";
-              src = github-copilot-cli-fish;
-            }
           ];
           functions = {
             fish_command_not_found = {
