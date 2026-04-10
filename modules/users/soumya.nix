@@ -56,7 +56,7 @@
           description = "Soumyaranjan Acharya";
           hashedPasswordFile = config.sops.secrets.soumya_password.path;
           openssh.authorizedKeys.keys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB15hq8HqBbgw3PspZ6O0iegrqMbqahPj0udLuf2eZ9f soumya@flockjay.com"
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIv1y8DzCwaUGK6DO+64qjctEC1Aia0LW/jhLhrYGSUB soumya@workstation"
           ];
         };
       };
