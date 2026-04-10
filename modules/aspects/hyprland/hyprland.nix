@@ -39,32 +39,24 @@
           hyprpolkitagent
           hyprland-qtutils
         ];
-        systemd.user.targets.hyprland-session.Unit.Wants = [ "xdg-desktop-autostart.target" ];
         wayland.windowManager.hyprland = {
           enable = true;
           package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
           portalPackage =
             inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+          # systemd.enable must be false when withUWSM = true — UWSM owns the session,
+          # not the HM systemd integration. Both active causes startup conflicts.
           systemd = {
-            enable = true;
+            enable = false;
             enableXdgAutostart = true;
             variables = [ "--all" ];
           };
           xwayland.enable = true;
-          plugins = [ pkgs.pyprland ];
           settings = {
-            exec = [ "pkill -x pypr; pypr &" ];
             exec-once = [
-              "[workspace special:pw silent] 1password --silent"
-              "[workspace special:spotify silent] spotify"
-              "[workspace special:ente silent] ente-auth"
-              "mullvad-gui &"
+              "mullvad-gui"
             ];
-            env = [
-              "HYPRCURSOR_THEME, MyCursor"
-              "HYPRCURSOR_SIZE, 32"
-              "XCURSOR_SIZE, 32"
-            ];
+
             input = {
               kb_options = [
                 "grp:alt_caps_toggle"
@@ -101,7 +93,6 @@
               disable_hyprland_logo = true;
               disable_splash_rendering = true;
               enable_swallow = true;
-              vfr = true;
               vrr = 2;
               enable_anr_dialog = true;
               anr_missed_pings = 15;
@@ -158,6 +149,48 @@
               "4, persistent:true,"
               "5, persistent:true,"
               "special:minimized, gapsout:100"
+              # Scratchpads — lazy: app starts only on first toggle (on-created-empty)
+              "special:term, on-created-empty:kitty --class kitty-term"
+              "special:filemanager, on-created-empty:thunar"
+              "special:pw, on-created-empty:1password --silent"
+              "special:spotify, on-created-empty:spotify"
+              "special:slack, on-created-empty:slack"
+              "special:ente, on-created-empty:enteauth"
+            ];
+
+            # windowrule: send each scratchpad app to its special workspace silently on open,
+            # and enforce float + size + center.
+            # "workspace ... silent" is a static effect (fires once at window open).
+            windowrule = [
+              "workspace special:term silent, match:class kitty-term"
+              "float on, match:class kitty-term"
+              "size 70% 70%, match:class kitty-term"
+              "center on, match:class kitty-term"
+
+              "workspace special:filemanager silent, match:class thunar"
+              "float on, match:class thunar"
+              "size 70% 70%, match:class thunar"
+              "center on, match:class thunar"
+
+              "workspace special:pw silent, match:class 1Password"
+              "float on, match:class 1Password"
+              "size 30% 50%, match:class 1Password"
+              "center on, match:class 1Password"
+
+              "workspace special:spotify silent, match:class Spotify"
+              "float on, match:class Spotify"
+              "size 40% 60%, match:class Spotify"
+              "center on, match:class Spotify"
+
+              "workspace special:slack silent, match:class Slack"
+              "float on, match:class Slack"
+              "size 70% 70%, match:class Slack"
+              "center on, match:class Slack"
+
+              "workspace special:ente silent, match:class io.ente.auth"
+              "float on, match:class io.ente.auth"
+              "size 10% 80%, match:class io.ente.auth"
+              "center on, match:class io.ente.auth"
             ];
           };
         };
