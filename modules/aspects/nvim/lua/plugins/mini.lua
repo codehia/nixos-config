@@ -45,8 +45,11 @@ return {
       -- Check why the LSP is showing ++ and add to fileinfo
       -- local lsp = statusline.section_lsp { trunc_width = 20, icon = '󰿘 ' }
 
+      local macro_reg = vim.fn.reg_recording()
+      local macro = macro_reg ~= '' and ('  @' .. macro_reg) or ''
+
       return statusline.combine_groups({
-        { hl = mode_hl, strings = { mode } },
+        { hl = mode_hl, strings = { mode, macro } },
         { hl = 'MiniStatuslineDevinfo', strings = { git } },
         '%<', -- Mark general truncate point
         { hl = 'MiniStatuslineFilename', strings = { filename } },

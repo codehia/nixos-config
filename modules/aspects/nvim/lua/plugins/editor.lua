@@ -35,6 +35,9 @@ return {
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sF', function()
+        builtin.find_files({ hidden = true })
+      end, { desc = '[S]earch [F]iles (include hidden)' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -50,6 +53,30 @@ return {
       vim.keymap.set('n', '<leader>s/', function()
         builtin.live_grep({ grep_open_files = true, prompt_title = 'Live Grep in Open Files' })
       end, { desc = '[S]earch [/] in Open Files' })
+      -- <leader>sG — live grep with glob filter (excludes hidden files/dirs)
+      -- <leader>sH — same but includes hidden files (dotfiles, .git, etc.)
+      --   files only:  *.py          (search only in Python files)
+      --   text only:   use <leader>sg instead (no glob needed)
+      --   combo:       *.py          then type regex in the grep prompt
+      --   multi-glob:  *.py,*.pyi    (comma-separated)
+      --   exclude:     !*.test.py    (bang prefix excludes)
+      local function grep_with_glob(hidden)
+        vim.ui.input({ prompt = 'Glob (e.g. *.py  *.py,*.pyi  !*.test.py): ' }, function(glob)
+          if glob and glob ~= '' then
+            local opts = { glob_pattern = glob, prompt_title = 'Live Grep (' .. glob .. ')' }
+            if hidden then
+              opts.additional_args = { '--hidden' }
+            end
+            builtin.live_grep(opts)
+          end
+        end)
+      end
+      vim.keymap.set('n', '<leader>sG', function()
+        grep_with_glob(false)
+      end, { desc = '[S]earch by [G]rep with glob filter' })
+      vim.keymap.set('n', '<leader>sH', function()
+        grep_with_glob(true)
+      end, { desc = '[S]earch by grep with glob filter (include [H]idden)' })
     end,
   },
 
@@ -124,12 +151,18 @@ return {
     event = 'BufReadPost',
     after = function()
       require('gitsigns').setup({
+        preview_config = { border = 'rounded' },
+
+        -- Option 1 (thin bar):
+        -- signs = { add={text='▎'}, change={text='▎'}, delete={text='▸'}, topdelete={text='▴'}, changedelete={text='▎'} }
+        -- Option 2 (nerd font icons — plus-circle, pencil, minus-circle, minus-square, pencil-square):
         signs = {
-          add = { text = '+' },
-          change = { text = '~' },
-          delete = { text = '_' },
-          topdelete = { text = '‾' },
-          changedelete = { text = '~' },
+          add = { text = '▌' },
+          change = { text = '▌' },
+          delete = { text = '▂' },
+          topdelete = { text = '▔' },
+          changedelete = { text = '▌' },
+          untracked = { text = '▎' },
         },
         on_attach = function(bufnr)
           local gitsigns = require('gitsigns')

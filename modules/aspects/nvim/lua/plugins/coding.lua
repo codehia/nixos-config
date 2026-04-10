@@ -250,34 +250,6 @@ return {
   },
 
   -- ---------------------------------------------------------------------------
-  -- Lspsaga — enhanced LSP UI (owns K, <leader>ca, <leader>rn)
-  -- pname: lspsaga.nvim
-  -- ---------------------------------------------------------------------------
-
-  {
-    'lspsaga.nvim',
-    event = 'LspAttach',
-    after = function()
-      require('lspsaga').setup({
-        lightbulb = { enable = true },
-        ui = { border = 'rounded' },
-        rename = { in_select = true },
-      })
-      vim.keymap.set('n', 'K', '<cmd>Lspsaga hover_doc<CR>', { desc = 'LSP: Hover Documentation' })
-      vim.keymap.set('n', '<leader>ca', '<cmd>Lspsaga code_action<CR>', { desc = 'LSP: [C]ode [A]ction' })
-      vim.keymap.set('n', '<leader>rn', '<cmd>Lspsaga rename<CR>', { desc = 'LSP: [R]e[n]ame' })
-      vim.keymap.set(
-        'n',
-        '<leader>rN',
-        '<cmd>Lspsaga rename ++project<CR>',
-        { desc = 'LSP: [R]e[N]ame (project-wide)' }
-      )
-      vim.keymap.set('n', '<leader>pd', '<cmd>Lspsaga peek_definition<CR>', { desc = 'LSP: [P]eek [D]efinition' })
-      vim.keymap.set('n', '<leader>lo', '<cmd>Lspsaga outline<CR>', { desc = 'LSP: [O]utline' })
-    end,
-  },
-
-  -- ---------------------------------------------------------------------------
   -- Conform — format on save
   -- pname: conform.nvim
   -- ---------------------------------------------------------------------------
@@ -440,58 +412,9 @@ return {
     end,
   },
 
-  -- ---------------------------------------------------------------------------
-  -- Avante — AI assistant (Claude)
-  -- pname: avante.nvim
-  -- Loads after UI renders (DeferredUIEnter) — no VeryLazy in lze
-  -- ---------------------------------------------------------------------------
-  {
-    'avante.nvim',
-    event = 'DeferredUIEnter',
-    after = function()
-      require('avante').setup({
-        -- provider = "claude",
-        providers = {
-          claude = {
-            endpoint = 'https://api.anthropic.com',
-            model = 'claude-sonnet-4-20250514',
-            timeout = 30000, -- Timeout in milliseconds
-            extra_request_body = {
-              temperature = 0.75,
-              max_tokens = 20480,
-            },
-          },
-        },
-        behaviour = {
-          auto_suggestions = false,
-          auto_set_highlight_group = true,
-          auto_set_keymaps = true,
-          auto_apply_diff_after_generation = false,
-        },
-        mappings = {
-          ask = '<leader>aa',
-          edit = '<leader>ae',
-          refresh = '<leader>ar',
-        },
-        hints = { enabled = true },
-        windows = {
-          position = 'right',
-          wrap = true,
-          width = 30,
-          sidebar_header = { align = 'center', rounded = true },
-        },
-        highlights = { diff = { current = 'DiffText', incoming = 'DiffAdd' } },
-        diff = { autojump = true, list_opener = 'copen' },
-      })
-    end,
-  },
-
   -- Dependencies loaded by lze before their parent plugins
   { 'nvim-nio', dep_of = { 'nvim-dap-ui' } },
   { 'nvim-dap-ui', dep_of = { 'nvim-dap' } },
   { 'nvim-dap-virtual-text', dep_of = { 'nvim-dap' } },
-  { 'render-markdown.nvim', dep_of = { 'avante.nvim' } },
-  { 'img-clip.nvim', dep_of = { 'avante.nvim' } },
-  { 'fzf-lua', dep_of = { 'avante.nvim' } },
   { 'friendly-snippets', dep_of = { 'luasnip' } },
 }

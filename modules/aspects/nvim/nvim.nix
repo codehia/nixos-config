@@ -15,7 +15,11 @@ in
     # perUser so homeManager forwarding reaches ctx.hm-user, and host.nvimLanguages is accessible.
     includes = [
       (den.lib.perUser (
-        { host, user, ... }:
+        {
+          host,
+          user,
+          ...
+        }:
         let
           languages =
             user.nvimLanguages or host.nvimLanguages or [
@@ -27,8 +31,7 @@ in
           homeManager =
             { pkgs, ... }:
             let
-              nvimPkg =
-                inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.neovim-unwrapped;
+              nvimPkg = inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.neovim-unwrapped;
 
               lzextrasLatest = inputs.lzextras.packages.${pkgs.stdenv.hostPlatform.system}.lzextras-vimPlugin;
 
@@ -61,7 +64,11 @@ in
                 (wlib.evalPackage [
                   { inherit pkgs; }
                   (
-                    { pkgs, wlib, ... }:
+                    {
+                      pkgs,
+                      wlib,
+                      ...
+                    }:
                     {
                       imports = [ wlib.wrapperModules.neovim ];
                       package = nvimPkg;

@@ -140,19 +140,6 @@ with pkgs.vimPlugins;
     lazy = true;
   };
 
-  # New from codehia/neovim
-  avante = {
-    data = avante-nvim;
-    lazy = true;
-  };
-  render-md = {
-    data = render-markdown-nvim;
-    lazy = true;
-  };
-  img-clip = {
-    data = img-clip-nvim;
-    lazy = true;
-  };
   copilot-chat = {
     data = CopilotChat-nvim;
     lazy = true;
@@ -189,24 +176,12 @@ with pkgs.vimPlugins;
     data = octo-nvim;
     lazy = true;
   };
-  lspsaga = {
-    data = lspsaga-nvim;
-    lazy = true;
-  };
   lspkind = {
     data = lspkind-nvim;
     lazy = true;
   };
   web-devicons = {
     data = nvim-web-devicons;
-    lazy = true;
-  };
-  fzf-lua = {
-    data = fzf-lua;
-    lazy = true;
-  };
-  fiendly-snippets = {
-    data = friendly-snippets;
     lazy = true;
   };
   hardtime = {

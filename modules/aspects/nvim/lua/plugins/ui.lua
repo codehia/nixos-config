@@ -27,6 +27,13 @@ return {
         -- plugins.all defaults to true when lazy.nvim is not loaded (we use lze).
         -- All 80+ integrations (navic, telescope, blink-cmp, treesitter, gitsigns,
         -- which-key, noice, trouble, indent-blankline, mini, etc.) auto-enabled.
+        on_highlights = function(hl, c)
+          hl.GitSignsAdd = { fg = c.git.add, bold = true }
+          hl.GitSignsChange = { fg = c.git.change, bold = true }
+          hl.GitSignsDelete = { fg = c.git.delete, bold = true }
+          hl.GitSignsTopdelete = { fg = c.git.delete, bold = true }
+          hl.GitSignsChangedelete = { fg = c.git.change, bold = true }
+        end,
       })
       vim.cmd.colorscheme('tokyonight')
     end,

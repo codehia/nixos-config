@@ -92,9 +92,9 @@ _G.nix_info = function(...) return _nix(nil, "info", ...) end
 
 ### LSP setup (native Neovim 0.11)
 
-LSP is configured in `lua/config/lsp.lua` using Neovim 0.11's built-in API — no lzextras
-handler or nvim-lspconfig hook pattern. Each server is fully self-contained with `cmd`,
-`filetypes`, and `root_markers`:
+LSP is configured in `lua/config/lsp.lua` using Neovim 0.11's built-in API — no lspsaga,
+no nvim-lspconfig hook pattern. Each server is fully self-contained with `cmd`, `filetypes`,
+and `root_markers`:
 
 ```lua
 vim.lsp.config("*", { on_attach = M.on_attach })
@@ -110,6 +110,26 @@ vim.lsp.enable({ "lua_ls", "nixd", ... })
 > nvim-lspconfig is in `opt/` (lazy), so its `lsp/` runtime files are NOT on the
 > runtime path. All server configs must include `cmd`, `filetypes`, and `root_markers`
 > explicitly.
+
+**LSP keymaps** (set in `M.on_attach`, all buffer-local):
+
+| Key | Action |
+|-----|--------|
+| `K` | Hover docs (`vim.lsp.buf.hover`, rounded border) |
+| `<C-k>` | Signature help (rounded border) |
+| `<leader>ca` | Code action (via dressing.nvim `vim.ui.select`) |
+| `<leader>rn` | Rename — pre-fills current name, cursor at end (via dressing.nvim) |
+| `gd` / `gr` / `gI` | Definition / references / implementation (telescope) |
+| `<leader>D` | Type definition |
+| `<leader>ds` / `<leader>ws` | Document / workspace symbols |
+
+**Borders:** hover, signature help, and diagnostic floats all use `border = 'rounded'`.
+Borders are set by passing `{ border = 'rounded' }` directly to `vim.lsp.buf.hover()` /
+`vim.lsp.buf.signature_help()` — the deprecated `vim.lsp.with` / `vim.lsp.handlers`
+global assignment is NOT used.
+
+**Diagnostic signs:** `✘` error, `▲` warn, `⚑` info, `»` hint — configured via
+`vim.diagnostic.config({ signs = { text = { ... } } })`.
 
 ---
 
@@ -327,11 +347,34 @@ To enable Go support: set `go = true;` in `nvim.nix` → `just install`.
 
 ---
 
+## Notable Keymaps
+
+### Telescope (`lua/plugins/editor.lua`)
+
+| Key | Action |
+|-----|--------|
+| `<leader>sf` | Find files (respects `.gitignore`, excludes dotfiles) |
+| `<leader>sF` | Find files including hidden dotfiles |
+| `<leader>sg` | Live grep (all files) |
+| `<leader>sG` | Live grep with glob filter — prompts for pattern e.g. `*.py`, `*.py,*.pyi`, `!*.test.py` |
+| `<leader>sH` | Same as `sG` but also includes hidden files |
+| `<leader>s/` | Live grep in open buffers only |
+
+### Gitsigns (`lua/plugins/editor.lua`)
+
+Signs use block Unicode characters (▌ add/change, ▂ delete, ▔ topdelete). Colors come from
+`tokyonight.on_highlights` using `c.git.add/change/delete` with `bold = true`. Alternative
+sign styles are in comments above the `signs = { ... }` block in `editor.lua`.
+
+### Mini statusline (`lua/plugins/mini.lua`)
+
+Macro recording is shown in the mode block as `@q` (or whichever register) while active,
+using `vim.fn.reg_recording()`.
+
 ## Environment Variables
 
 | Variable | Used by | How to set |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | avante.nvim | sops-nix secret or shell session |
 | `GITHUB_TOKEN` | octo.nvim | sops-nix secret or shell session |
 
 ---

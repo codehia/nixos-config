@@ -30,9 +30,15 @@ M.on_attach = function(client, bufnr)
     map('<leader>ws', vim.lsp.buf.workspace_symbol, '[W]orkspace [S]ymbols')
   end
 
-  -- NOTE: K, <leader>ca, <leader>rn are owned by lspsaga
+  map('K', function()
+    vim.lsp.buf.hover({ border = 'rounded' })
+  end, 'Hover Documentation')
+  map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'v' })
+  map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-  map('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  map('<C-k>', function()
+    vim.lsp.buf.signature_help({ border = 'rounded' })
+  end, 'Signature Documentation')
   map('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
   map('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
   map('<leader>wl', function()
@@ -84,6 +90,18 @@ end
 -- Native Neovim 0.11 LSP setup
 M.setup = function()
   vim.lsp.config('*', { on_attach = M.on_attach })
+
+  vim.diagnostic.config({
+    float = { border = 'rounded' },
+    signs = {
+      text = {
+        [vim.diagnostic.severity.ERROR] = '✘',
+        [vim.diagnostic.severity.WARN] = '▲',
+        [vim.diagnostic.severity.INFO] = '⚑',
+        [vim.diagnostic.severity.HINT] = '»',
+      },
+    },
+  })
 
   -- WHY nix_has_feature() guards:
   -- extraPackages in nvim.nix is filtered by the same `languages` list that populates
