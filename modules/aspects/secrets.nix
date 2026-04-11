@@ -11,7 +11,7 @@
       {
         imports = [ inputs.sops-nix.nixosModules.sops ];
         sops = {
-          age.keyFile = "/var/lib/sops/age/keys.txt";
+          age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
         };
 
         # Remove dangling SSH host key symlinks left by old sops management.
@@ -39,7 +39,7 @@
       {
         imports = [ inputs.sops-nix.homeManagerModules.sops ];
         sops = {
-          age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+          age.sshKeyPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519" ];
         };
       };
   };
