@@ -202,8 +202,8 @@ secrets/
   rclone.yaml        # rclone config (personal + thinkpad only)
 ```
 
-Each host has an age private key at `/var/lib/sops/age/keys.txt`. `just install`
-syncs it to `~/.config/sops/age/keys.txt` for home-manager activation.
+Each host decrypts secrets using its SSH host key — sops-nix derives an age key from
+`/etc/ssh/ssh_host_ed25519_key` automatically. No manual age key file needed.
 
 Edit secrets: `sops secrets/deus.yaml` (decrypts, opens editor, re-encrypts on save).
 

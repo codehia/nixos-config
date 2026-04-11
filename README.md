@@ -14,7 +14,7 @@ on thinkpad)
 ## Commands
 
 ```bash
-just install         # build and apply — also auto-restores the sops age key if missing
+just install         # build and apply
 just test            # activate temporarily, no boot entry
 just dry             # preview what would change, nothing applied
 just debug           # apply with full trace (good for debugging build failures)
@@ -345,37 +345,29 @@ Files needed:
 }
 ```
 
-### 3. Generate an age key on the new machine
+### 3. Install NixOS and boot
+
+NixOS auto-generates the SSH host key at `/etc/ssh/ssh_host_ed25519_key` on first boot. No manual key generation needed.
+
+### 4. Get the age public key and register it in `.sops.yaml`
+
+On the new machine after first boot:
 
 ```bash
-# Run on the new machine:
-sudo mkdir -p /var/lib/sops/age
-sudo age-keygen -o /var/lib/sops/age/keys.txt
-sudo chmod 600 /var/lib/sops/age/keys.txt
-
-# Print the public key — needed for .sops.yaml:
-sudo age-keygen -y /var/lib/sops/age/keys.txt
+cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
 # → age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-### 4. Register the key in `.sops.yaml`
+Add it to `.sops.yaml` on workstation:
 
 ```yaml
 keys:
   - &thinkpad age1...
   - &personal age1...
   - &workstation age1...
-  - &newhost age1...    # paste the public key from the step above
+  - &newhost age1...    # paste the output from above
 
 creation_rules:
-  # Secrets file for this host's SSH host key:
-  - path_regex: secrets/newhost\.yaml$
-    key_groups:
-      - age:
-          - *newhost
-
-  # If deus is on this host, add *newhost to deus.yaml so deus's secrets
-  # (SSH user key) can be decrypted on this machine:
   - path_regex: secrets/deus\.yaml$
     key_groups:
       - age:
@@ -385,40 +377,18 @@ creation_rules:
           - *newhost    # add this line
 ```
 
-After updating the rules for `deus.yaml`, re-encrypt it so the new host key is added:
+Re-encrypt shared files so the new host can decrypt them:
 
 ```bash
 sops updatekeys secrets/deus.yaml
+sops updatekeys secrets/common.yaml
 ```
 
-### 5. Create the SSH host key secret
+### 5. Stage and build
 
 ```bash
-# Generate a key for the host:
-ssh-keygen -t ed25519 -f /tmp/newhost_hostkey -N "" -C "root@newhost"
-
-# Create the sops secrets file:
-sops secrets/newhost.yaml
-```
-
-In the editor, add:
-```yaml
-ssh_host_ed25519_key: |
-    -----BEGIN OPENSSH PRIVATE KEY-----
-    <paste private key content here>
-    -----END OPENSSH PRIVATE KEY-----
-```
-
-Clean up the temp key:
-```bash
-rm /tmp/newhost_hostkey /tmp/newhost_hostkey.pub
-```
-
-### 6. Stage and build
-
-```bash
-git add modules/hosts/newhost/ secrets/newhost.yaml
-just install
+git add modules/hosts/newhost/
+just install   # on the new host — no age key bootstrap needed
 ```
 
 ### 7. Enable rclone on the new host (optional, deus only)
@@ -519,15 +489,14 @@ Secrets are encrypted with [sops](https://github.com/getsops/sops) + age keys, a
 decrypted at activation time by sops-nix. `.sops.yaml` says which age keys can decrypt
 which files.
 
-Each host has one age key. It lives in two places (same file, two paths) because
-NixOS-level and home-manager-level services run as different users:
+Each host decrypts secrets using its **SSH host key** — no separate age key file to manage:
 
-| Path | Owner | Used for |
-|------|-------|----------|
-| `/var/lib/sops/age/keys.txt` | root | SSH host keys, system secrets |
-| `~/.config/sops/age/keys.txt` | user | SSH user keys, rclone.conf |
+| Layer | Key source | Secrets placed |
+|-------|-----------|----------------|
+| NixOS (`sops.age.sshKeyPaths`) | `/etc/ssh/ssh_host_ed25519_key` | System secrets, user SSH keys |
+| Home-manager (`sops.age.sshKeyPaths`) | `~/.ssh/id_ed25519` | rclone.conf |
 
-`just install` auto-syncs the user copy from the system copy if it's missing.
+On a fresh install, NixOS generates the SSH host key on first boot — sops-nix picks it up automatically with zero manual setup.
 
 ### Add a user SSH key
 
@@ -601,7 +570,7 @@ homeManager = { config, ... }: {
 
 # System secret — placed in /etc
 nixos.sops.secrets.service_key = {
-  sopsFile = ../../secrets/workstation.yaml;
+  sopsFile = ../../secrets/common.yaml;
   path = "/etc/myservice/key";
   owner = "myservice";
   mode = "0400";
@@ -615,21 +584,11 @@ nixos.sops.secrets.service_key = {
 sops updatekeys secrets/rclone.yaml
 ```
 
-### Restore the age key on a fresh install
+### Reinstalling a host
 
-```bash
-# The encrypted backup lives in the repo:
-age --decrypt secrets/<hostname>-age-key.age > /tmp/keys.txt
-
-sudo mkdir -p /var/lib/sops/age
-sudo install -m 600 -o root -g root /tmp/keys.txt /var/lib/sops/age/keys.txt
-
-mkdir -p ~/.config/sops/age
-install -m 600 /tmp/keys.txt ~/.config/sops/age/keys.txt
-
-rm /tmp/keys.txt
-# Then just install
-```
+No manual key restoration needed. On first boot after install, NixOS auto-generates
+`/etc/ssh/ssh_host_ed25519_key` and sops-nix derives the age key from it automatically.
+The SSH host fingerprint changes after reinstall — update `known_hosts` on other machines.
 
 ---
 

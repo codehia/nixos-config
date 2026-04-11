@@ -55,33 +55,29 @@ Files needed:
 }
 ```
 
-## 3. Generate an age key on the new machine
+## 3. Install NixOS and boot
+
+NixOS auto-generates the SSH host key at `/etc/ssh/ssh_host_ed25519_key` on first boot via `sshd-keygen.service`. No manual key generation needed.
+
+## 4. Get the age public key and register it in `.sops.yaml`
+
+On the new machine after first boot:
 
 ```bash
-sudo mkdir -p /var/lib/sops/age
-sudo age-keygen -o /var/lib/sops/age/keys.txt
-sudo chmod 600 /var/lib/sops/age/keys.txt
-
-# Print the public key — needed for .sops.yaml:
-sudo age-keygen -y /var/lib/sops/age/keys.txt
+cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
 # → age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-## 4. Register the key in `.sops.yaml`
+Add it to `.sops.yaml` on workstation:
 
 ```yaml
 keys:
   - &thinkpad age1...
   - &personal age1...
   - &workstation age1...
-  - &newhost age1...    # paste the public key from the step above
+  - &newhost age1...    # paste the output from above
 
 creation_rules:
-  - path_regex: secrets/newhost\.yaml$
-    key_groups:
-      - age:
-          - *newhost
-
   - path_regex: secrets/deus\.yaml$
     key_groups:
       - age:
@@ -91,42 +87,25 @@ creation_rules:
           - *newhost    # add this line
 ```
 
-After updating the rules for `deus.yaml`, re-encrypt it:
+Re-encrypt shared files so the new host can decrypt them:
 
 ```bash
 sops updatekeys secrets/deus.yaml
+sops updatekeys secrets/common.yaml
 ```
 
-## 5. Create the SSH host key secret
+## 5. Stage and build
 
 ```bash
-ssh-keygen -t ed25519 -f /tmp/newhost_hostkey -N "" -C "root@newhost"
-sops secrets/newhost.yaml
+git add modules/hosts/newhost/
+just install   # on the new host — no age key bootstrap needed
 ```
 
-In the editor, add:
-```yaml
-ssh_host_ed25519_key: |
-    -----BEGIN OPENSSH PRIVATE KEY-----
-    <paste private key content here>
-    -----END OPENSSH PRIVATE KEY-----
-```
+## 6. Enable rclone (optional, deus only)
 
-```bash
-rm /tmp/newhost_hostkey /tmp/newhost_hostkey.pub
-```
-
-## 6. Stage and build
-
-```bash
-git add modules/hosts/newhost/ secrets/newhost.yaml
-just install
-```
-
-## 7. Enable rclone (optional, deus only)
+Add the new host to rclone.yaml's recipients in `.sops.yaml`:
 
 ```yaml
-# .sops.yaml
 - path_regex: secrets/rclone\.yaml$
   key_groups:
     - age:

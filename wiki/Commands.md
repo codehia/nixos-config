@@ -1,7 +1,7 @@
 # Commands
 
 ```bash
-just install         # build and apply — also auto-restores the sops age key if missing
+just install         # build and apply
 just test            # activate temporarily, no boot entry
 just dry             # preview what would change, nothing applied
 just debug           # apply with full trace (good for debugging build failures)
