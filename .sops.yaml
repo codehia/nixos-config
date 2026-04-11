@@ -1,7 +1,7 @@
 keys:
-  - &thinkpad age1e7x9jlcpmmhd03xm2amstt90kwjphwklu3wa028v20tauz6r4aeqfdw8gp
-  - &personal age1uu6vj77ea5gtdwxsarvw7rygzrefeg4nl3vam9ddue279a3nhanqvsy8km
-  - &workstation age1fjph6rn4nhquuxslks9tt36d8vankcxtwss2cwc96xyllzd67fnsytphfm
+  - &thinkpad age14erpwmsl6vsnl5vx4zkqqkcfyfrgv5yprzwxjp4xazxjntvg532sdmsp3r
+  - &personal age14tcn43rzydp8t6afujxlzy0xwh9ctftvz43e7pez43qhdmgqmc6qyrywle
+  - &workstation age1w5yred8ne457e0xhfcyvqwdy0ucvs5cywht3fdyn0tyt2gfhkg8qvd3dpy
   - &rclone age1kg0cjadgrycgx3s0qufp9c0xlhmc3ectsvmtt5k79lwsyh3x7q9qj3m3tp
 
 
