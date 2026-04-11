@@ -2,25 +2,22 @@
 
 ## How it works
 
-Secrets are encrypted with [sops](https://github.com/getsops/sops) + age keys, and
-decrypted at activation time by sops-nix. `.sops.yaml` says which age keys can decrypt
-which files.
+Secrets are encrypted with [sops](https://github.com/getsops/sops) + age keys, and decrypted at activation time by sops-nix. `.sops.yaml` says which age keys can decrypt which files.
 
-Each host has one age key in two places (same file, two paths):
+Each host decrypts secrets using its **SSH host key** — no separate age key file to manage:
 
-| Path | Owner | Used for |
-|------|-------|----------|
-| `/var/lib/sops/age/keys.txt` | root | SSH host keys, system secrets |
-| `~/.config/sops/age/keys.txt` | user | SSH user keys, rclone.conf |
+| Layer | Key source | When it runs |
+|-------|-----------|--------------|
+| NixOS (`sops.age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"]`) | SSH host key | Every boot (system activation) |
+| Home-manager (`sops.age.sshKeyPaths = ["~/.ssh/id_ed25519"]`) | User SSH key | On login (HM activation) |
 
-`just install` auto-syncs the user copy from the system copy if it's missing.
+The age public keys in `.sops.yaml` are derived from each machine's SSH host key via `ssh-to-age`. On a fresh install, NixOS generates the SSH host key on first boot — sops-nix picks it up automatically with zero manual setup.
 
 ---
 
 ## Add a user SSH key
 
-`ssh.nix` automatically places a user's SSH key at `~/.ssh/id_ed25519` if
-`secrets/<username>.yaml` exists.
+`ssh.nix` automatically places a user's SSH key at `~/.ssh/id_ed25519` if `secrets/<username>.yaml` exists. Placement happens via NixOS-level sops on every boot.
 
 **1. Add a creation rule to `.sops.yaml`**
 
@@ -30,6 +27,7 @@ creation_rules:
     key_groups:
       - age:
           - *workstation
+          - *thinkpad   # add all hosts the user lives on
 ```
 
 **2. Generate an SSH key**
@@ -53,7 +51,15 @@ ssh_user_ed25519_key: |
     -----END OPENSSH PRIVATE KEY-----
 ```
 
-**4. Clean up and apply**
+**4. Add the public key to the user's NixOS config**
+
+```nix
+users.users.soumya.openssh.authorizedKeys.keys = [
+  "ssh-ed25519 AAAA... soumya@workstation"
+];
+```
+
+**5. Clean up and apply**
 
 ```bash
 rm /tmp/soumya_key /tmp/soumya_key.pub
@@ -74,21 +80,19 @@ sops secrets/deus.yaml    # decrypts, opens in $EDITOR, re-encrypts on save
 ## Add a new secret and use it in config
 
 ```nix
-# Home-manager secret
-homeManager = { config, ... }: {
-  sops.secrets.github_token = {
-    sopsFile = ../../secrets/deus.yaml;
-    path = "${config.home.homeDirectory}/.config/gh/token";
-    mode = "0600";
-  };
-};
-
-# System secret
-nixos.sops.secrets.service_key = {
-  sopsFile = ../../secrets/workstation.yaml;
-  path = "/etc/myservice/key";
+# System secret (placed by NixOS-level sops, available on every boot)
+nixos.sops.secrets.my_token = {
+  sopsFile = ../../secrets/common.yaml;
   owner = "myservice";
   mode = "0400";
+};
+
+# Home-manager secret (placed by HM sops, available after login)
+homeManager = { config, ... }: {
+  sops.secrets.rclone_conf = {
+    sopsFile = ../../secrets/rclone.yaml;
+    path = "${config.home.homeDirectory}/.config/rclone/rclone.conf";
+  };
 };
 ```
 
@@ -98,22 +102,15 @@ nixos.sops.secrets.service_key = {
 
 ```bash
 # After updating .sops.yaml to add a new age key:
-sops updatekeys secrets/rclone.yaml
+sops updatekeys secrets/common.yaml
 ```
 
 ---
 
-## Restore the age key on a fresh install
+## Adding a new host
 
-```bash
-age --decrypt secrets/<hostname>-age-key.age > /tmp/keys.txt
-
-sudo mkdir -p /var/lib/sops/age
-sudo install -m 600 -o root -g root /tmp/keys.txt /var/lib/sops/age/keys.txt
-
-mkdir -p ~/.config/sops/age
-install -m 600 /tmp/keys.txt ~/.config/sops/age/keys.txt
-
-rm /tmp/keys.txt
-just install
-```
+1. Install NixOS and boot — SSH host key is auto-generated on first boot
+2. Get the age public key: `cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age`
+3. Add it to `.sops.yaml` with a new YAML anchor
+4. `sops updatekeys` on any shared files (common.yaml, deus.yaml, etc.)
+5. `just install` on the new host — no age key bootstrap needed

@@ -14,7 +14,7 @@ A SOPS-encrypted YAML file looks like:
 github_token: ENC[AES256_GCM,data:abc123...,iv:...,tag:...,type:str]
 sops:
     age:
-        - recipient: age1e7x9jlc...
+        - recipient: age14erpwm...
           enc: |
               -----BEGIN AGE ENCRYPTED FILE-----
               ...
@@ -34,7 +34,7 @@ The `sops:` block is metadata SOPS appends to the file — it stores the encrypt
 - **Decrypt**: `age --decrypt -i keys.txt file.txt.age`
 - Keys are short strings, no keyring, no daemon, no web of trust
 
-When SOPS uses age, it generates a random data key (AES-256), uses it to encrypt the secret values, then encrypts the data key with each recipient's age public key. Decryption requires the matching age private key.
+age can also derive keys from SSH keys — `ssh-to-age` converts an ed25519 SSH public key to an age public key. sops-nix uses this to let the SSH host key double as the sops decryption key.
 
 ## How SOPS + age work together
 
@@ -51,7 +51,7 @@ Encryption (write time):
   encrypted data keys stored in sops: metadata block
 
 Decryption (read time):
-  age private key
+  age private key (derived from SSH host key)
       ↓
   decrypts the data key from sops: metadata block
       ↓
@@ -62,21 +62,16 @@ Multiple recipients means multiple machines can decrypt the same file independen
 
 ## .sops.yaml — Encryption Rules
 
-The `.sops.yaml` file at the repo root defines which age public keys are recipients for which files:
+The `.sops.yaml` file at the repo root defines which age public keys are recipients for which files. The age public keys here are derived from each machine's SSH host key via `ssh-to-age`:
 
 ```yaml
-# .sops.yaml
 keys:
-  - &thinkpad    age1e7x9jlcpmmhd03xm2amstt90kwjphwklu3wa028v20tauz6r4aeqfdw8gp
-  - &personal    age1uu6vj77ea5gtdwxsarvw7rygzrefeg4nl3vam9ddue279a3nhanqvsy8km
-  - &workstation age1fjph6rn4nhquuxslks9tt36d8vankcxtwss2cwc96xyllzd67fnsytphfm
+  - &thinkpad    age14erpwmsl6vsnl5vx4zkqqkcfyfrgv5yprzwxjp4xazxjntvg532sdmsp3r
+  - &personal    age14tcn43rzydp8t6afujxlzy0xwh9ctftvz43e7pez43qhdmgqmc6qyrywle
+  - &workstation age1w5yred8ne457e0xhfcyvqwdy0ucvs5cywht3fdyn0tyt2gfhkg8qvd3dpy
   - &rclone      age1kg0cjadgrycgx3s0qufp9c0xlhmc3ectsvmtt5k79lwsyh3x7q9qj3m3tp
 
 creation_rules:
-  - path_regex: secrets/thinkpad\.yaml$
-    key_groups:
-      - age: [*thinkpad]
-
   - path_regex: secrets/common\.yaml$
     key_groups:
       - age: [*thinkpad, *personal, *workstation]
@@ -87,18 +82,15 @@ creation_rules:
   # ... etc
 ```
 
-YAML anchors (`&name`) define the keys once; aliases (`*name`) reuse them. When you run `sops secrets/thinkpad.yaml`, SOPS looks up the matching `creation_rules` entry and encrypts the data key for only those recipients — thinkpad cannot decrypt workstation's secrets, for example.
+YAML anchors (`&name`) define the keys once; aliases (`*name`) reuse them.
 
 ### Secret files and their recipients
 
 | File | Recipients | Contents |
 |------|-----------|----------|
-| `secrets/thinkpad.yaml` | thinkpad | SSH host keys |
-| `secrets/personal.yaml` | personal | SSH host keys |
-| `secrets/workstation.yaml` | workstation | SSH host keys |
 | `secrets/common.yaml` | thinkpad, personal, workstation | `github_token` |
 | `secrets/deus.yaml` | thinkpad, personal, workstation | `ssh_user_ed25519_key` |
-| `secrets/soumya.yaml` | thinkpad, workstation | `ssh_user_ed25519_key` |
+| `secrets/soumya.yaml` | thinkpad, workstation | `user_password`, `ssh_user_ed25519_key` |
 | `secrets/rclone.yaml` | rclone, personal, thinkpad | `rclone_conf` |
 
 ## What is sops-nix?
@@ -119,60 +111,53 @@ The key insight: **secrets are never in the Nix store** (which is world-readable
 ```nix
 { inputs, ... }:
 {
-  flake-file.inputs.sops-nix = {
-    url = "github:Mic92/sops-nix";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-
   den.aspects.secrets = {
-    nixos = { ... }: {
+    nixos = { pkgs, lib, ... }: {
       imports = [ inputs.sops-nix.nixosModules.sops ];
-      sops.age.keyFile = "/var/lib/sops/age/keys.txt";
+      sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+      # cleanup script removes stale symlinks from old sops-managed SSH host keys
+      system.activationScripts.cleanup-sops-ssh-hostkey = lib.stringAfter [ ] ''...'';
+      system.activationScripts.setupSecrets.deps = [ "cleanup-sops-ssh-hostkey" ];
     };
 
     homeManager = { config, ... }: {
       imports = [ inputs.sops-nix.homeManagerModules.sops ];
-      sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+      sops.age.sshKeyPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519" ];
     };
   };
 }
 ```
 
-This is a Multi-Context Aspect — it imports the sops-nix modules into both NixOS and home-manager, and points each to the age key at its respective location. The flake input is declared inline here (`flake-file.inputs`) so it's auto-merged by the dendritic pattern.
+NixOS-level sops decrypts using the SSH host key (auto-generated by NixOS on first boot). HM sops decrypts using the user's SSH key (which is itself placed by NixOS sops on boot). No manual age key file management.
 
-### Two key locations — why?
+### SSH host keys
 
-NixOS-level services (sshd, nix-daemon) run as `root`. Home-manager activation runs as the user. A file owned `root:root 0600` is unreadable to the user. Both need the same age key to decrypt their respective secrets.
+NixOS manages SSH host keys directly — `sshd-keygen.service` generates a real key file at `/etc/ssh/ssh_host_ed25519_key` on first boot. sops-nix then uses that same key as its decryption identity.
 
-| Path | Owner | Used by |
-|------|-------|---------|
-| `/var/lib/sops/age/keys.txt` | root:root 0600 | NixOS sops-nix (system activation) |
-| `~/.config/sops/age/keys.txt` | deus:users 0600 | HM sops-nix (user activation) |
-
-Both files contain the **same private key**. If you only restore the system key after a reinstall, home-manager activation will fail with `permission denied`.
-
-### SSH host keys — `modules/aspects/ssh.nix`
+### User SSH keys — `modules/aspects/ssh.nix`
 
 ```nix
-hostKey = { host, ... }:
+userKey = { user, ... }:
   let
-    sopsFile = "${secrets}/${host.hostName}.yaml";
+    sopsFile = "${secrets}/${user.userName}.yaml";
     managed = builtins.pathExists sopsFile;
   in {
     nixos = { lib, ... }: lib.mkIf managed {
-      services.openssh.hostKeys = [];   # disable auto-generated keys
-      sops.secrets.ssh_host_ed25519_key = {
+      systemd.tmpfiles.rules = [
+        "d /home/${user.userName}/.ssh 0700 ${user.userName} users -"
+      ];
+      sops.secrets."ssh-${user.userName}" = {
         inherit sopsFile;
-        path = "/etc/ssh/ssh_host_ed25519_key";
-        owner = "root"; group = "root"; mode = "0600";
+        key = "ssh_user_ed25519_key";
+        path = "/home/${user.userName}/.ssh/id_ed25519";
+        owner = user.userName;
+        mode = "0600";
       };
     };
   };
 ```
 
-The aspect is **conditional** — it only activates if `secrets/<hostname>.yaml` exists (`builtins.pathExists` is pure, evaluated at eval time). This means adding a new host just requires creating the secrets file; nothing else changes.
-
-User SSH keys follow the same pattern at the home-manager level, decrypting to `~/.ssh/id_ed25519`.
+User SSH keys are placed via **NixOS-level** sops (not home-manager), so they're available on every boot, not just after user login. Secret names are unique per user (`ssh-<username>`) to avoid namespace collisions on multi-user hosts.
 
 ### GitHub token — `modules/aspects/nix-config.nix`
 
@@ -186,8 +171,6 @@ systemd.services.nix-daemon.serviceConfig.EnvironmentFiles = [
 ];
 ```
 
-The secret is decrypted to a file in `/run/secrets/`. That file is passed to nix-daemon as an `EnvironmentFile` — systemd reads it and injects the `GITHUB_TOKEN=...` variable into the daemon's environment, allowing authenticated GitHub access for flake fetching.
-
 ### Rclone — `modules/aspects/rclone.nix`
 
 ```nix
@@ -197,121 +180,50 @@ sops.secrets.rclone_conf = {
 };
 ```
 
-The decrypted rclone config is placed directly at the standard rclone config path. The `rclone-gdrive-mount` systemd user service then references it by path.
-
 ## Activation Flow (End to End)
 
 ```
 Boot / nixos-rebuild switch:
   sops-nix NixOS activation
-    reads /var/lib/sops/age/keys.txt
-    decrypts secrets/<hostname>.yaml
-    → writes /etc/ssh/ssh_host_ed25519_key (root:root 0600)
+    derives age key from /etc/ssh/ssh_host_ed25519_key
     decrypts secrets/common.yaml
     → writes /run/secrets/github_token (root:root 0400)
+    decrypts secrets/soumya.yaml + secrets/deus.yaml
+    → writes /home/soumya/.ssh/id_ed25519 (soumya 0600)
+    → writes /home/deus/.ssh/id_ed25519 (deus 0600)
+    decrypts secrets/soumya.yaml (user_password)
+    → writes /run/secrets/soumya_password (root 0400)
   OpenSSH starts, uses /etc/ssh/ssh_host_ed25519_key
   nix-daemon starts, reads EnvironmentFile → has GITHUB_TOKEN
 
 Login / home-manager switch:
   sops-nix HM activation
-    reads ~/.config/sops/age/keys.txt
-    decrypts secrets/<username>.yaml
-    → writes ~/.ssh/id_ed25519 (user 0600)
+    derives age key from ~/.ssh/id_ed25519
     decrypts secrets/rclone.yaml
     → writes ~/.config/rclone/rclone.conf (user 0600)
   rclone-gdrive-mount.service starts, mounts Google Drive
 ```
 
-## Creating a Shared Secrets File (readable by multiple hosts)
+## Adding a New Host
 
-The key insight: `.sops.yaml` creation rules are applied **by file path**. When you run `sops secrets/foo.yaml`, SOPS looks up which rule matches `secrets/foo.yaml` and encrypts the data key for every recipient in that rule. Each host can then independently decrypt using only its own private key.
-
-**Step 1: Add a creation rule to `.sops.yaml`**
-
-```yaml
-creation_rules:
-  - path_regex: secrets/myshared\.yaml$
-    key_groups:
-      - age:
-          - *thinkpad
-          - *personal
-          - *workstation
-```
-
-All three age public keys are listed as recipients. SOPS will encrypt one copy of the data key per recipient.
-
-**Step 2: Create (or edit) the file on any one host**
-
-You only need your own age private key to create a new file — SOPS encrypts *to* the recipients' public keys, which are already in `.sops.yaml`. You do not need the other hosts' private keys.
-
-```bash
-sops secrets/myshared.yaml
-# $EDITOR opens with an empty template; add your secrets:
-# my_api_key: supersecret
-# On save, SOPS encrypts values and writes 3 encrypted data keys into the sops: block
-```
-
-**Step 3: Commit the encrypted file**
-
-The file is safe to commit. Each host has its own encrypted copy of the data key in the `sops:` metadata block. On thinkpad, the thinkpad-encrypted copy is used; on workstation, its own copy is used. Neither can read the other's private key.
-
-**Step 4: Consume the secret in NixOS/HM config**
-
-```nix
-sops.secrets.my_api_key = {
-  sopsFile = ../../secrets/myshared.yaml;
-};
-```
-
-sops-nix will decrypt this on each host using whichever key it finds at the configured `age.keyFile` path.
-
----
-
-**Adding an existing file to more recipients** (e.g., a new host needs access):
-
-1. Add the new host's public key to `.sops.yaml` under the relevant `creation_rule`
-2. Run `sops updatekeys secrets/myshared.yaml` — this re-encrypts the data key for the new recipient and appends it to the `sops:` block
-3. Commit the updated file — now the new host can decrypt it too
-
-The existing encrypted values are untouched; only the metadata block gains a new entry.
+1. Install NixOS and boot — SSH host key auto-generated
+2. `cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age` — get the age public key
+3. Add to `.sops.yaml` with a new anchor
+4. `sops updatekeys secrets/common.yaml secrets/deus.yaml` — re-encrypt for new host
+5. `just install` on the new host — decryption works automatically, no key bootstrap
 
 ## Common Operations
 
 ```bash
 # Edit a secrets file (opens decrypted in $EDITOR, re-encrypts on save)
-sops secrets/thinkpad.yaml
+sops secrets/deus.yaml
 
 # Or without sops in PATH
-nix shell nixpkgs#sops -c sops secrets/thinkpad.yaml
+nix shell nixpkgs#sops -c sops secrets/deus.yaml
 
 # Add a new host's key to an existing file's recipients
 sops updatekeys secrets/common.yaml
 
-# Generate a new age key
-age-keygen -o /var/lib/sops/age/keys.txt
-# output: Public key: age1...  ← add this to .sops.yaml
+# Get a machine's age public key from its SSH host key
+cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
 ```
-
-## Adding a New Host (Summary)
-
-1. `age-keygen -o /var/lib/sops/age/keys.txt` on the new host
-2. Copy to `~/.config/sops/age/keys.txt` (same file, different permissions/owner)
-3. Add public key to `.sops.yaml` with a new YAML anchor
-4. `sops secrets/newhost.yaml` — add `ssh_host_ed25519_key`
-5. Add new host's key to any `common.yaml`-style creation rules, then `sops updatekeys secrets/common.yaml`
-6. `just install` — ssh.nix detects the new file via `builtins.pathExists` and activates
-
-## Key Files Reference
-
-| File | Purpose |
-|------|---------|
-| `.sops.yaml` | Age recipients + per-file creation rules |
-| `secrets/*.yaml` | Encrypted secret values |
-| `modules/aspects/secrets.nix` | sops-nix module import + key file paths |
-| `modules/aspects/ssh.nix` | SSH host/user key decryption (conditional) |
-| `modules/aspects/nix-config.nix` | GitHub token → nix-daemon EnvironmentFile |
-| `modules/aspects/rclone.nix` | rclone.conf decryption |
-| `/var/lib/sops/age/keys.txt` | Age private key (system, NOT in repo) |
-| `~/.config/sops/age/keys.txt` | Age private key (user copy, NOT in repo) |
-
-The private age key is the **only** thing not in the repo. Back it up securely. Losing it means re-encrypting every secrets file with a new key.

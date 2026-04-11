@@ -5,39 +5,34 @@ This note covers the full procedure to create it.
 
 ## Prerequisites
 
-- `sops` and `age` available (`nix-shell -p sops age` if not)
-- The host age key at `~/.config/sops/age/keys.txt` (so sops can encrypt)
-- The host's age **public** key (shown by `age-keygen -y ~/.config/sops/age/keys.txt`)
+- `sops` available (`nix shell nixpkgs#sops` if not)
+- The host's age **public** key — derived from the SSH host key: `cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age`
 
 ## Step 1 — Add a creation rule to `.sops.yaml`
 
-Add the host's age key as a recipient for the new user's secrets file.
-For a user that only lives on one host (e.g. `soumya` on `workstation`):
+Add the relevant host age keys as recipients for the new user's secrets file.
+For a user that lives on workstation and thinkpad:
 
 ```yaml
 creation_rules:
   - path_regex: secrets/soumya\.yaml$
     key_groups:
       - age:
-          - *workstation   # use whichever host anchor applies
+          - *workstation
+          - *thinkpad
 ```
-
-If the user lives on multiple hosts, list all relevant host anchors.
 
 ## Step 2 — Generate an SSH key for the user
 
 ```bash
 ssh-keygen -t ed25519 -f /tmp/new_user_ssh -N "" -C "soumya@workstation"
 # /tmp/new_user_ssh     — private key
-# /tmp/new_user_ssh.pub — public key (save this somewhere)
+# /tmp/new_user_ssh.pub — public key (add this to authorized_keys in the user's .nix file)
 ```
 
 ## Step 3 — Create the sops secrets file
 
 ```bash
-# Read the private key into a variable so you can paste it into the editor
-cat /tmp/new_user_ssh
-
 sops secrets/soumya.yaml
 ```
 
@@ -50,17 +45,21 @@ ssh_user_ed25519_key: |
     -----END OPENSSH PRIVATE KEY-----
 ```
 
-The indentation under the `|` block scalar must be consistent (4 spaces shown above).
+## Step 4 — Add the public key to the user's NixOS config
 
-## Step 4 — Clean up the plaintext key
+```nix
+users.users.soumya.openssh.authorizedKeys.keys = [
+  "ssh-ed25519 AAAA... soumya@workstation"
+];
+```
+
+## Step 5 — Clean up the plaintext key
 
 ```bash
 rm /tmp/new_user_ssh /tmp/new_user_ssh.pub
 ```
 
-Keep the public key in a safe place if you need it for `authorized_keys` on remote servers.
-
-## Step 5 — Rebuild
+## Step 6 — Rebuild
 
 ```bash
 git add secrets/soumya.yaml
@@ -68,7 +67,7 @@ just install
 ```
 
 `ssh.nix` will detect `secrets/soumya.yaml`, set `managed = true`, and place the private key
-at `~/.ssh/id_ed25519` (mode 0600) via home-manager sops-nix on next activation.
+at `~/.ssh/id_ed25519` (mode 0600) via NixOS-level sops-nix on every boot.
 
 ## How `ssh.nix` picks this up
 
@@ -79,22 +78,30 @@ let
   sopsFile = "${secrets}/${user.userName}.yaml";   # e.g. secrets/soumya.yaml
   managed  = builtins.pathExists sopsFile;          # true once file exists
 in {
-  homeManager = { config, lib, ... }: lib.mkIf managed {
-    sops.secrets.ssh_user_ed25519_key = {
+  nixos = { lib, ... }: lib.mkIf managed {
+    systemd.tmpfiles.rules = [
+      "d /home/${user.userName}/.ssh 0700 ${user.userName} users -"
+    ];
+    sops.secrets."ssh-${user.userName}" = {
       inherit sopsFile;
-      path = "${config.home.homeDirectory}/.ssh/id_ed25519";
+      key = "ssh_user_ed25519_key";
+      path = "/home/${user.userName}/.ssh/id_ed25519";
+      owner = user.userName;
       mode = "0600";
     };
   };
 }
 ```
 
+Keys are placed at system level (not home-manager) so they're available on every boot, not just after login. Secret names are unique per user (`ssh-<username>`) to avoid collisions on multi-user hosts.
+
 ## Adding a new host to an existing secrets file
 
 If the user moves to a new host, re-encrypt the file with the new host key added:
 
 ```bash
-# 1. Add the new host age key anchor to .sops.yaml and add it to the user's creation rule
-# 2. Re-encrypt:
+# 1. Get the new host's age key: cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age
+# 2. Add the new anchor to .sops.yaml and add it to the user's creation rule
+# 3. Re-encrypt:
 sops updatekeys secrets/soumya.yaml
 ```
