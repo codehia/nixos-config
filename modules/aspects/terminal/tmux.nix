@@ -28,8 +28,11 @@
           plugins = with pkgs; [
             dotbar
             tmuxPlugins.sensible
+            tmuxPlugins.tmux-fzf
           ];
           extraConfig = ''
+            TMUX_FZF_OPTIONS="-p -w 90% -h 80% -m"
+
             # split current window horizontally
             bind - split-window -v
             # split current window vertically
@@ -67,7 +70,9 @@
             # -- display -------------------------------------------------------------------
             set -g pane-active-border-style "bg=default,fg=colour166"
             set -g pane-border-style "bg=default,fg=colour245"
-            set -g pane-border-lines "heavy"
+            set -g pane-border-lines "double"
+            set -g pane-border-status top
+            set -g pane-border-format " #{pane_index} #{pane_current_command} "
 
             set -g base-index 1           # start windows numbering at 1
             setw -g pane-base-index 1     # make pane numbering consistent with windows
