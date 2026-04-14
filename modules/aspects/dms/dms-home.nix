@@ -90,9 +90,6 @@ let
           home.file.".face".source = "${self}/assets/profile.jpg";
 
           # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
-          # Also seeds session.json wallpaperPath on first install (only if file absent).
-          # Note: session.json is owned by DMS at runtime — we must NOT use the HM
-          # session option which would replace it with a read-only nix store symlink.
           home.activation.syncWallpapers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
             wallpaperSrc="${self}/assets/.wallpapers"
             wallpaperDst="$HOME/Pictures/Wallpapers"
@@ -100,13 +97,6 @@ let
             if [ -d "$wallpaperSrc" ] && [ -n "$(ls -A "$wallpaperSrc" 2>/dev/null)" ]; then
               $DRY_RUN_CMD mkdir -p "$wallpaperDst"
               $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete "$wallpaperSrc/" "$wallpaperDst/"
-            fi
-
-            sessionFile="$HOME/.local/state/DankMaterialShell/session.json"
-            defaultWallpaper="$HOME/Pictures/Wallpapers/ultrawide/hello-world-pixel-3440x1440-15168.png"
-            if [ -z "$DRY_RUN_CMD" ] && [ ! -f "$sessionFile" ]; then
-              mkdir -p "$(dirname "$sessionFile")"
-              echo "{\"wallpaperPath\":\"$defaultWallpaper\"}" > "$sessionFile"
             fi
           '';
 
@@ -125,6 +115,12 @@ let
             enableAudioWavelength = false;
             enableCalendarEvents = false;
             settings = finalSettings;
+            session = {
+              wallpaperPath = "${config.home.homeDirectory}/Pictures/Wallpapers/ultrawide/hello-world-pixel-3440x1440-15168.png";
+              wallpaperCyclingEnabled = true;
+              wallpaperCyclingMode = "interval";
+              wallpaperCyclingInterval = 300;
+            };
             plugins.dankPomodoroTimer = {
               src =
                 pkgs.fetchFromGitHub {
