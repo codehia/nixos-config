@@ -4,13 +4,17 @@
     nixos =
       { pkgs, config, ... }:
       {
-        sops.secrets.github_token = {
+        sops.secrets.GITHUB_ACCESS_TOKEN = {
           sopsFile = ../../secrets/common.yaml;
+          mode = "0444"; # world-readable — nix client reads !include as the user, not root
         };
 
-        systemd.services.nix-daemon.serviceConfig.EnvironmentFiles = [
-          config.sops.secrets.github_token.path
-        ];
+        # The secret value in common.yaml must be a valid nix.conf line:
+        #   access-tokens = github.com=<token>
+        # !include defers reading to nix-daemon startup, after sops has decrypted the secret.
+        nix.extraOptions = ''
+          !include ${config.sops.secrets.GITHUB_ACCESS_TOKEN.path}
+        '';
 
         environment.binsh = "${pkgs.bash}/bin/bash";
         nix = {
