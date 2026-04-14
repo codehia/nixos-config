@@ -1,12 +1,20 @@
 -- =============================================================================
 -- FORMAT DISPATCHER
 -- Reads Nix-provided formatter metadata (fast/slow per filetype) and provides:
---   M.format_fast(bufnr)  — sync, used in BufWritePre
---   M.format_slow(bufnr)  — async background, notification on completion
---   M.format_all(bufnr)   — fast sync + slow async
+--   M.format_fast(bufnr)        — sync, used in format_on_save (BufWritePre)
+--   M.format_after_save(bufnr)  — async after-save for filetypes that timed out
+--   M.format_slow(bufnr)        — async background, notification on completion
+--   M.format_all(bufnr)         — fast sync + slow async
+--
+-- Slow-filetype detection (from codehia/neovim):
+--   On first timeout, the filetype is added to slow_format_filetypes.
+--   format_fast skips it on subsequent saves; format_after_save handles it async.
 -- =============================================================================
 
 local M = {}
+
+-- Filetypes that timed out on fast format — switched to after-save async
+local slow_format_filetypes = {}
 
 --- Get fast formatters for a filetype from Nix info
 ---@param ft string
@@ -30,13 +38,20 @@ function M.get_slow(ft)
   return nil
 end
 
---- Run fast formatters synchronously (for BufWritePre)
+--- Run fast formatters synchronously (for BufWritePre).
+--- If a filetype is already marked slow, skips — format_after_save handles it.
+--- On timeout, marks the filetype as slow for future saves.
 ---@param bufnr number
 function M.format_fast(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local ft = vim.bo[bufnr].filetype
-  local fast = M.get_fast(ft)
 
+  -- Already known to be slow — defer to format_after_save
+  if slow_format_filetypes[ft] then
+    return
+  end
+
+  local fast = M.get_fast(ft)
   if fast then
     require('conform').format({
       bufnr = bufnr,
@@ -44,11 +59,8 @@ function M.format_fast(bufnr)
       timeout_ms = 500,
       lsp_format = 'fallback',
     }, function(err)
-      -- If fast formatting timed out or failed, queue slow formatters
-      if err then
-        vim.schedule(function()
-          M.format_slow(bufnr)
-        end)
+      if err and err:match('timeout$') then
+        slow_format_filetypes[ft] = true
       end
     end)
   else
@@ -61,8 +73,22 @@ function M.format_fast(bufnr)
   end
 end
 
---- Run slow formatters asynchronously (background, notifies on completion)
+--- After-save handler for slow filetypes (return value used by conform's format_after_save).
+--- Returns conform options if filetype is slow, nil otherwise.
 ---@param bufnr number
+---@return table|nil
+function M.format_after_save(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local ft = vim.bo[bufnr].filetype
+  if not slow_format_filetypes[ft] then
+    return nil
+  end
+  return { async = true, lsp_format = 'fallback' }
+end
+
+--- Run slow formatters asynchronously (background, notifies on completion).
+--- Used for manual invocation via <leader>cF.
+---@param bufnr? number
 function M.format_slow(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local ft = vim.bo[bufnr].filetype
@@ -90,7 +116,7 @@ function M.format_slow(bufnr)
 end
 
 --- Run fast (sync) then slow (async) formatters
----@param bufnr number
+---@param bufnr? number
 function M.format_all(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   M.format_fast(bufnr)

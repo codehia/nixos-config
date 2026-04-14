@@ -283,10 +283,12 @@ return {
 
       require('conform').setup({
         notify_on_error = false,
-        -- Use the format dispatcher for on-save: fast only (sync)
         format_on_save = function(bufnr)
           fmt.format_fast(bufnr)
-          return nil -- we handled formatting ourselves
+          return nil -- handled by dispatcher
+        end,
+        format_after_save = function(bufnr)
+          return fmt.format_after_save(bufnr)
         end,
         formatters_by_ft = formatters_by_ft,
       })
