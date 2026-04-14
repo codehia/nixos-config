@@ -1,4 +1,15 @@
 { den, inputs, ... }:
+let
+  extraBrowsersConfig =
+    { host, ... }:
+    {
+      homeManager =
+        { pkgs, ... }:
+        {
+          home.packages = map (name: pkgs.${name}) (host.extraBrowsers or [ ]);
+        };
+    };
+in
 {
   flake-file.inputs.zen-browser = {
     url = "github:0xc000022070/zen-browser-flake";
@@ -10,12 +21,14 @@
         "brave"
         "google-chrome"
       ])
+      (den.lib.perUser extraBrowsersConfig)
     ];
 
     homeManager =
       { ... }:
       {
         imports = [ inputs.zen-browser.homeModules.beta ];
+
         programs.zen-browser = {
           enable = true;
           profiles."Default Profile".settings = {

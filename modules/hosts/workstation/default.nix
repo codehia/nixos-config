@@ -19,6 +19,7 @@
     users.deus = {
       personalApps = true;
     };
+    extraBrowsers = [ "google-chrome" ];
     users.soumya = {
       nvimLanguages = [
         "nix"
