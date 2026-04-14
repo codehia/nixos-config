@@ -1,20 +1,32 @@
 # Hyprland compositor — base config, packages, and settings.
 # Uses the collector pattern: other files (binds.nix, hyprpaper.nix, pyprland.nix) also define
 # den.aspects.hyprland and their attrs are merged together by den.
-{ inputs, ... }:
+{ den, inputs, ... }:
+let
+  hyprlandPackages =
+    { host, ... }:
+    {
+      nixos.programs.hyprland = {
+        package = inputs.hyprland.packages.${host.system}.hyprland;
+        portalPackage = inputs.hyprland.packages.${host.system}.xdg-desktop-portal-hyprland;
+      };
+    };
+in
 {
   flake-file.inputs.hyprland = {
     url = "github:hyprwm/hyprland";
   };
 
   den.aspects.hyprland = {
-    # package/portalPackage are set per-host (workstation.nix, thinkpad.nix) to avoid
-    # "defined multiple times" errors — den applies this nixos block once per user context
-    # (soumya + deus), which conflicts on unique options like `package`.
+    # enable + withUWSM are safe as static attrset (booleans merge fine across contexts).
+    # package/portalPackage use perHost to avoid "defined multiple times" — non-mergeable
+    # derivations would conflict if applied once per user context without perHost.
     nixos.programs.hyprland = {
       enable = true;
       withUWSM = true;
     };
+
+    includes = [ (den.lib.perHost hyprlandPackages) ];
 
     homeManager =
       { pkgs, config, ... }:

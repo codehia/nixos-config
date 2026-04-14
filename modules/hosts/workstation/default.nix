@@ -101,6 +101,7 @@
       den.aspects.zram
 
       # Desktop
+      den.aspects.hyprland
       den.aspects.dms
       den.aspects.greetd
       den.aspects.dconf
