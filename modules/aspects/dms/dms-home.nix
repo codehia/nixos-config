@@ -142,14 +142,15 @@ let
             };
           };
 
-          # qt5ct/qt6ct config requests kvantum as the Qt style, but kvantum fails
-          # to load due to a qtsvg version mismatch, causing quickshell to deadlock.
-          # Bypass qt5ct entirely for DMS — it uses its own QML theme anyway.
-          systemd.user.services.dms.Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
-
-          # UWSM owns the session (hyprland.systemd.enable = false), so hyprland-session.target
-          # is never created. Override to graphical-session.target which UWSM activates instead.
-          systemd.user.services.dms.Install.WantedBy = lib.mkForce [ "graphical-session.target" ];
+          systemd.user.services.dms = {
+            # qt5ct/qt6ct config requests kvantum as the Qt style, but kvantum fails
+            # to load due to a qtsvg version mismatch, causing quickshell to deadlock.
+            # Bypass qt5ct entirely for DMS — it uses its own QML theme anyway.
+            Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
+            # UWSM owns the session (hyprland.systemd.enable = false), so hyprland-session.target
+            # is never created. Override to graphical-session.target which UWSM activates instead.
+            Install.WantedBy = lib.mkForce [ "graphical-session.target" ];
+          };
         };
     }
   );
