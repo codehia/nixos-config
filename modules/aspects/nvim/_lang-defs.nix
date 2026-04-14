@@ -46,11 +46,11 @@
   nix = {
     packages = with pkgs; [
       nixd
-      alejandra
+      nixfmt-rfc-style
     ];
     formatters = {
       fast = {
-        nix = [ "alejandra" ];
+        nix = [ "nixfmt" ];
       };
       slow = { };
     };

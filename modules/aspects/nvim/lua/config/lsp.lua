@@ -140,7 +140,7 @@ M.setup = function()
       settings = {
         nixd = {
           nixpkgs = { expr = nix_info('nixdExtras', 'nixpkgs') or 'import <nixpkgs> {}' },
-          formatting = { command = { 'alejandra' } },
+          formatting = { command = { 'nixfmt' } },
           diagnostic = { suppress = { 'sema-escaping-with' } },
         },
       },
