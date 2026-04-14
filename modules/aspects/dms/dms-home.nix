@@ -75,9 +75,62 @@ let
           ...
         }:
         let
-          themeFile = "${config.home.homeDirectory}/.config/DankMaterialShell/themes/catppuccin/theme.json";
+          home = config.home.homeDirectory;
+
+          # Detects monitor width via DMS's wayland randr query, populates
+          # ~/Pictures/Wallpapers/active/ with symlinks from the right resolution folder.
+          # PATH provided by the systemd service unit below.
+          wallpaperSelectScript = pkgs.writeShellScript "dms-wallpaper-select" ''
+            WALLPAPER_BASE="$HOME/Pictures/Wallpapers"
+            ACTIVE_DIR="$WALLPAPER_BASE/active"
+
+            WIDTH=$(dms randr --json | jq '[.outputs[] | select(.enabled) | .width] | max // 0')
+
+            if [ "$WIDTH" -ge 3440 ]; then
+              FOLDER="$WALLPAPER_BASE/ultrawide"
+            else
+              FOLDER="$WALLPAPER_BASE/regular"
+            fi
+
+            # Ensure Wallpapers/ is writable (rsync from nix store can leave it 555)
+            chmod u+w "$WALLPAPER_BASE" 2>/dev/null || true
+
+            mkdir -p "$ACTIVE_DIR"
+            find "$ACTIVE_DIR" -maxdepth 1 -type l -delete
+
+            for f in "$FOLDER"/*; do
+              [ -f "$f" ] || continue
+              ln -sf "$f" "$ACTIVE_DIR/$(basename "$f")"
+            done
+
+            # Extension-less link as initial wallpaper — excluded from cycling by find's -iname patterns
+            FIRST=$(ls "$FOLDER" 2>/dev/null | head -1)
+            [ -n "$FIRST" ] && ln -sf "$FOLDER/$FIRST" "$ACTIVE_DIR/wallpaper"
+          '';
+
+          wallpaperSelectService = {
+            Unit = {
+              Description = "Select wallpaper folder based on monitor resolution";
+              After = [ "graphical-session.target" ];
+              PartOf = [ "graphical-session.target" ];
+            };
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${wallpaperSelectScript}";
+              RemainAfterExit = true;
+              Environment = "PATH=/run/current-system/sw/bin:${
+                lib.makeBinPath [
+                  pkgs.jq
+                  pkgs.findutils
+                  pkgs.coreutils
+                ]
+              }";
+            };
+            Install.WantedBy = [ "graphical-session.target" ];
+          };
+
           finalSettings = lib.recursiveUpdate settings {
-            customThemeFile = themeFile;
+            customThemeFile = "${home}/.config/DankMaterialShell/themes/catppuccin/theme.json";
             currentThemeName = "custom"; # DMS Theme.qml only loads customThemeFile when name === "custom"
             currentThemeCategory = "custom";
           };
@@ -86,7 +139,6 @@ let
           imports = [ inputs.dms.homeModules.dank-material-shell ];
 
           home.file.".config/DankMaterialShell/themes/catppuccin/theme.json".source = ./catppuccin-theme.json;
-
           home.file.".face".source = "${self}/assets/profile.jpg";
 
           # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
@@ -96,7 +148,9 @@ let
 
             if [ -d "$wallpaperSrc" ] && [ -n "$(ls -A "$wallpaperSrc" 2>/dev/null)" ]; then
               $DRY_RUN_CMD mkdir -p "$wallpaperDst"
-              $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete "$wallpaperSrc/" "$wallpaperDst/"
+              $DRY_RUN_CMD chmod u+w "$wallpaperDst"
+              $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete --no-perms --chmod=D755,F644 --exclude='active' "$wallpaperSrc/" "$wallpaperDst/"
+              $DRY_RUN_CMD mkdir -p "$wallpaperDst/active"
             fi
           '';
 
@@ -116,7 +170,7 @@ let
             enableCalendarEvents = false;
             settings = finalSettings;
             session = {
-              wallpaperPath = "${config.home.homeDirectory}/Pictures/Wallpapers/ultrawide/hello-world-pixel-3440x1440-15168.png";
+              wallpaperPath = "${home}/Pictures/Wallpapers/active/wallpaper";
               wallpaperCyclingEnabled = true;
               wallpaperCyclingMode = "interval";
               wallpaperCyclingInterval = 300;
@@ -138,6 +192,8 @@ let
             };
           };
 
+          systemd.user.services.dms-wallpaper-select = wallpaperSelectService;
+
           systemd.user.services.dms = {
             # qt5ct/qt6ct config requests kvantum as the Qt style, but kvantum fails
             # to load due to a qtsvg version mismatch, causing quickshell to deadlock.
@@ -146,6 +202,9 @@ let
             # UWSM owns the session (hyprland.systemd.enable = false), so hyprland-session.target
             # is never created. Override to graphical-session.target which UWSM activates instead.
             Install.WantedBy = lib.mkForce [ "graphical-session.target" ];
+            # Wait for wallpaper selection before starting.
+            Unit.After = [ "dms-wallpaper-select.service" ];
+            Unit.Wants = [ "dms-wallpaper-select.service" ];
           };
         };
     }
