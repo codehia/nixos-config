@@ -6,7 +6,7 @@
     home-manager.enable = true;
     nhCleanEnabled = true;
     greetdUser = "soumya";
-    greetdSessionBin = "start-hyprland";
+    greetdSessionCmd = "uwsm start /run/current-system/sw/bin/start-hyprland";
     wm = "hyprland";
     # Aspects added here are picked up by deus's extraAspectsSelector and included only on this host.
     # Useful when deus needs an aspect on some hosts but not all (e.g. work tools on a work laptop).

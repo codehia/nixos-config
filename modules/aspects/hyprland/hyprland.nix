@@ -8,26 +8,22 @@
   };
 
   den.aspects.hyprland = {
-    nixos =
-      { ... }:
-      {
-        programs.hyprland = {
-          enable = true;
-          withUWSM = true;
-        };
-        environment.etc."wayland-sessions/hyprland.desktop".text = ''
-          [Desktop Entry]
-          Name=Hyprland
-          Comment=A dynamic tiling Wayland compositor
-          Exec=Hyprland
-          Type=Application
-        '';
-      };
+    # package/portalPackage are set per-host (workstation.nix, thinkpad.nix) to avoid
+    # "defined multiple times" errors — den applies this nixos block once per user context
+    # (soumya + deus), which conflicts on unique options like `package`.
+    nixos.programs.hyprland = {
+      enable = true;
+      withUWSM = true;
+    };
 
     homeManager =
-      { pkgs, ... }:
+      { pkgs, config, ... }:
       {
         home.sessionVariables.NIXOS_OZONE_WL = "1";
+        # Export HM session variables into the UWSM environment so systemd
+        # services (DMS, etc.) inherit PATH and other HM-set vars.
+        xdg.configFile."uwsm/env".source =
+          "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
         home.packages = with pkgs; [
           swww
           grim
@@ -40,22 +36,15 @@
         ];
         wayland.windowManager.hyprland = {
           enable = true;
-          package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-          portalPackage =
-            inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-          # systemd.enable must be false when withUWSM = true — UWSM owns the session,
-          # not the HM systemd integration. Both active causes startup conflicts.
-          systemd = {
-            enable = false;
-            enableXdgAutostart = true;
-            variables = [ "--all" ];
-          };
+          # Use the NixOS module's package (set to the flake version via programs.hyprland.package).
+          # Avoids version mismatch between the session binary and the HM config.
+          package = null;
+          portalPackage = null;
+          # UWSM owns the session — HM systemd integration must be disabled.
+          systemd.enable = false;
+          systemd.variables = [ "--all" ];
           xwayland.enable = true;
           settings = {
-            exec-once = [
-              "mullvad-gui"
-            ];
-
             input = {
               kb_options = [
                 "grp:alt_caps_toggle"
@@ -139,7 +128,7 @@
               slave_count_for_center_master = 2;
             };
 
-            monitor = [ ", preferred, auto, 1" ];
+            monitor = [ ", 3440x1440@75.05Hz, auto, 1" ];
 
             workspace = [
               "1, persistent:true,"

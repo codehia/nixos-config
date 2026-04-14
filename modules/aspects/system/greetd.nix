@@ -13,7 +13,7 @@
         { host }:
         let
           user = host.greetdUser;
-          session = "/home/${user}/.nix-profile/bin/${host.greetdSessionBin}";
+          session = host.greetdSessionCmd or "/home/${user}/.nix-profile/bin/${host.greetdSessionBin}";
         in
         {
           nixos =
