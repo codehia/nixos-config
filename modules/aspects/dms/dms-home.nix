@@ -77,16 +77,21 @@ let
         let
           home = config.home.homeDirectory;
 
-          # Detects monitor width via DMS's wayland randr query, populates
-          # ~/Pictures/Wallpapers/active/ with symlinks from the right resolution folder.
-          # PATH provided by the systemd service unit below.
+          # Detects max connected-display width via kernel DRM sysfs (no Wayland or DMS required),
+          # populates ~/Pictures/Wallpapers/active/ with symlinks from the right resolution folder.
+          # Idempotent — safe to re-trigger on display hotplug (e.g. from Kanshi).
           wallpaperSelectScript = pkgs.writeShellScript "dms-wallpaper-select" ''
             WALLPAPER_BASE="$HOME/Pictures/Wallpapers"
             ACTIVE_DIR="$WALLPAPER_BASE/active"
 
-            WIDTH=$(dms randr --json | jq '[.outputs[] | select(.enabled) | .width] | max // 0')
+            # Widest single connected display (kernel DRM sysfs, not combined)
+            WIDTH=$(
+              for d in /sys/class/drm/card*-*/; do
+                [ "$(cat "$d/status" 2>/dev/null)" = "connected" ] && cat "$d/modes" 2>/dev/null
+              done | awk -Fx '{print $1}' | sort -n | tail -1
+            )
 
-            if [ "$WIDTH" -ge 3440 ]; then
+            if [ "''${WIDTH:-0}" -ge 3440 ]; then
               FOLDER="$WALLPAPER_BASE/ultrawide"
             else
               FOLDER="$WALLPAPER_BASE/regular"
@@ -105,7 +110,7 @@ let
 
             # Extension-less link as initial wallpaper — excluded from cycling by find's -iname patterns
             FIRST=$(ls "$FOLDER" 2>/dev/null | head -1)
-            [ -n "$FIRST" ] && ln -sf "$FOLDER/$FIRST" "$ACTIVE_DIR/wallpaper"
+            [ -n "$FIRST" ] && ln -sf "$FOLDER/$FIRST" "$ACTIVE_DIR/wallpaper" || true
           '';
 
           wallpaperSelectService = {
@@ -120,7 +125,7 @@ let
               RemainAfterExit = true;
               Environment = "PATH=/run/current-system/sw/bin:${
                 lib.makeBinPath [
-                  pkgs.jq
+                  pkgs.gawk
                   pkgs.findutils
                   pkgs.coreutils
                 ]
@@ -150,7 +155,27 @@ let
               $DRY_RUN_CMD mkdir -p "$wallpaperDst"
               $DRY_RUN_CMD chmod u+w "$wallpaperDst"
               $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete --no-perms --chmod=D755,F644 --exclude='active' "$wallpaperSrc/" "$wallpaperDst/"
-              $DRY_RUN_CMD mkdir -p "$wallpaperDst/active"
+
+              # Pre-populate active/ so DMS has a wallpaper even before the service runs.
+              # Same DRM detection as the service — widest single connected display.
+              WIDTH=$(
+                for d in /sys/class/drm/card*-*/; do
+                  [ "$(cat "$d/status" 2>/dev/null)" = "connected" ] && cat "$d/modes" 2>/dev/null
+                done | ${pkgs.gawk}/bin/awk -Fx '{print $1}' | sort -n | tail -1
+              )
+              if [ "''${WIDTH:-0}" -ge 3440 ]; then
+                folder="$wallpaperDst/ultrawide"
+              else
+                folder="$wallpaperDst/regular"
+              fi
+              mkdir -p "$wallpaperDst/active"
+              find "$wallpaperDst/active" -maxdepth 1 -type l -delete
+              for f in "$folder"/*; do
+                [ -f "$f" ] || continue
+                ln -sf "$f" "$wallpaperDst/active/$(basename "$f")"
+              done
+              FIRST=$(ls "$folder" 2>/dev/null | head -1)
+              [ -n "$FIRST" ] && ln -sf "$folder/$FIRST" "$wallpaperDst/active/wallpaper" || true
             fi
           '';
 
