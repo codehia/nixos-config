@@ -162,7 +162,7 @@ let
                 for d in /sys/class/drm/card*-*/; do
                   [ "$(cat "$d/status" 2>/dev/null)" = "connected" ] && cat "$d/modes" 2>/dev/null
                 done | ${pkgs.gawk}/bin/awk -Fx '{print $1}' | sort -n | tail -1
-              )
+              ) || true
               if [ "''${WIDTH:-0}" -ge 3440 ]; then
                 folder="$wallpaperDst/ultrawide"
               else
