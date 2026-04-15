@@ -25,6 +25,7 @@
             lib.mkOptionDefault {
               # ── App launchers ──
               "${mod}+space" = "exec dms ipc launcher toggle";
+              "${mod}+Return" = null;
               "${mod}+Shift+Return" = "exec ghostty";
               "${mod}+w" = "exec zen-beta";
 
