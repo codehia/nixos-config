@@ -4,6 +4,10 @@
 { inputs, ... }:
 {
   flake-file.inputs = {
+    wallpapers = {
+      url = "git+https://codeberg.org/codehia/wallpapers";
+      flake = false;
+    };
     dms = {
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs-unstable";

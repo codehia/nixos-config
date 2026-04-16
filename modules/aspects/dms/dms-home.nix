@@ -163,7 +163,7 @@ let
 
           # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
           home.activation.syncWallpapers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            wallpaperSrc="${self}/assets/.wallpapers"
+            wallpaperSrc="${inputs.wallpapers}"
             wallpaperDst="$HOME/Pictures/Wallpapers"
 
             if [ -d "$wallpaperSrc" ] && [ -n "$(ls -A "$wallpaperSrc" 2>/dev/null)" ]; then

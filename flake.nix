@@ -30,7 +30,7 @@
     flake-file.url = "github:vic/flake-file";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs-lib";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
     };
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
@@ -54,7 +54,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
-    nixpkgs-lib.follows = "nixpkgs";
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell";
@@ -84,6 +83,10 @@
     tuigreet = {
       url = "github:NotAShelf/tuigreet";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    wallpapers = {
+      url = "git+https://codeberg.org/codehia/wallpapers";
+      flake = false;
     };
     wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";

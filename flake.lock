@@ -580,7 +580,7 @@
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
-          "nixpkgs-lib"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -2531,9 +2531,6 @@
         "niri-scratchpad": "niri-scratchpad",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_9",
-        "nixpkgs-lib": [
-          "nixpkgs"
-        ],
         "nixpkgs-unstable": "nixpkgs-unstable",
         "noctalia": "noctalia",
         "pam-fde-boot-pw": "pam-fde-boot-pw",
@@ -2543,6 +2540,7 @@
         "stylix": "stylix",
         "sway-scratch": "sway-scratch",
         "tuigreet": "tuigreet",
+        "wallpapers": "wallpapers",
         "wrappers": "wrappers",
         "zen-browser": "zen-browser"
       }
@@ -2981,6 +2979,22 @@
         "owner": "NotAShelf",
         "repo": "tuigreet",
         "type": "github"
+      }
+    },
+    "wallpapers": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776363552,
+        "narHash": "sha256-1suu99hBURaQqWOw69iop3ohYvd/gy7t2O8M+Svrf2o=",
+        "ref": "refs/heads/master",
+        "rev": "4dd02424804ad998bfe5ca664532f84cc67e6e1a",
+        "revCount": 1,
+        "type": "git",
+        "url": "ssh://git@codeberg.org/codehia/wallpapers"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@codeberg.org/codehia/wallpapers"
       }
     },
     "wrappers": {
