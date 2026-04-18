@@ -3,11 +3,17 @@
     nixos =
       { pkgs, ... }:
       {
+        console = {
+          font = "ter-v24n";
+          packages = [ pkgs.terminus_font ];
+          earlySetup = true;
+        };
+
         boot = {
           loader = {
             systemd-boot = {
               enable = true;
-              consoleMode = "2";
+              consoleMode = "max";
             };
             efi.canTouchEfiVariables = true;
           };
