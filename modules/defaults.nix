@@ -4,6 +4,11 @@
 {
   den.default = {
     nixos.system.stateVersion = "25.11";
+    nixos.time.timeZone = "Asia/Kolkata";
+    nixos.i18n = {
+      defaultLocale = "en_US.UTF-8";
+      extraLocales = [ "all" ];
+    };
     homeManager.home.stateVersion = "25.11";
     includes = [
       den.provides.define-user
