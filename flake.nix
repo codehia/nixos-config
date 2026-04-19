@@ -55,10 +55,6 @@
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
     pam-fde-boot-pw = {
       url = "git+https://git.sr.ht/~kennylevinsen/pam_fde_boot_pw";
       flake = false;
