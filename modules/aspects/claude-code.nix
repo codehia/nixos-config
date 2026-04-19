@@ -9,16 +9,13 @@
   den.aspects.apps = {
     includes = [
       (den._.unfree [ "claude-code" ])
-      (den.lib.perUser (
-        { ... }:
-        {
-          homeManager =
-            { pkgs, ... }:
-            {
-              home.packages = [ pkgs.claude-code ];
-            };
-        }
-      ))
+      {
+        homeManager =
+          { pkgs, ... }:
+          {
+            home.packages = [ pkgs.claude-code ];
+          };
+      }
     ];
   };
 }
