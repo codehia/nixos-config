@@ -31,57 +31,12 @@
   };
 
   den.aspects.workstation = {
-    nixos =
-      { ... }:
-      {
-        imports = [
-          ./_hardware-configuration.nix
-          ./_disko-config.nix
-        ];
-
-        time.timeZone = "Asia/Kolkata";
-
-        i18n = {
-          defaultLocale = "en_US.UTF-8";
-          extraLocales = [ "all" ];
-        };
-
-        services = {
-          gvfs.enable = true;
-          fwupd.enable = true;
-          kanata = {
-            enable = false;
-            keyboards = {
-              kinesis = {
-                devices = [
-                  "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-event-if02"
-                  "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-if01-event-kbd"
-                ];
-                extraDefCfg = "process-unmapped-keys yes";
-                configFile = ../thinkpad/kinesis.kbd;
-              };
-            };
-          };
-          udev.extraRules = ''
-            KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
-          '';
-        };
-        hardware = {
-          uinput.enable = true;
-          bluetooth = {
-            enable = false;
-            powerOnBoot = false;
-            settings.General.Experimental = false;
-          };
-        };
-
-        systemd.services.kanata-internalKeyboard.serviceConfig = {
-          SupplementaryGroups = [
-            "input"
-            "uinput"
-          ];
-        };
-      };
+    nixos = {
+      imports = [
+        ./_hardware-configuration.nix
+        ./_disko-config.nix
+      ];
+    };
 
     includes = [
       # Core system
@@ -99,6 +54,8 @@
       den.aspects.pipewire
       den.aspects.graphics
       den.aspects.zram
+
+      den.aspects.core-services
 
       # Desktop
       den.aspects.hyprland

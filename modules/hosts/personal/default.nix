@@ -26,52 +26,14 @@
   };
 
   den.aspects.personal = {
-    nixos =
-      { pkgs, ... }:
-      {
-        imports = [
-          ./_hardware-configuration.nix
-          ./_disko-config.nix
-        ];
-
-        time.timeZone = "Asia/Kolkata";
-
-        i18n = {
-          defaultLocale = "en_US.UTF-8";
-          extraLocales = [ "all" ];
-        };
-
-        environment.systemPackages = with pkgs; [
-          webkitgtk_6_0
-          webkitgtk_4_1
-          gtk4
-        ];
-
-        programs.appimage.enable = true;
-
-        services = {
-          flatpak.enable = true;
-          gvfs.enable = true;
-          fwupd.enable = true;
-          mullvad-vpn = {
-            enable = true;
-            package = pkgs.mullvad-vpn;
-          };
-          avahi = {
-            enable = true;
-            nssmdns4 = true;
-            nssmdns6 = true;
-            openFirewall = true;
-          };
-        };
-      };
+    nixos = {
+      imports = [
+        ./_hardware-configuration.nix
+        ./_disko-config.nix
+      ];
+    };
 
     includes = [
-      (den._.unfree [
-        "mullvad"
-        "mullvad-vpn"
-      ])
-
       # Core system
       den.aspects.nix-config
       den.aspects.networking
@@ -83,12 +45,17 @@
       den.aspects.nix-tools
 
       # Hardware
+      den.aspects.mullvad
+      den.aspects.avahi
       den.aspects.tailscale
       den.aspects.pipewire
       den.aspects.graphics
       den.aspects.lact
       den.aspects.ios-devices
       den.aspects.zram
+
+      den.aspects.core-services
+      den.aspects.desktop-services
 
       # Desktop
       den.aspects.dms
