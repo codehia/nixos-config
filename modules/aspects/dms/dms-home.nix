@@ -18,6 +18,7 @@ let
     { host, ... }:
     let
       isLaptop = host.isLaptop or false;
+      isHyprland = host.wm == "hyprland";
       patchBarConfig =
         bar:
         lib.recursiveUpdate bar {
@@ -214,6 +215,21 @@ let
               wallpaperCyclingEnabled = true;
               wallpaperCyclingMode = "interval";
               wallpaperCyclingInterval = 300;
+
+              # Night light: warm amber after 18:00, neutral during the day.
+              # Uses DMS's built-in wlr-gamma-control-v1 — works on SwayfX.
+              # Skipped on Hyprland — hyprsunset handles it there via hyprland-ctm-control-v1.
+            }
+            // lib.optionalAttrs (!isHyprland) {
+              nightModeEnabled = true;
+              nightModeAutoEnabled = true;
+              nightModeAutoMode = "time";
+              nightModeTemperature = 3000;
+              nightModeHighTemperature = 6500;
+              nightModeStartHour = 18;
+              nightModeStartMinute = 0;
+              nightModeEndHour = 6;
+              nightModeEndMinute = 0;
             };
             plugins.dankPomodoroTimer = {
               src =
