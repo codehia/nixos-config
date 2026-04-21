@@ -1503,11 +1503,11 @@
         "scenefx": "scenefx"
       },
       "locked": {
-        "lastModified": 1776738712,
-        "narHash": "sha256-NpwcxKFcqX+84O4Of4mMvY0uXNE7jLOw5FWVf2sx/2E=",
+        "lastModified": 1776764696,
+        "narHash": "sha256-kIdQGUlrTnUv+lFVj47wS/H1rmvC7ajV3V2sThS0XN4=",
         "owner": "DreamMaoMao",
         "repo": "mango",
-        "rev": "60f31cd1bf3a070feb816e3b1952179948743f62",
+        "rev": "461dcb6989325a5fd2fdbb75104f1187e37de0b4",
         "type": "github"
       },
       "original": {
@@ -2484,11 +2484,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776589301,
-        "narHash": "sha256-3g+BPNYwKrjOtBaQi1cLBEtLKtDLZAS01gFd6/ybtlE=",
+        "lastModified": 1776761300,
+        "narHash": "sha256-0CTVYyznIl8QC6PpMoOSM2Qo4sIdHp3j3wV8lU7wON8=",
         "ref": "refs/heads/master",
-        "rev": "9a54119893bdd30fec628063322bc726f96afc1f",
-        "revCount": 803,
+        "rev": "d60498adc038526b3d155e8ad61e51e78e6e32eb",
+        "revCount": 804,
         "type": "git",
         "url": "https://git.outfoxxed.me/quickshell/quickshell"
       },
@@ -2682,11 +2682,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776119890,
-        "narHash": "sha256-Zm6bxLNnEOYuS/SzrAGsYuXSwk3cbkRQZY0fJnk8a5M=",
+        "lastModified": 1776771786,
+        "narHash": "sha256-DRFGPfFV6hbrfO9a1PH1FkCi7qR5FgjSqsQGGvk1rdI=",
         "owner": "Mic92",
         "repo": "sops-nix",
-        "rev": "d4971dd58c6627bfee52a1ad4237637c0a2fb0cd",
+        "rev": "bef289e2248991f7afeb95965c82fbcd8ff72598",
         "type": "github"
       },
       "original": {
@@ -2941,11 +2941,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1776722801,
-        "narHash": "sha256-NrcQnSu7hGaq+kCsS3vu8tT0yul2/JtI059huF1wQrs=",
+        "lastModified": 1776774909,
+        "narHash": "sha256-aQtWjTQMbdAAod8zEwL2sa+gVXrdKRCu0CGg2QeTQy4=",
         "owner": "NotAShelf",
         "repo": "tuigreet",
-        "rev": "98fa2d9f43122b0f763f4ad6dc86e8fce5a9d961",
+        "rev": "468fb28a510b816460d1aba5f5bb2dcf66f532a0",
         "type": "github"
       },
       "original": {
