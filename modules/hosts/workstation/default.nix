@@ -39,31 +39,10 @@
     };
 
     includes = [
-      # Core system
-      den.aspects.nix-config
-      den.aspects.networking
-      den.aspects.boot
-      den.aspects.sudo
-      den.aspects.disko
-
-      # Nix tooling
-      den.aspects.nix-tools
-
-      # Hardware
+      den.aspects.base-system
+      den.aspects.graphical-session
       den.aspects.tailscale
-      den.aspects.pipewire
-      den.aspects.graphics
-      den.aspects.zram
-
-      den.aspects.core-services
-
-      # Desktop
       den.aspects.hyprland
-      den.aspects.dms
-      den.aspects.greetd
-      den.aspects.dconf
-      den.aspects.fonts
-      den.aspects.gnome-keyring
     ];
   };
 }

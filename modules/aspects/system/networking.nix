@@ -11,10 +11,6 @@
           nixos.networking = {
             hostName = host.hostName;
             networkmanager.enable = true;
-            firewall = {
-              trustedInterfaces = [ "tailscale0" ];
-              checkReversePath = "loose";
-            };
           };
         }
       ))

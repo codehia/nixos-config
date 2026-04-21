@@ -46,7 +46,6 @@ in
 
       # Packages and tools
       den.aspects.packages
-      den.aspects.services
       den.aspects.shell-tools
       den.aspects.tui
       den.aspects.cli-utils

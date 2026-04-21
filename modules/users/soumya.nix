@@ -34,7 +34,6 @@
       den.aspects.cli-utils
       den.aspects.packages
       den.aspects.dev-tools
-      den.aspects.services
       den.aspects.apps
 
       # Work

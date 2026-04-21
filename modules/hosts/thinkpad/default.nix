@@ -36,54 +36,21 @@
   };
 
   den.aspects.thinkpad = {
-    nixos = {
-      imports = [
-        ./_hardware-configuration.nix
-        ./_disko-config.nix
-      ];
-
-      services = {
-        upower.enable = true;
-        libinput = {
-          enable = true;
-          touchpad = {
-            accelSpeed = "0.5";
-          };
-        };
-      };
-    };
+    nixos.imports = [
+      ./_hardware-configuration.nix
+      ./_disko-config.nix
+    ];
 
     includes = [
-      # Core system
-      den.aspects.nix-config
-      den.aspects.networking
-      den.aspects.boot
-      den.aspects.sudo
-      den.aspects.disko
-
-      # Nix tooling
-      den.aspects.nix-tools
-
-      # Hardware
+      den.aspects.base-system
+      den.aspects.graphical-session
+      den.aspects.tailscale
+      den.aspects.desktop-services
       den.aspects.mullvad
       den.aspects.avahi
-      den.aspects.tlp
-      den.aspects.bluetooth
-      den.aspects.tailscale
-      den.aspects.pipewire
-      den.aspects.graphics
       den.aspects.ios-devices
-      den.aspects.zram
-
-      den.aspects.core-services
-      den.aspects.desktop-services
-
-      # Desktop
-      den.aspects.dms
-      den.aspects.greetd
-      den.aspects.dconf
-      den.aspects.fonts
-      den.aspects.gnome-keyring
+      den.aspects.laptop
+      den.aspects.bluetooth
     ];
   };
 }
