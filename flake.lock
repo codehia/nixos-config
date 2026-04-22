@@ -432,11 +432,11 @@
         "quickshell": "quickshell"
       },
       "locked": {
-        "lastModified": 1776799121,
-        "narHash": "sha256-G+qUbf2jZ14mbfJdtQVvW2XPWelmOR4BaG9m4SUWIck=",
+        "lastModified": 1776868325,
+        "narHash": "sha256-p5IqaxTTVB7mOpsKENNJbmKoqGiW5KBv4JfZ4VtV6lE=",
         "owner": "AvengeMedia",
         "repo": "DankMaterialShell",
-        "rev": "c6ed64b24e414cd4b9588b645a6345b15fa697f4",
+        "rev": "97fa86d8f0f73232119040dca264566f1dc22772",
         "type": "github"
       },
       "original": {
@@ -1148,11 +1148,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1776805766,
-        "narHash": "sha256-IVUzmEflwGk02ZAuBBc3h0gWu/p2c9H+cg//dgWlFBg=",
+        "lastModified": 1776864544,
+        "narHash": "sha256-Erndbsry1Crh7t0BGGF7TC9zNcttZfAllrXEPco20iw=",
         "owner": "hyprwm",
         "repo": "hyprland",
-        "rev": "019dac7a0560145d7a557005a21a7fe48ecabe3e",
+        "rev": "d4dd299d8082097068d3d05bef7198424fbb8dfb",
         "type": "github"
       },
       "original": {
@@ -1599,11 +1599,11 @@
         "xwayland-satellite-unstable": "xwayland-satellite-unstable"
       },
       "locked": {
-        "lastModified": 1776805172,
-        "narHash": "sha256-5xA2D+iOEMoKBcTSbQe8Ztao5APX7C3eVeiFAdCg3WM=",
+        "lastModified": 1776856212,
+        "narHash": "sha256-+ctOPF22mhj1CxUuZ8Qog1O4p3Cl8l8sFpUKqcb0RKA=",
         "owner": "sodiboo",
         "repo": "niri-flake",
-        "rev": "035f8ef8a0a5ec8f226231b15e84ebd88a81b1f3",
+        "rev": "a27f4b9943c2cf48bfcf83f147522741f28cb512",
         "type": "github"
       },
       "original": {
@@ -1652,11 +1652,11 @@
     "niri-unstable": {
       "flake": false,
       "locked": {
-        "lastModified": 1776800113,
-        "narHash": "sha256-8UFcj0LV4zZ0gTX96LlbzpmBfYkoXsfb3ETg7GeRup8=",
+        "lastModified": 1776853441,
+        "narHash": "sha256-mSxfoEs7DiDhMCBzprI/1K7UXzMISuGq0b7T06LVJXE=",
         "owner": "YaLTeR",
         "repo": "niri",
-        "rev": "e472b5b0f13d91fdf0e5d07551f68177d25043d0",
+        "rev": "74d2b18603366b98ec9045ecf4a632422f472365",
         "type": "github"
       },
       "original": {
@@ -2484,11 +2484,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776845530,
-        "narHash": "sha256-2Vm9rjVevSZVDZW4uyZ2uK1Sz2p8mvIx4EQBnUZ5trc=",
+        "lastModified": 1776854048,
+        "narHash": "sha256-lLbV66V3RMNp1l8/UelmR4YzoJ5ONtgvEtiUMJATH/o=",
         "ref": "refs/heads/master",
-        "rev": "b850b8a1a9898b7c211834a3da91034194a125e1",
-        "revCount": 805,
+        "rev": "783c953987dc56ff0601abe6845ed96f1d00495a",
+        "revCount": 806,
         "type": "git",
         "url": "https://git.outfoxxed.me/quickshell/quickshell"
       },
