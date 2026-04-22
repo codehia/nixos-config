@@ -151,7 +151,7 @@ in
               "special:minimized, gapsout:100"
               # Scratchpads — lazy: app starts only on first toggle (on-created-empty)
               "special:term, on-created-empty:kitty --class kitty-term"
-              "special:filemanager, on-created-empty:thunar"
+              "special:filemanager, on-created-empty:nautilus"
               "special:pw, on-created-empty:1password --silent"
               "special:spotify, on-created-empty:spotify"
               "special:slack, on-created-empty:slack"
@@ -167,10 +167,10 @@ in
               "size 70% 70%, match:class kitty-term"
               "center on, match:class kitty-term"
 
-              "workspace special:filemanager silent, match:class thunar"
-              "float on, match:class thunar"
-              "size 70% 70%, match:class thunar"
-              "center on, match:class thunar"
+              "workspace special:filemanager silent, match:class org.gnome.Nautilus"
+              "float on, match:class org.gnome.Nautilus"
+              "size 70% 70%, match:class org.gnome.Nautilus"
+              "center on, match:class org.gnome.Nautilus"
 
               "workspace special:pw silent, match:class 1Password"
               "float on, match:class 1Password"

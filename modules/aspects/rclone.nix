@@ -31,7 +31,7 @@
           Service = {
             Type = "simple";
             ExecStartPre = "/run/current-system/sw/bin/mkdir -p ${home}/google-drive";
-            ExecStart = "${pkgs.rclone}/bin/rclone mount --config ${home}/.config/rclone/rclone.conf --vfs-cache-mode full gdrive: ${home}/google-drive/";
+            ExecStart = "${pkgs.rclone}/bin/rclone mount --config ${home}/.config/rclone/rclone.conf --vfs-cache-mode full --drive-export-formats docx,xlsx,pptx,pdf gdrive: ${home}/google-drive/";
             ExecStop = "/run/wrappers/bin/fusermount3 -uz ${home}/google-drive/";
             Restart = "on-failure";
             RestartSec = "10s";

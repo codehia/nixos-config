@@ -57,12 +57,12 @@
           { class = "Spotify"; }
           { class = "Slack"; }
           { app_id = "io.ente.auth"; }
-          { app_id = "thunar"; }
+          { app_id = "org.gnome.Nautilus"; }
         ];
 
         # Auto-scratchpad apps that are pre-launched at startup so they start hidden.
         # sway-scratch can then find them in the scratchpad and show/hide on demand.
-        # Only applies to startup apps — on-demand apps (kitty-dropterm, thunar, slack)
+        # Only applies to startup apps — on-demand apps (kitty-dropterm, nautilus, slack)
         # are NOT listed here so their first sway-scratch invocation shows them directly.
         wayland.windowManager.sway.config.window.commands = [
           {

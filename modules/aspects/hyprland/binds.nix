@@ -47,7 +47,7 @@
           "$modifier, SPACE, exec, dms ipc launcher toggle"
           "$modifier SHIFT, RETURN, exec, ghostty"
           "$modifier, W, exec, zen-beta"
-          "$modifier, T, exec, thunar"
+          "$modifier, T, exec, nautilus"
 
           "$modifier, M,        layoutmsg, focusmaster"
           "$modifier, RETURN,   layoutmsg, swapwithmaster master"

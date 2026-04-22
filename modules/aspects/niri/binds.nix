@@ -18,7 +18,7 @@
       ];
       "Mod+Q".action.spawn = "ghostty";
       "Mod+W".action.spawn = "zen-beta";
-      "Mod+T".action.spawn = "thunar";
+      "Mod+T".action.spawn = "nautilus";
 
       # ── Window management ──
       "Mod+C".action.close-window = [ ];

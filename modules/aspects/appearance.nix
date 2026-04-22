@@ -101,6 +101,7 @@
             bat.enable = false;
             fzf.enable = false;
             lazygit.enable = false;
+            yazi.enable = false;
             # Qt handled by catppuccin.kvantum instead
             qt.enable = false;
             zen-browser.profileNames = [ "Default Profile" ];
@@ -108,7 +109,7 @@
         };
 
         # GTK: adw-gtk3 without -dark follows gsettings color-scheme natively,
-        # so the DMS dark mode toggle propagates correctly to Thunar etc.
+        # so the DMS dark mode toggle propagates correctly to Nautilus etc.
         gtk.theme = {
           package = lib.mkForce pkgs.adw-gtk3;
           name = lib.mkForce "adw-gtk3";

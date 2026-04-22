@@ -7,7 +7,7 @@
       bind=SUPER,p,spawn,rofi -show drun
       bind=SUPER,q,spawn,ghostty
       bind=SUPER,w,spawn,zen-beta
-      bind=SUPER,t,spawn,thunar
+      bind=SUPER,t,spawn,nautilus
 
       # Window management
       bind=SUPER,c,killclient

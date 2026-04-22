@@ -95,7 +95,8 @@
                 ''exec sway-scratch show --class Slack --exec slack --resize "set 70 ppt 70 ppt"'';
               "${mod}+e" =
                 ''exec sway-scratch show --app-id io.ente.auth --exec enteauth --resize "set 70 ppt 70 ppt"'';
-              "${mod}+t" = ''exec sway-scratch show --app-id thunar --exec thunar --resize "set 70 ppt 70 ppt"'';
+              "${mod}+t" =
+                ''exec sway-scratch show --app-id org.gnome.Nautilus --exec nautilus --resize "set 70 ppt 70 ppt"'';
 
               # ── Media / brightness ──
               "F1" = "exec dms ipc audio mute";

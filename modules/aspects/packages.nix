@@ -20,9 +20,6 @@
           gearlever
           brightnessctl
 
-          # file management
-          xfce.thunar
-          xfce.thunar-volman
           kdePackages.gwenview
         ];
       };
