@@ -65,6 +65,10 @@ let
 
         # Lock session before suspend/hibernate.
         lockBeforeSuspend = true;
+
+        # Night mode via DMS wlr-gamma-control-v1 (SwayfX only — Hyprland uses hyprsunset).
+        nightModeEnabled = !isHyprland;
+        nightModeAutoEnabled = !isHyprland;
       };
     in
     {
