@@ -25,25 +25,9 @@ in
     ];
 
     homeManager =
-      { ... }:
+      { pkgs, ... }:
       {
-        imports = [ inputs.zen-browser.homeModules.beta ];
-
-        programs.zen-browser = {
-          enable = true;
-          profiles."Default Profile".settings = {
-            "font.name.serif.x-western" = "Noto Serif";
-            "font.name.sans-serif.x-western" = "SF Pro Display";
-            "font.name.monospace.x-western" = "SF Mono";
-            "font.size.variable.x-western" = 16;
-            "font.size.fixed.x-western" = 16;
-            # Indic scripts
-            "font.name.sans-serif.te" = "Noto Sans Telugu";
-            "font.name.serif.te" = "Noto Serif Telugu";
-            "font.name.sans-serif.kn" = "Noto Sans Kannada";
-            "font.name.serif.kn" = "Noto Serif Kannada";
-          };
-        };
+        home.packages = [ inputs.zen-browser.packages.${pkgs.system}.beta ];
         xdg.mimeApps = {
           enable = true;
           defaultApplications = {
