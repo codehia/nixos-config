@@ -70,7 +70,7 @@ specs.lsp-group = [                                     # list of specs
     formatters.fast = { sh = ["shfmt"]; markdown = ["markdownlint"]; };
   };
   lua     = { packages = [ lua-language-server stylua ]; formatters.fast = { lua = ["stylua"]; }; };
-  nix     = { packages = [ nixd alejandra ]; formatters.fast = { nix = ["alejandra"]; }; };
+  nix     = { packages = [ nixd nixfmt-rfc-style ]; formatters.fast = { nix = ["nixfmt"]; }; };
   python  = { packages = [ basedpyright flake8 autopep8 isort ]; ... };
   typescript = { packages = [ typescript-language-server prettier eslint_d ]; ... };
   go      = { packages = [ gopls delve golangci-lint go ]; ... };
@@ -88,7 +88,7 @@ Adding a new language = add a block here + add the name to `host.nvimLanguages`.
 # Nix side (nvim.nix)
 info = {
   categories = { lua = true; nix = true; };
-  formatters.fast = { lua = ["stylua"]; nix = ["alejandra"]; };
+  formatters.fast = { lua = ["stylua"]; nix = ["nixfmt"]; };
   nixdExtras.nixpkgs = "import ${pkgs.path} {}";
 };
 ```

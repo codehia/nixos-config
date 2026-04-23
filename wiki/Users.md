@@ -16,15 +16,31 @@ git add modules/users/newuser.nix
       den.provides.primary-user       # uid 1000 + wheel — drop this for secondary users
       (den.provides.user-shell "fish")
 
-      den.aspects.catppuccin
-      den.aspects.stylix
-      den.aspects.fish
-      den.aspects.ghostty
-      den.aspects.git
-      den.aspects.nvim
+      # Theming
+      den.aspects.appearance          # stylix + catppuccin (combined)
+
+      # Terminal / shell
+      den.aspects.terminal            # ghostty, kitty, fish, tmux
+
+      # Editor / dev
+      den.aspects.vcs                 # git, lazygit, direnv
+      den.aspects.editor              # nvim + vscode
+
+      # Browser
+      den.aspects.browser
+
+      # Secrets / SSH
       den.aspects.secrets
       den.aspects.ssh
-      den.aspects.shell-tools
+
+      # Packages and tools
+      den.aspects.packages
+      den.aspects.shell-tools         # bat, eza, fzf, yazi, zoxide, ...
+      den.aspects.tui
+      den.aspects.cli-utils
+      den.aspects.apps                # graphical app bundles
+
+      # Desktop shell
       den.aspects.dms-home
     ];
 

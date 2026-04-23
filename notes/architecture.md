@@ -197,8 +197,8 @@ values are encrypted.
 ```
 secrets/
   common.yaml        # shared across all hosts (github_token, etc.)
-  deus.yaml          # deus's SSH key (all hosts)
-  workstation.yaml   # workstation SSH host key
+  deus.yaml          # deus's SSH key + password (all hosts)
+  soumya.yaml        # soumya's SSH key + password
   rclone.yaml        # rclone config (personal + thinkpad only)
 ```
 

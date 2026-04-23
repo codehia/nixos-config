@@ -35,11 +35,11 @@ The whole thing is built around **aspects** — each aspect is a `.nix` file tha
 feature. Hosts and users list which aspects they want in their `includes`. That's it.
 
 ```
-fish.nix   git.nix   catppuccin.nix   nvim/   hyprland/   rclone.nix   ...
+appearance   terminal   vcs   editor   browser   apps   shell-tools   ...
                                 ↓
-  personal: includes fish, git, catppuccin, nvim, swayfx, rclone, ...
-  thinkpad: includes the same + hyprland in extraAspects
-  workstation: soumya gets fish, git, catppuccin, nvim, hyprland, ...
+  personal: includes appearance, terminal, vcs, editor, apps, swayfx, ...
+  thinkpad: the same + rclone in extraAspects (deus only on thinkpad)
+  workstation: soumya gets appearance, terminal, vcs, editor, hyprland, ...
 ```
 
 The framework that wires this together is [den](https://github.com/vic/den). It runs a pipeline:
@@ -67,10 +67,10 @@ nixos-config/
 ├── .sops.yaml              # which age keys can decrypt which secrets files
 │
 ├── secrets/                # sops-encrypted files
-│   ├── deus.yaml           # deus's SSH private key (accessible on all 3 hosts)
-│   ├── workstation.yaml    # SSH host key for workstation
+│   ├── deus.yaml           # deus's SSH private key + password (all hosts)
+│   ├── soumya.yaml         # soumya's SSH private key + password
 │   ├── rclone.yaml         # rclone.conf (personal + thinkpad only)
-│   └── ...
+│   └── common.yaml         # shared secrets (GitHub token, etc.)
 │
 ├── assets/.wallpapers/     # synced to ~/Pictures/Wallpapers on activation
 ├── notes/                  # reference docs (see table at end of this file)
@@ -90,15 +90,33 @@ nixos-config/
     │   └── soumya.nix      # soumya's feature includes, identity
     │
     └── aspects/
-        ├── fish.nix
-        ├── git.nix
-        ├── ssh.nix
-        ├── rclone.nix
-        ├── nvim/           # split across multiple files (collector pattern)
-        ├── hyprland/
-        ├── swayfx/
-        ├── system/         # system-level aspects (greetd, networking, ...)
-        └── ...
+        ├── appearance.nix  # stylix + catppuccin theming (combined)
+        ├── browser.nix     # zen browser
+        ├── packages.nix    # misc user packages
+        ├── tui.nix         # TUI tools
+        ├── cli-utils.nix   # CLI utilities
+        ├── rclone.nix      # rclone gdrive mount
+        ├── ssh.nix         # SSH key deployment via sops
+        ├── secrets.nix     # sops secrets config
+        ├── mullvad.nix     # Mullvad VPN
+        ├── lact.nix        # GPU fan control
+        ├── tailscale.nix   # Tailscale VPN
+        ├── avahi.nix       # mDNS
+        ├── bluetooth.nix   # Bluetooth
+        ├── apps/           # graphical app bundles (chat, media, creative...)
+        ├── shell-tools/    # shell utilities (bat, eza, fzf, yazi, zoxide...)
+        ├── terminal/       # terminal emulators + shell (ghostty, kitty, fish, tmux)
+        ├── vcs/            # version control (git, lazygit, direnv)
+        ├── editor/         # editors — nvim + vscode bundle
+        ├── nvim/           # Neovim config (collector pattern)
+        ├── hyprland/       # Hyprland WM config
+        ├── swayfx/         # SwayFX WM config
+        ├── niri/           # Niri WM
+        ├── kanata/         # keyboard remapping
+        ├── waybar/         # Waybar status bar
+        ├── wayland/        # Wayland compositor utilities
+        ├── dms/            # DankMaterialShell (desktop shell)
+        └── system/         # system-level aspects (greetd, networking, boot, ...)
 ```
 
 ---
@@ -259,7 +277,6 @@ name to the host's declaration and deus gets it only there:
 # modules/hosts/thinkpad/default.nix
 den.hosts.x86_64-linux.thinkpad = {
   extraAspects = [
-    "hyprland"   # deus gets hyprland HM config on thinkpad only
     "rclone"     # deus gets rclone on thinkpad only
   ];
 };
@@ -325,21 +342,13 @@ Files needed:
     };
 
     includes = [
-      den.aspects.nix-config
-      den.aspects.networking
-      den.aspects.boot
-      den.aspects.sudo
-      den.aspects.disko
-      den.aspects.nh
-      den.aspects.nix-tools
+      # Core system bundles
+      den.aspects.base-system        # nix-config, networking, boot, sudo, disko, nix-tools, zram
+      den.aspects.graphical-session  # pipewire, graphics, greetd, dms, fonts, gnome-keyring
+      den.aspects.desktop-services   # flatpak, appimage, WebKit/GTK
+      # Networking / VPN
       den.aspects.tailscale
-      den.aspects.pipewire
-      den.aspects.graphics
-      den.aspects.zram
-      den.aspects.dms
-      den.aspects.greetd
-      den.aspects.fonts
-      den.aspects.gnome-keyring
+      # Add host-specific aspects below (avahi, mullvad, lact, laptop, bluetooth, ...)
     ];
   };
 }
@@ -432,15 +441,31 @@ git add modules/users/newuser.nix
       den.provides.primary-user       # uid 1000 + wheel — drop this for secondary users
       (den.provides.user-shell "fish")
 
-      den.aspects.catppuccin
-      den.aspects.stylix
-      den.aspects.fish
-      den.aspects.ghostty
-      den.aspects.git
-      den.aspects.nvim
+      # Theming
+      den.aspects.appearance          # stylix + catppuccin (combined)
+
+      # Terminal / shell
+      den.aspects.terminal            # ghostty, kitty, fish, tmux
+
+      # Editor / dev
+      den.aspects.vcs                 # git, lazygit, direnv
+      den.aspects.editor              # nvim + vscode
+
+      # Browser
+      den.aspects.browser
+
+      # Secrets / SSH
       den.aspects.secrets
       den.aspects.ssh
-      den.aspects.shell-tools
+
+      # Packages and tools
+      den.aspects.packages
+      den.aspects.shell-tools         # bat, eza, fzf, yazi, zoxide, ...
+      den.aspects.tui
+      den.aspects.cli-utils
+      den.aspects.apps                # graphical app bundles
+
+      # Desktop shell
       den.aspects.dms-home
       # add whatever else the user needs
     ];

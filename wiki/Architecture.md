@@ -36,10 +36,10 @@ nixos-config/
 ├── .sops.yaml              # which age keys can decrypt which secrets files
 │
 ├── secrets/                # sops-encrypted files
-│   ├── deus.yaml           # deus's SSH private key (accessible on all 3 hosts)
-│   ├── workstation.yaml    # SSH host key for workstation
+│   ├── deus.yaml           # deus's SSH private key + password (all hosts)
+│   ├── soumya.yaml         # soumya's SSH private key + password
 │   ├── rclone.yaml         # rclone.conf (personal + thinkpad only)
-│   └── ...
+│   └── common.yaml         # shared secrets (GitHub token, etc.)
 │
 ├── assets/.wallpapers/     # synced to ~/Pictures/Wallpapers on activation
 ├── notes/                  # reference docs
@@ -59,13 +59,33 @@ nixos-config/
     │   └── soumya.nix      # soumya's feature includes, identity
     │
     └── aspects/
-        ├── fish.nix
-        ├── git.nix
-        ├── ssh.nix
-        ├── rclone.nix
-        ├── nvim/           # split across multiple files (collector pattern)
-        ├── hyprland/
-        ├── swayfx/
-        ├── system/         # system-level aspects (greetd, networking, ...)
-        └── ...
+        ├── appearance.nix  # stylix + catppuccin theming (combined)
+        ├── browser.nix     # zen browser
+        ├── packages.nix    # misc user packages
+        ├── tui.nix         # TUI tools
+        ├── cli-utils.nix   # CLI utilities
+        ├── rclone.nix      # rclone gdrive mount
+        ├── ssh.nix         # SSH key deployment via sops
+        ├── secrets.nix     # sops secrets config
+        ├── mullvad.nix     # Mullvad VPN
+        ├── lact.nix        # GPU fan control
+        ├── tailscale.nix   # Tailscale VPN
+        ├── avahi.nix       # mDNS
+        ├── bluetooth.nix   # Bluetooth
+        ├── tlp.nix         # laptop power management
+        ├── work.nix        # work-specific tools (soumya)
+        ├── apps/           # graphical app bundles (chat, media, creative...)
+        ├── shell-tools/    # shell utilities (bat, eza, fzf, yazi, zoxide...)
+        ├── terminal/       # terminal emulators + shell (ghostty, kitty, fish, tmux)
+        ├── vcs/            # version control (git, lazygit, direnv)
+        ├── editor/         # editors — nvim + vscode bundle
+        ├── nvim/           # Neovim config (collector pattern across multiple files)
+        ├── hyprland/       # Hyprland WM config
+        ├── swayfx/         # SwayFX WM config
+        ├── niri/           # Niri WM
+        ├── kanata/         # keyboard remapping
+        ├── waybar/         # Waybar status bar
+        ├── wayland/        # Wayland compositor utilities
+        ├── dms/            # DankMaterialShell (desktop shell)
+        └── system/         # system-level aspects (greetd, networking, boot, ...)
 ```

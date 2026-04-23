@@ -82,7 +82,7 @@ specs.lsp-group = [                                     # list of specs
     linters = {};
   };
   lua     = { packages = [ lua-language-server stylua ]; formatters.fast = { lua = ["stylua"]; }; };
-  nix     = { packages = [ nixd alejandra ]; formatters.fast = { nix = ["alejandra"]; }; };
+  nix     = { packages = [ nixd nixfmt-rfc-style ]; formatters.fast = { nix = ["nixfmt"]; }; };
   python  = { packages = [ basedpyright flake8 autopep8 isort ]; ... };
   typescript = { packages = [ typescript-language-server prettier eslint_d ]; ... };
   go      = { packages = [ gopls delve golangci-lint go ]; ... };

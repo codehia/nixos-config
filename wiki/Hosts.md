@@ -35,21 +35,13 @@ Files needed:
     };
 
     includes = [
-      den.aspects.nix-config
-      den.aspects.networking
-      den.aspects.boot
-      den.aspects.sudo
-      den.aspects.disko
-      den.aspects.nh
-      den.aspects.nix-tools
+      # Core system bundles
+      den.aspects.base-system        # nix-config, networking, boot, sudo, disko, nix-tools, zram
+      den.aspects.graphical-session  # pipewire, graphics, greetd, dms, fonts, gnome-keyring
+      den.aspects.desktop-services   # flatpak, appimage, WebKit/GTK
+      # Networking / VPN
       den.aspects.tailscale
-      den.aspects.pipewire
-      den.aspects.graphics
-      den.aspects.zram
-      den.aspects.dms
-      den.aspects.greetd
-      den.aspects.fonts
-      den.aspects.gnome-keyring
+      # Add host-specific aspects below (avahi, mullvad, lact, laptop, bluetooth, ...)
     ];
   };
 }

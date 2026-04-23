@@ -141,7 +141,6 @@ name to the host's declaration and deus gets it only there:
 # modules/hosts/thinkpad/default.nix
 den.hosts.x86_64-linux.thinkpad = {
   extraAspects = [
-    "hyprland"   # deus gets hyprland HM config on thinkpad only
     "rclone"     # deus gets rclone on thinkpad only
   ];
 };
