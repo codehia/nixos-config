@@ -74,16 +74,16 @@ function M.format_fast(bufnr)
 end
 
 --- After-save handler for slow filetypes (return value used by conform's format_after_save).
---- Returns conform options if filetype is slow, nil otherwise.
+--- Returns conform options if: ft was promoted to slow (timeout), OR ft has slow formatters but no fast ones.
 ---@param bufnr number
 ---@return table|nil
 function M.format_after_save(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local ft = vim.bo[bufnr].filetype
-  if not slow_format_filetypes[ft] then
-    return nil
+  if slow_format_filetypes[ft] or (M.get_slow(ft) and not M.get_fast(ft)) then
+    return { async = true, lsp_format = 'fallback' }
   end
-  return { async = true, lsp_format = 'fallback' }
+  return nil
 end
 
 --- Run slow formatters asynchronously (background, notifies on completion).
