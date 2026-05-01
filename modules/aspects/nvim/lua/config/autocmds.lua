@@ -53,6 +53,17 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
   end,
 })
 
+-- Go: use tabs (gofmt standard)
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'go', 'gomod' },
+  callback = function()
+    vim.bo.expandtab = false
+    vim.bo.tabstop = 4
+    vim.bo.shiftwidth = 4
+  end,
+  desc = 'Go: tabs with width 4',
+})
+
 -- Go to last loc when opening a buffer
 vim.api.nvim_create_autocmd('BufReadPost', {
   callback = function(event)

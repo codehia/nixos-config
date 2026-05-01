@@ -242,6 +242,36 @@ vim.lsp.enable({ 'lua_ls', 'nixd', 'basedpyright', 'ts_ls', 'gopls', 'texlab' })
 
 ---
 
+## blink-cmp — Known Gotchas
+
+### Snippet expansion appends instead of replacing (`fun → funfunc`)
+
+Do **not** use `snippets.preset = 'luasnip'`. Use explicit expand/active/jump functions
+so blink-cmp controls prefix deletion before expanding:
+
+```lua
+snippets = {
+  expand = function(snippet) require('luasnip').lsp_expand(snippet) end,
+  active = function(filter)
+    if filter and filter.direction then return require('luasnip').jumpable(filter.direction) end
+    return require('luasnip').in_snippet()
+  end,
+  jump = function(direction) require('luasnip').jump(direction) end,
+},
+```
+
+### Tab jumps cursor instead of inserting tab
+
+Do **not** use `'snippet_forward'` in keymaps — it fires even after a snippet session
+ends. Use `luasnip.locally_jumpable()` in a custom function instead.
+
+### Go filetype: uses tabs
+
+`expandtab = true` globally, overridden per-buffer in `autocmds.lua` for `go`/`gomod`
+filetypes (`tabstop = 4`, `shiftwidth = 4`, `expandtab = false`).
+
+---
+
 ## Adding a New Plugin — End to End
 
 1. **`_plugins.nix`**: add `my-plugin = { data = pkgs.vimPlugins.my-plugin-nvim; lazy = true; };`

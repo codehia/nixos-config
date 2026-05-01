@@ -347,6 +347,78 @@ To enable Go support: set `go = true;` in `nvim.nix` → `just install`.
 
 ---
 
+## blink-cmp — Completion & Snippets
+
+File: `lua/plugins/coding.lua`
+
+Stack: **blink.cmp** + **LuaSnip** + **friendly-snippets** + **blink-cmp-copilot**.
+
+### Snippet integration
+
+`preset = 'luasnip'` is **not used**. Explicit functions are wired instead so blink-cmp
+controls prefix deletion before snippet expansion — prevents the `fun → funfunc` append
+bug (completion body inserted without removing the typed prefix):
+
+```lua
+snippets = {
+  expand = function(snippet) require('luasnip').lsp_expand(snippet) end,
+  active = function(filter)
+    if filter and filter.direction then
+      return require('luasnip').jumpable(filter.direction)
+    end
+    return require('luasnip').in_snippet()
+  end,
+  jump = function(direction) require('luasnip').jump(direction) end,
+},
+```
+
+### Tab / S-Tab keymaps
+
+`snippet_forward` / `snippet_backward` are **not used**. They fire whenever LuaSnip
+considers the cursor "jumpable" — even after a session ends — causing Tab to jump the
+cursor unexpectedly. `luasnip.locally_jumpable()` is used instead: only returns true
+when the cursor is actually inside an active snippet region:
+
+```lua
+['<Tab>'] = {
+  function()
+    local luasnip = require('luasnip')
+    if luasnip.locally_jumpable(1) then luasnip.jump(1); return true end
+  end,
+  'fallback',
+},
+```
+
+### Acceptance keymaps
+
+| Key | Action |
+|-----|--------|
+| `<C-y>` | `select_and_accept` (selects first item if none selected, then accepts) |
+| `<CR>` | `accept` (from `preset = 'default'`) |
+| `<C-e>` | hide menu |
+
+---
+
+## Filetype-specific Settings
+
+### Go
+
+Go uses real tabs (gofmt standard). `expandtab = true` (global) is overridden per-buffer
+via an autocmd in `lua/config/autocmds.lua`:
+
+```lua
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'go', 'gomod' },
+  callback = function()
+    vim.bo.expandtab = false
+    vim.bo.tabstop = 4
+    vim.bo.shiftwidth = 4
+  end,
+})
+```
+
+---
+
 ## Notable Keymaps
 
 ### Telescope (`lua/plugins/editor.lua`)

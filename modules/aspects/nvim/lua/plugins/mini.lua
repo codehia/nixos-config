@@ -59,7 +59,14 @@ return {
       })
     end
     statusline.section_location = function()
-      return '%2l:%-2v'
+      local search = ''
+      if vim.v.hlsearch == 1 then
+        local s = vim.fn.searchcount()
+        if s.total > 0 then
+          search = (' [%d/%d]'):format(s.current, s.total)
+        end
+      end
+      return '%2l:%-2v' .. search
     end
 
     -- Mini.pairs for auto-pairing brackets
