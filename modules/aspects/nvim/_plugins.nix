@@ -200,4 +200,8 @@ with pkgs.vimPlugins;
     data = tokyonight-nvim;
     lazy = false;
   };
+  nvim-highlight-colors = {
+    data = nvim-highlight-colors;
+    lazy = false;
+  };
 }

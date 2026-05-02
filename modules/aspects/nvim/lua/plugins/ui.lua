@@ -310,6 +310,14 @@ return {
       vim.keymap.set('n', '<leader>ms', '<cmd>Markview splitToggle<cr>', { desc = '[M]arkview [S]plit toggle' })
     end,
   },
+  {
+    'nvim-highlight-colors',
+    lazy = false,
+    before = function()
+      require('nvim-highlight-colors')
+      vim.keymap.set('n', '<leader>uc', '<cmd>HighlightColors Toggle<cr>', { desc = '[U]I [C]olor highlight toggle' })
+    end,
+  },
   -- Dependencies loaded by lze before their parent plugins
   { 'nui.nvim', dep_of = { 'noice.nvim' } },
 }
