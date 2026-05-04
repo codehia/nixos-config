@@ -50,3 +50,12 @@ repl:
 # Garbage collect — remove old generations and unused store entries
 clean:
 	nh clean all
+
+verify:
+	nix-store --verify --check-contents
+
+list-gens:
+	nix-env --list-generations
+
+repair:
+	sudo nixos-rebuild switch --repair
