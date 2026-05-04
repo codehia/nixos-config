@@ -87,6 +87,10 @@
               scale = "1";
             };
 
+            output."HDMI-A-1" = {
+              mode = "3440x1440@75.050Hz";
+            };
+
             gaps = {
               inner = 7;
               outer = 0;
