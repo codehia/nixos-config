@@ -36,8 +36,8 @@
   "modalAnimationSpeed": 2,
   "modalCustomAnimationDuration": 150,
   "enableRippleEffects": true,
-  "wallpaperFillMode": "Fill",
-  "blurEnabled": false,
+  "wallpaperFillMode": "Fit",
+  "blurEnabled": true,
   "blurredWallpaperLayer": false,
   "blurWallpaperOnOverview": false,
   "showLauncherButton": true,
@@ -582,5 +582,5 @@
   "clipboardEnterToPaste": false,
   "launcherPluginVisibility": {},
   "launcherPluginOrder": [],
-  "configVersion": 5
+  "configVersion": 7
 }
