@@ -26,9 +26,8 @@
       {
         home.packages = with pkgs; [
           wl-clipboard
-          swappy
-          grim
-          slurp
+          grimblast
+          satty
         ];
 
         programs.niri.settings = {

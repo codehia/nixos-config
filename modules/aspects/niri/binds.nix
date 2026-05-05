@@ -11,7 +11,7 @@
   den.aspects.niri = {
     homeManager.programs.niri.settings.binds = {
       # ── Application launchers ──
-      "Mod+P".action.spawn = [
+      "Mod+Space".action.spawn = [
         "rofi"
         "-show"
         "drun"
@@ -74,10 +74,24 @@
       "Mod+WheelScrollDown".action.focus-workspace-down = [ ];
       "Mod+WheelScrollUp".action.focus-workspace-up = [ ];
 
-      # ── Screenshot (niri built-in) ──
-      "Print".action.screenshot = [ ];
-      "Ctrl+Print".action.screenshot-screen = [ ];
-      "Alt+Print".action.screenshot-window = [ ];
+      # ── Screenshot ──
+      "Mod+P".action.spawn = [
+        "grimblast"
+        "--notify"
+        "copysave"
+        "screen"
+      ];
+      "Mod+Ctrl+P".action.spawn = [
+        "grimblast"
+        "--notify"
+        "copysave"
+        "area"
+      ];
+      "Mod+Alt+P".action.spawn = [
+        "bash"
+        "-c"
+        "mkdir -p $HOME/Pictures/Screenshots && FILE=$(mktemp /tmp/screenshot-XXXXXX.png) && grimblast --freeze save area \"$FILE\" && satty --filename \"$FILE\" --output-filename \"$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png\"; rm -f \"$FILE\""
+      ];
 
       # ── Scratchpad (Nirius — generic minimize) ──
       # Minimize focused window to scratchpad (bottom workspace)

@@ -42,6 +42,14 @@
           fi
         '';
       in
+      let
+        screenshotAnnotate = pkgs.writeShellScript "screenshot-annotate" ''
+          mkdir -p "$HOME/Pictures/Screenshots"
+          FILE=$(mktemp /tmp/screenshot-XXXXXX.png)
+          grimblast --freeze save area "$FILE" && satty --filename "$FILE" --output-filename "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
+          rm -f "$FILE"
+        '';
+      in
       {
         wayland.windowManager.hyprland.settings.bind = [
           "$modifier, SPACE, exec, dms ipc launcher toggle"
@@ -134,8 +142,9 @@
           "$modifier SHIFT, G, exec, dms ipc control-center toggle"
 
           # ── Screenshot ──
-          ", Print, exec, grim - | wl-copy"
-          "CONTROL, Print, exec, grim -g \"$(slurp)\" - | wl-copy"
+          "$modifier, P, exec, grimblast --notify copysave screen"
+          "$modifier CONTROL, P, exec, grimblast --notify copysave area"
+          "$modifier ALT, P, exec, ${screenshotAnnotate}"
         ];
       };
   };

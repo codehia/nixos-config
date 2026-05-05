@@ -50,9 +50,8 @@
           packages = with pkgs; [
             playerctl
             wl-clipboard
-            grim
-            slurp
-            swappy
+            grimblast
+            satty
             swayr
           ];
           sessionVariables.NIXOS_OZONE_WL = "1";

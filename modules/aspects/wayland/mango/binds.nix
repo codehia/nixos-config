@@ -4,7 +4,7 @@
   den.aspects.mangowc = {
     homeManager.wayland.windowManager.mango.settings = ''
       # Application launchers
-      bind=SUPER,p,spawn,rofi -show drun
+      bind=SUPER,SPACE,spawn,rofi -show drun
       bind=SUPER,q,spawn,ghostty
       bind=SUPER,w,spawn,zen-beta
       bind=SUPER,t,spawn,nautilus
@@ -75,6 +75,11 @@
 
       # Exit MangoWC
       bind=SUPER+SHIFT,q,quit
+
+      # Screenshot
+      bind=SUPER,p,spawn,grimblast --notify copysave screen
+      bind=SUPER+CTRL,p,spawn,grimblast --notify copysave area
+      bind=SUPER+ALT,p,spawn,bash -c 'mkdir -p $HOME/Pictures/Screenshots && FILE=$(mktemp /tmp/screenshot-XXXXXX.png) && grimblast --freeze save area "$FILE" && satty --filename "$FILE" --output-filename "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"; rm -f "$FILE"'
     '';
   };
 }

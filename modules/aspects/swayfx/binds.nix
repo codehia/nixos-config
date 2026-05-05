@@ -15,7 +15,15 @@
 {
   den.aspects.swayfx = {
     homeManager =
-      { lib, ... }:
+      { lib, pkgs, ... }:
+      let
+        screenshotAnnotate = pkgs.writeShellScript "screenshot-annotate" ''
+          mkdir -p "$HOME/Pictures/Screenshots"
+          FILE=$(mktemp /tmp/screenshot-XXXXXX.png)
+          grimblast --freeze save area "$FILE" && satty --filename "$FILE" --output-filename "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
+          rm -f "$FILE"
+        '';
+      in
       {
         wayland.windowManager.sway.config = {
           keybindings =
@@ -118,8 +126,9 @@
               "Mod1+Tab" = "focus next";
 
               # ── Screenshot ──
-              "Print" = "exec grim - | wl-copy";
-              "Ctrl+Print" = ''exec grim -g "$(slurp)" - | wl-copy'';
+              "${mod}+p" = "exec grimblast --notify copysave screen";
+              "${mod}+Ctrl+p" = "exec grimblast --notify copysave area";
+              "${mod}+Mod1+p" = "exec ${screenshotAnnotate}";
 
               # ── Session ──
               "${mod}+Shift+c" = "reload";

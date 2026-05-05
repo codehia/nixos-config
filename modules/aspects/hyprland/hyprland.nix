@@ -37,11 +37,9 @@ in
         xdg.configFile."uwsm/env".source =
           "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
         home.packages = with pkgs; [
-          swww
-          grim
-          slurp
+          grimblast
+          satty
           wl-clipboard
-          swappy
           ydotool
           hyprpolkitagent
           hyprland-qtutils

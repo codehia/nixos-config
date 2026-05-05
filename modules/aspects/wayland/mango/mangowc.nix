@@ -38,10 +38,9 @@ in
         imports = [ inputs.mango.hmModules.mango ];
 
         home.packages = with pkgs; [
-          grim
-          slurp
+          grimblast
+          satty
           wl-clipboard
-          swappy
         ];
 
         wayland.windowManager.mango = {
