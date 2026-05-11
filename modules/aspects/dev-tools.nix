@@ -14,6 +14,7 @@
           ++ (with pkgs.unstable; [
             httpie-desktop
             github-copilot-cli
+            beekeeper-studio
           ]);
       };
   };
