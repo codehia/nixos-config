@@ -61,7 +61,7 @@ return {
     statusline.section_location = function()
       local search = ''
       if vim.v.hlsearch == 1 then
-        local s = vim.fn.searchcount()
+        local s = vim.fn.searchcount({ maxcount = 0 })
         if s.total > 0 then
           search = (' [%d/%d]'):format(s.current, s.total)
         end
