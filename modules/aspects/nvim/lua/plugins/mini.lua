@@ -1,6 +1,9 @@
--- ---------------------------------------------------------------------------
--- Mini — starter, statusline, pairs, icons, ai, surround
--- ---------------------------------------------------------------------------
+--[[
+————————————————————————————————————————————————————————————
+—— Mini — starter, statusline, pairs, icons, ai, surround ——
+————————————————————————————————————————————————————————————
+]]
+
 return {
   'mini.nvim',
   lazy = false,
@@ -33,40 +36,55 @@ return {
     })
 
     -- Mini.statusline
+    vim.o.showcmdloc = 'statusline'
     local statusline = require('mini.statusline')
     statusline.setup({ use_icons = vim.g.have_nerd_font })
-    ---@diagnostic disable-next-line: duplicate-set-field
+
+    -- Custom highlight groups (Catppuccin Mocha)
+    vim.api.nvim_set_hl(0, 'MiniStatuslineMacro', { fg = '#fab387', bg = '#313244', bold = true })
+    vim.api.nvim_set_hl(0, 'MiniStatuslineSearch', { fg = '#1e1e2e', bg = '#fab387' })
+    vim.api.nvim_set_hl(0, 'MiniStatuslineShowcmd', { fg = '#cba6f7', bg = '#313244' })
+
+    local function section_macro()
+      local reg = vim.fn.reg_recording()
+      return reg ~= '' and ('@' .. reg) or ''
+    end
+
+    local function section_search()
+      if vim.v.hlsearch ~= 1 then
+        return ''
+      end
+      local s = vim.fn.searchcount({ maxcount = 0 })
+      if s.total == 0 then
+        return ''
+      end
+      return ('[%d/%d]'):format(s.current, s.total)
+    end
+
     statusline.active = function()
       local mode, mode_hl = statusline.section_mode({ trunc_width = 20000 })
       local git = statusline.section_git({ trunc_width = 40 })
       local filename = statusline.section_filename({ trunc_width = 20000 })
       local fileinfo = statusline.section_fileinfo({ trunc_width = 20000 })
       local location = statusline.section_location()
-      -- Check why the LSP is showing ++ and add to fileinfo
-      -- local lsp = statusline.section_lsp { trunc_width = 20, icon = '󰿘 ' }
-
-      local macro_reg = vim.fn.reg_recording()
-      local macro = macro_reg ~= '' and ('  @' .. macro_reg) or ''
+      local showcmd = vim.api.nvim_eval_statusline('%S', {}).str
 
       return statusline.combine_groups({
-        { hl = mode_hl, strings = { mode, macro } },
+        { hl = mode_hl, strings = { mode } },
         { hl = 'MiniStatuslineDevinfo', strings = { git } },
+        { hl = 'MiniStatuslineMacro', strings = { section_macro() } },
         '%<', -- Mark general truncate point
         { hl = 'MiniStatuslineFilename', strings = { filename } },
         '%=', -- End left alignment
+        { hl = 'MiniStatuslineShowcmd', strings = { showcmd } },
         { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+        { hl = 'MiniStatuslineSearch', strings = { section_search() } },
         { hl = mode_hl, strings = { location } },
       })
     end
+
     statusline.section_location = function()
-      local search = ''
-      if vim.v.hlsearch == 1 then
-        local s = vim.fn.searchcount({ maxcount = 0 })
-        if s.total > 0 then
-          search = (' [%d/%d]'):format(s.current, s.total)
-        end
-      end
-      return '%2l:%-2v' .. search
+      return '%2l:%-2v'
     end
 
     -- Mini.pairs for auto-pairing brackets
