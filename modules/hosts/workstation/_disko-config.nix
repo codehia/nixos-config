@@ -43,10 +43,6 @@
                         "noatime"
                       ];
                     };
-                    "/swap" = {
-                      mountpoint = "/.swapvol";
-                      swap.swapfile.size = "16G";
-                    };
                   };
                 };
               };
@@ -60,6 +56,20 @@
         content = {
           type = "gpt";
           partitions = {
+            swap = {
+              size = "34G";
+              content = {
+                type = "luks";
+                name = "crypted-swap";
+                settings = {
+                  allowDiscards = true;
+                };
+                content = {
+                  type = "swap";
+                  resumeDevice = true;
+                };
+              };
+            };
             luks = {
               size = "100%";
               content = {
