@@ -59,3 +59,9 @@ list-gens:
 
 repair:
 	sudo nixos-rebuild switch --repair
+
+# Place workstation SSH host key during fresh install.
+# Run from the installer after nixos-install, before first reboot.
+# Requires the passphrase used when encrypting secrets/workstation-host-key.age.
+place-host-key:
+	age -d secrets/workstation-host-key.age | sudo install -m 600 /dev/stdin /mnt/etc/ssh/ssh_host_ed25519_key
