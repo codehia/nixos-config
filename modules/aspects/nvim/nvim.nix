@@ -39,7 +39,7 @@ in
               enabledLangs = [ "general" ] ++ languages;
 
               # Collect packages from all enabled languages
-              extraPackages = lib.concatMap (l: langDefs.${l}.packages) enabledLangs;
+              runtimePkgs = lib.concatMap (l: langDefs.${l}.packages) enabledLangs;
 
               # Merge formatter maps (fast and slow) across enabled languages
               mergeFmtMaps =
@@ -72,7 +72,7 @@ in
                     {
                       imports = [ wlib.wrapperModules.neovim ];
                       package = nvimPkg;
-                      inherit extraPackages;
+                      inherit runtimePkgs;
                       specs = import ./_plugins.nix { inherit pkgs lzextrasLatest; };
                       info = {
                         nixdExtras.nixpkgs = "import ${pkgs.path} {}";
