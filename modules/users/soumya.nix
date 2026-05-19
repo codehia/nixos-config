@@ -15,7 +15,7 @@
       den.aspects.terminal
 
       # Window manager — swayfx across all hosts
-      den.aspects.swayfx
+      den.aspects.hyprland
 
       # Editor / dev
       den.aspects.vcs
