@@ -50,6 +50,7 @@ in
       den.aspects.tui
       den.aspects.cli-utils
       den.aspects.apps
+      den.aspects.zoom
       den.aspects.qbittorrent
       den.aspects.dms-home
 
