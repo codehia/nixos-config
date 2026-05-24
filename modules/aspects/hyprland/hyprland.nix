@@ -18,15 +18,12 @@ in
   };
 
   den.aspects.hyprland = {
-    # enable + withUWSM are safe as static attrset (booleans merge fine across contexts).
-    # package/portalPackage use perHost to avoid "defined multiple times" — non-mergeable
-    # derivations would conflict if applied once per user context without perHost.
     nixos.programs.hyprland = {
       enable = true;
       withUWSM = true;
     };
 
-    includes = [ (den.lib.perHost hyprlandPackages) ];
+    includes = [ hyprlandPackages ];
 
     homeManager =
       { pkgs, config, ... }:

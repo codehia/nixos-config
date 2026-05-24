@@ -2,7 +2,7 @@
 {
   den.aspects.apps = {
     includes = [
-      (den.lib.perUser (
+      (
         { user, ... }:
         lib.optionalAttrs (user.personalApps or false) {
           homeManager =
@@ -11,7 +11,7 @@
               home.packages = [ pkgs.calibre ];
             };
         }
-      ))
+      )
     ];
   };
 }

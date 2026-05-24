@@ -14,7 +14,7 @@ let
   # apps list if this were true.
   baseSettings = builtins.fromJSON (builtins.readFile ./dms-settings.json);
 
-  dmsPerUser = den.lib.perUser (
+  dmsPerUser =
     { host, ... }:
     let
       isLaptop = host.isLaptop or false;
@@ -288,8 +288,7 @@ let
             Unit.Wants = [ "dms-wallpaper-select.service" ];
           };
         };
-    }
-  );
+    };
 in
 {
   den.aspects.dms-home = {

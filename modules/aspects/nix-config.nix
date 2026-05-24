@@ -58,12 +58,12 @@
 
     includes = [
       # nh manages GC when nhCleanEnabled — disable the built-in automatic GC in that case.
-      (den.lib.perHost (
+      (
         { host }:
         {
           nixos.nix.gc.automatic = !(host.nhCleanEnabled or false);
         }
-      ))
+      )
     ];
   };
 }

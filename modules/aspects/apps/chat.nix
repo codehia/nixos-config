@@ -6,7 +6,7 @@
         "signal-desktop"
         "discord"
       ])
-      (den.lib.perUser (
+      (
         { user, ... }:
         lib.optionalAttrs (user.personalApps or false) {
           homeManager =
@@ -18,7 +18,7 @@
               ];
             };
         }
-      ))
+      )
     ];
   };
 }

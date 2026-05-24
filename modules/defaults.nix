@@ -14,16 +14,16 @@
       den.provides.define-user
       den.provides.hostname
       den.provides.inputs'
-      (den.lib.perUser (
+      (
         { user, ... }:
         {
           nixos.nix.settings.trusted-users = [ user.userName ];
         }
-      ))
+      )
     ];
   };
 
   # Enable mutual-provider at the user context so provides.to-users /
   # provides.to-hosts routing works across host <-> user boundaries.
-  den.ctx.user.includes = [ den.provides.mutual-provider ];
+  den.schema.user.includes = [ den.provides.mutual-provider ];
 }

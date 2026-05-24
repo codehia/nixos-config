@@ -25,7 +25,7 @@ in
         "google-chrome"
         "firefox-esr"
       ])
-      (den.lib.perUser extraBrowsersConfig)
+      extraBrowsersConfig
     ];
 
     homeManager =

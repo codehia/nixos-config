@@ -4,8 +4,6 @@
 # Host-specific aspect selection (wm, extraAspects) is driven by freeform host attrs.
 { den, ... }:
 let
-  inherit (den.lib) perUser;
-
   wmSelector =
     { host, ... }:
     {
@@ -30,7 +28,7 @@ in
       den.aspects.terminal
 
       # Window manager — host.wm selects the aspect by name
-      (perUser wmSelector)
+      wmSelector
 
       # Editor / dev
       den.aspects.vcs
@@ -59,7 +57,7 @@ in
       # them to den.aspects.${name} at eval time. Aspects needed on ALL hosts must
       # be listed directly in includes above — putting them in extraAspects instead
       # silently omits them from any host that doesn't declare the name.
-      (perUser extraAspectsSelector)
+      extraAspectsSelector
     ];
 
     nixos =

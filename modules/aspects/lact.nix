@@ -30,7 +30,7 @@
     };
 
     includes = [
-      (den.lib.perHost (
+      (
         { host }:
         let
           gpuKey = host.gpuKey or null;
@@ -78,7 +78,7 @@
               ];
             };
         }
-      ))
+      )
     ];
   };
 }

@@ -12,9 +12,8 @@ in
   flake-file.inputs.lzextras.url = "github:BirdeeHub/lzextras";
 
   den.aspects.nvim = {
-    # perUser so homeManager forwarding reaches ctx.hm-user, and host.nvimLanguages is accessible.
     includes = [
-      (den.lib.perUser (
+      (
         {
           host,
           user,
@@ -98,7 +97,7 @@ in
               ];
             };
         }
-      ))
+      )
     ];
   };
 }

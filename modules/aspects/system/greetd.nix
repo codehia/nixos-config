@@ -9,7 +9,7 @@
   };
   den.aspects.greetd = {
     includes = [
-      (den.lib.perHost (
+      (
         { host }:
         let
           user = host.greetdUser;
@@ -41,7 +41,7 @@
               };
             };
         }
-      ))
+      )
     ];
   };
 }

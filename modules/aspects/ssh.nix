@@ -3,8 +3,6 @@
 # Placed via system-level sops (NixOS activation) — reliable on every boot for all users.
 { den, ... }:
 let
-  inherit (den.lib) perUser;
-
   secrets = ../../secrets;
 
   userKey =
@@ -34,7 +32,7 @@ in
   den.aspects.ssh = {
     nixos.services.openssh.enable = true;
     includes = [
-      (perUser userKey)
+      userKey
     ];
   };
 }

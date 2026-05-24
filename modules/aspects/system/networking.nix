@@ -5,7 +5,7 @@
 {
   den.aspects.networking = {
     includes = [
-      (den.lib.perHost (
+      (
         { host }:
         {
           nixos.networking = {
@@ -13,7 +13,7 @@
             networkmanager.enable = true;
           };
         }
-      ))
+      )
     ];
   };
 }
