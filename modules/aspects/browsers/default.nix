@@ -13,14 +13,17 @@ let
   helium = import ./_helium.nix { inherit inputs; };
 in
 {
-  flake-file.inputs.zen-browser = zen.flakeInput;
-  flake-file.inputs.helium = helium.flakeInput;
+  flake-file.inputs = {
+    zen-browser = zen.flakeInput;
+    helium = helium.flakeInput;
+  };
 
   den.aspects.browser = {
     includes = [
       (den._.unfree [
         "brave"
         "google-chrome"
+        "firefox-esr"
       ])
       (den.lib.perUser extraBrowsersConfig)
     ];
