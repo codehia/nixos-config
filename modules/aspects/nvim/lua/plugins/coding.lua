@@ -28,7 +28,15 @@ return {
     'blink.cmp',
     event = 'InsertEnter',
     after = function()
+      vim.keymap.set('n', '<leader>tC', function()
+        vim.g.blink_cmp_enabled = vim.g.blink_cmp_enabled == false
+        vim.notify('Completion ' .. (vim.g.blink_cmp_enabled == false and 'disabled' or 'enabled'))
+      end, { desc = '[T]oggle [C]ompletion' })
+
       require('blink.cmp').setup({
+        enabled = function()
+          return vim.g.blink_cmp_enabled ~= false
+        end,
         keymap = {
           preset = 'default',
           ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
