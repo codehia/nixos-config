@@ -10,6 +10,8 @@
           (with pkgs; [
             just
             devenv
+            devbox
+            siyuan
           ])
           ++ (with pkgs.unstable; [
             httpie-desktop
