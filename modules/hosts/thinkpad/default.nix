@@ -49,6 +49,7 @@
       den.aspects.ios-devices
       den.aspects.laptop
       den.aspects.bluetooth
+      den.aspects.gaming
     ];
   };
 }

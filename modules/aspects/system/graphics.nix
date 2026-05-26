@@ -7,7 +7,6 @@
     nixos.hardware = {
       graphics = {
         enable = true;
-        # enable32Bit = true;  # Uncomment when Steam/Proton needed
       };
       amdgpu.initrd.enable = true; # Loads amdgpu in initramfs (replaces manual kernelModules entry)
     };
