@@ -20,6 +20,7 @@
             enable = true;
             createDirectories = true;
             music = "${config.home.homeDirectory}/Media/Music";
+            publicShare = "${config.home.homeDirectory}";
           };
         };
         home = {

@@ -32,6 +32,19 @@
     homeManager =
       { pkgs, ... }:
       {
+        systemd.user.services.lxqt-policykit-agent = {
+          Unit = {
+            Description = "LXQt PolicyKit Authentication Agent";
+            After = [ "graphical-session.target" ];
+            PartOf = [ "graphical-session.target" ];
+          };
+          Service = {
+            ExecStart = "${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent";
+            Restart = "on-failure";
+          };
+          Install.WantedBy = [ "graphical-session.target" ];
+        };
+
         services.swayidle = {
           enable = true;
           events = [

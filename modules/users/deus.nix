@@ -80,6 +80,7 @@ in
     homeManager.home = {
       homeDirectory = "/home/deus";
       sessionVariables.BROWSER = "zen";
+      file."Public/.keep".text = "";
     };
     homeManager.programs.git.settings.user = {
       name = "codehia";

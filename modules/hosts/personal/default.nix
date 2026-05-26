@@ -44,6 +44,7 @@
       den.aspects.desktop-services
       den.aspects.mullvad
       den.aspects.avahi
+      den.aspects.samba
       den.aspects.lact
       den.aspects.ios-devices
       den.aspects.gaming
