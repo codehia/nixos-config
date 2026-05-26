@@ -31,12 +31,18 @@
   };
 
   den.aspects.workstation = {
-    nixos = {
-      imports = [
-        ./_hardware-configuration.nix
-        ./_disko-config.nix
-      ];
-    };
+    nixos =
+      { pkgs, ... }:
+      {
+        imports = [
+          ./_hardware-configuration.nix
+          ./_disko-config.nix
+        ];
+        powerManagement.resumeCommands = ''
+          ${pkgs.kmod}/bin/modprobe -r rtsx_pci_sdmmc rtsx_pci
+          ${pkgs.kmod}/bin/modprobe rtsx_pci rtsx_pci_sdmmc
+        '';
+      };
 
     includes = [
       den.aspects.base-system

@@ -11,7 +11,7 @@
     wm = "swayfx";
     # Aspects added here are picked up by deus's extraAspectsSelector and included only on this host.
     # Useful when deus needs an aspect on some hosts but not all (e.g. work tools on a work laptop).
-    extraAspects = [ ];
+    extraAspects = [ "rclone" ];
     nvimLanguages = [
       "lua"
       "nix"
@@ -34,10 +34,18 @@
   };
 
   den.aspects.thinkpad = {
-    nixos.imports = [
-      ./_hardware-configuration.nix
-      ./_disko-config.nix
-    ];
+    nixos =
+      { pkgs, ... }:
+      {
+        imports = [
+          ./_hardware-configuration.nix
+          ./_disko-config.nix
+        ];
+        powerManagement.resumeCommands = ''
+          ${pkgs.kmod}/bin/modprobe -r rtsx_pci_sdmmc rtsx_pci
+          ${pkgs.kmod}/bin/modprobe rtsx_pci rtsx_pci_sdmmc
+        '';
+      };
 
     includes = [
       den.aspects.base-system
@@ -46,6 +54,7 @@
       den.aspects.desktop-services
       den.aspects.mullvad
       den.aspects.avahi
+      den.aspects.samba
       den.aspects.ios-devices
       den.aspects.laptop
       den.aspects.bluetooth
