@@ -20,7 +20,7 @@
         screenshotAnnotate = pkgs.writeShellScript "screenshot-annotate" ''
           mkdir -p "$HOME/Pictures/Screenshots"
           FILE=$(mktemp /tmp/screenshot-XXXXXX.png)
-          grimblast --freeze save area "$FILE" && satty --filename "$FILE" --output-filename "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
+          ${pkgs.sway-contrib.grimshot}/bin/grimshot save area "$FILE" && satty --filename "$FILE" --output-filename "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
           rm -f "$FILE"
         '';
       in
@@ -126,8 +126,8 @@
               "Mod1+Tab" = "focus next";
 
               # ── Screenshot ──
-              "${mod}+p" = "exec grimblast --notify copysave screen";
-              "${mod}+Ctrl+p" = "exec grimblast --notify copysave area";
+              "${mod}+p" = "exec grimshot --notify savecopy screen";
+              "${mod}+Ctrl+p" = "exec grimshot --notify savecopy area";
               "${mod}+Mod1+p" = "exec ${screenshotAnnotate}";
 
               # ── Session ──

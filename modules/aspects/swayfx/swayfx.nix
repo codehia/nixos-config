@@ -50,7 +50,7 @@
           packages = with pkgs; [
             playerctl
             wl-clipboard
-            grimblast
+            sway-contrib.grimshot
             satty
             swayr
           ];
