@@ -2,6 +2,12 @@
 { den, ... }:
 {
   den.aspects.laptop = {
+    nixos =
+      { pkgs, ... }:
+      {
+        environment.systemPackages = [ pkgs.brightnessctl ];
+      };
+
     includes = [
       den.aspects.tlp
       den.aspects.upower

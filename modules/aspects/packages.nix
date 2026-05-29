@@ -16,11 +16,7 @@
         home.packages = with pkgs; [
           cowsay
           fortune
-          fastfetch
           gearlever
-          brightnessctl
-
-          kdePackages.gwenview
         ];
       };
   };

@@ -6,7 +6,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
   };
-  den.aspects.apps = {
+  den.aspects.dev-tools = {
     includes = [
       (den._.unfree [ "claude-code" ])
       {

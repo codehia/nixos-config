@@ -25,6 +25,9 @@
           # notifications
           libnotify
 
+          # process / task running
+          parallel
+
           # networking
           mtr
           iperf3

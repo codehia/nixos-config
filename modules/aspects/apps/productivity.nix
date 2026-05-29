@@ -19,6 +19,7 @@
             kdePackages.okular
             _1password-gui
             ente-auth
+            siyuan
           ])
           ++ (with pkgs.unstable; [
             obsidian

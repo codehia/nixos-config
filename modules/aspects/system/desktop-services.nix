@@ -11,6 +11,8 @@
           webkitgtk_6_0
           webkitgtk_4_1
           gtk4
+          libglvnd
+          libglibutil
         ];
       };
   };

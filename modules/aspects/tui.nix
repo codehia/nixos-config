@@ -9,6 +9,7 @@
           iotop
           iftop
           ncdu
+          fastfetch
           pulsemixer
           bluetui
 
@@ -21,8 +22,6 @@
           ethtool
           pciutils
           usbutils
-          libglvnd
-          libglibutil
         ];
       };
   };
