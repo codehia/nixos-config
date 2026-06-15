@@ -63,6 +63,11 @@ let
         # Disable audio visualizer — cava not installed (enableAudioWavelength = false).
         audioVisualizerEnabled = false;
 
+        # Disable media playback OSD — DMS fires it on every MPRIS MetadataChanged signal,
+        # which streaming apps (e.g. Helium) emit every second. No config option to limit
+        # it to play/pause/track changes only; upstream fix needed in MediaPlaybackOSD.qml.
+        osdMediaPlaybackEnabled = false;
+
         # Lock session before suspend/hibernate.
         lockBeforeSuspend = true;
 
