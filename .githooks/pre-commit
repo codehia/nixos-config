@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+git fetch --quiet 2>/dev/null
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+BEHIND=$(git rev-list HEAD.."origin/$BRANCH" --count 2>/dev/null)
+
+# BEHIND is empty if origin/<branch> doesn't exist — treat that as 0
+if [ "${BEHIND:-0}" -gt 0 ]; then
+  echo "Error: branch is behind origin/$BRANCH by $BEHIND commit(s) — pull before committing."
+  exit 1
+fi
+
+exit 0

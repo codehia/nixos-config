@@ -30,6 +30,14 @@
         pass_filenames = false;
         always_run = true;
       };
+      check-upstream = {
+        enable = true;
+        name = "Check for unpulled upstream changes";
+        entry = "./.githooks/pre-commit";
+        stages = [ "pre-commit" ];
+        pass_filenames = false;
+        always_run = true;
+      };
       prepend-hostname = {
         enable = true;
         name = "Prepend hostname to commit message";
