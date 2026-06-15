@@ -48,6 +48,7 @@
             max-jobs = "auto";
             http-connections = 50;
             max-substitution-jobs = 128;
+            fallback = true; # build locally if a cached NAR is advertised but missing
           };
           gc = {
             dates = "weekly";
