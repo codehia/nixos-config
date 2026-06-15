@@ -11,8 +11,17 @@ FIRST_LINE=$(head -n 1 "$COMMIT_MSG_FILE")
 
 # Check if the first line already starts with "HOSTNAME: "
 if [[ "$FIRST_LINE" != "$HOST_CAPS: "* ]]; then
-  
+
   # Use GNU sed to insert the hostname at the beginning of the first line (1s/^/...)
   sed -i "1s/^/$HOST_CAPS: /" "$COMMIT_MSG_FILE"
-  
+
+  # Re-read so the date check below sees the updated line
+  FIRST_LINE=$(head -n 1 "$COMMIT_MSG_FILE")
+
+fi
+
+# Append today's date when the message is just "update"
+if [[ "$FIRST_LINE" == "$HOST_CAPS: update" ]]; then
+  DATE=$(date +%Y-%m-%d)
+  sed -i "1s/$HOST_CAPS: update/$HOST_CAPS: update $DATE/" "$COMMIT_MSG_FILE"
 fi
