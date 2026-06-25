@@ -215,12 +215,7 @@ return {
   -- ---------------------------------------------------------------------------
   {
     'oil.nvim',
-    keys = {
-      { '-', desc = 'Open parent directory' },
-      lzextras.key2spec('n', '<leader>-', function()
-        require('oil').toggle_float()
-      end, { desc = 'Open parent directory (float)' }),
-    },
+    event = 'DeferredUIEnter',
     after = function()
       require('oil').setup({
         default_file_explorer = true,
@@ -235,8 +230,15 @@ return {
         },
         float = { padding = 2, max_width = 90, max_height = 0 },
         win_options = { wrap = true, winblend = 0 },
-        keymaps = { ['<C-c>'] = false, ['q'] = 'actions.close' },
+        keymaps = {
+          ['<C-c>'] = false,
+          ['q'] = 'actions.close',
+          ['<BS>'] = 'actions.parent',
+        },
       })
+      vim.keymap.set('n', '<leader>-', function()
+        require('oil').toggle_float()
+      end, { desc = 'Open file browser (float)' })
     end,
   },
 
