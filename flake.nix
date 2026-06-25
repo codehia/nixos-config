@@ -87,5 +87,9 @@
     };
     wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    zennotes = {
+      url = "github:ZenNotes/zennotes";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 }
