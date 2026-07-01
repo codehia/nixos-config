@@ -2,19 +2,6 @@
   den.aspects.terminal = {
     homeManager =
       { pkgs, ... }:
-      let
-        dotbar = pkgs.tmuxPlugins.mkTmuxPlugin {
-          pluginName = "tmux-dotbar";
-          version = "714ba5994f8857571d6146b1f3612949ae91f820";
-          src = pkgs.fetchFromGitHub {
-            owner = "vaaleyard";
-            repo = "tmux-dotbar";
-            rev = "714ba5994f8857571d6146b1f3612949ae91f820";
-            sha256 = "sha256-n9k18pJnd5mnp9a7VsMBmEHDwo3j06K6/G6p7/DTyIY=";
-          };
-          rtpFilePath = "dotbar.tmux";
-        };
-      in
       {
         programs.tmux = {
           shell = "${pkgs.fish}/bin/fish";
@@ -25,10 +12,10 @@
           baseIndex = 1;
           newSession = true;
           tmuxp.enable = true;
-          plugins = with pkgs; [
+          plugins = with pkgs.tmuxPlugins; [
             dotbar
-            tmuxPlugins.sensible
-            tmuxPlugins.tmux-fzf
+            sensible
+            tmux-fzf
           ];
           extraConfig = ''
             TMUX_FZF_OPTIONS="-p -w 90% -h 80% -m"
