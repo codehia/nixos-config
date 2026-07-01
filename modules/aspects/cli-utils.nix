@@ -37,6 +37,9 @@
           socat
           nmap
           ipcalc
+
+          # process managers
+          reptyr
         ];
       };
   };
