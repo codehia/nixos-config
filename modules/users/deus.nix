@@ -79,7 +79,7 @@ in
 
     homeManager.home = {
       homeDirectory = "/home/deus";
-      sessionVariables.BROWSER = "zen";
+      sessionVariables.BROWSER = "zen-beta";
       file."Public/.keep".text = "";
     };
     homeManager.programs.git.settings.user = {
