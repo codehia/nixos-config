@@ -8,7 +8,6 @@
     nhCleanEnabled = true;
     greetdUser = "deus";
     greetdSessionBin = "sway";
-    wm = "swayfx";
     # Aspects added here are picked up by deus's extraAspectsSelector and included only on this host.
     # Useful when deus needs an aspect on some hosts but not all (e.g. work tools on a work laptop).
     extraAspects = [ "rclone" ];

@@ -6,8 +6,8 @@
     home-manager.enable = true;
     nhCleanEnabled = true;
     greetdUser = "soumya";
-    greetdSessionBin = "sway";
-    wm = "hyprland";
+    # Auto-login straight into Hyprland under UWSM (matches the greeter session entry).
+    greetdSessionCmd = "/run/current-system/sw/bin/uwsm start -- Hyprland";
     # Aspects added here are picked up by deus's extraAspectsSelector and included only on this host.
     # Useful when deus needs an aspect on some hosts but not all (e.g. work tools on a work laptop).
     extraAspects = [ ];

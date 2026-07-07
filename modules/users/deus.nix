@@ -1,7 +1,7 @@
 # User aspect — defines the "deus" user identity and selects all feature aspects.
 #
 # Feature aspects live here so their homeManager config flows via ctx.user → HM.
-# Host-specific aspect selection (wm, extraAspects) is driven by freeform host attrs.
+# Host-specific aspect selection (extraAspects) is driven by freeform host attrs.
 { den, ... }:
 let
   extraAspectsSelector =
