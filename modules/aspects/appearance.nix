@@ -22,6 +22,17 @@
       { ... }:
       {
         imports = [ inputs.catppuccin.nixosModules.catppuccin ];
+        # Mocha VT palette (console.colors) — the Linux console approximates all
+        # colors to its 16-slot palette, so this is what makes tuigreet's named
+        # theme colors render as Catppuccin hues.
+        catppuccin = {
+          enable = true;
+          flavor = "mocha";
+          tty.enable = true;
+          # Boot splash stays "connect" (boot.nix) — catppuccin would conflict on
+          # boot.plymouth.theme otherwise. Only the splash theme; plymouth itself stays on.
+          plymouth.enable = false;
+        };
         # Set Qt theme vars at the system level so all sessions (greetd-started
         # compositors, D-Bus activated apps, xdg-open chains) inherit them.
         environment.sessionVariables = {
