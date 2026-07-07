@@ -33,6 +33,7 @@
             lib.mkOptionDefault {
               # ── App launchers ──
               "${mod}+space" = "exec dms ipc launcher toggle";
+              # null kills the sway default (opens a terminal) without rebinding
               "${mod}+Return" = null;
               "${mod}+Shift+Return" = "exec ghostty";
               "${mod}+w" = "exec zen-beta";
@@ -41,6 +42,10 @@
               "${mod}+c" = "kill";
               "${mod}+f" = "fullscreen toggle";
               "${mod}+Shift+f" = "floating toggle";
+
+              # ── Focus last / urgent (Hyprland: focuscurrentorlast / focusurgentorlast) ──
+              "${mod}+x" = "exec swayr switch-to-urgent-or-lru-window";
+              "${mod}+u" = "[urgent=latest] focus";
 
               # ── Focus (vim keys) ──
               "${mod}+h" = "focus left";
@@ -101,7 +106,8 @@
                 ''exec sway-scratch show --class Spotify --exec spotify --resize "set 70 ppt 70 ppt"'';
               "${mod}+Shift+s" =
                 ''exec sway-scratch show --class Slack --exec slack --resize "set 70 ppt 70 ppt"'';
-              "${mod}+e" =
+              # Mod+Shift+e matches the Hyprland ente scratchpad bind
+              "${mod}+Shift+e" =
                 ''exec sway-scratch show --app-id io.ente.auth --exec enteauth --resize "set 70 ppt 70 ppt"'';
               "${mod}+t" =
                 ''exec sway-scratch show --app-id org.gnome.Nautilus --exec nautilus --resize "set 70 ppt 70 ppt"'';

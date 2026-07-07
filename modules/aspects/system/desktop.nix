@@ -6,6 +6,7 @@
       den.aspects.pipewire
       den.aspects.graphics
       den.aspects.greetd
+      den.aspects.wm-sessions
       den.aspects.dms
       den.aspects.fonts
       den.aspects.gnome-keyring
