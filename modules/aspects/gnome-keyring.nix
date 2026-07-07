@@ -56,9 +56,9 @@
         };
 
         # Inject the LUKS passphrase into the PAM session just before
-        # pam_gnome_keyring runs (which is at order 12700).
+        # pam_gnome_keyring runs (which is at order 12600 in NixOS 26.05+).
         security.pam.services.greetd.rules.session.fde_boot_pw = {
-          order = 12600;
+          order = 12500;
           enable = true;
           control = "optional";
           modulePath = "${pam-fde-boot-pw}/lib/security/pam_fde_boot_pw.so";

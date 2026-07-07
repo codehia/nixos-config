@@ -83,7 +83,7 @@
   typescript = {
     packages = with pkgs; [
       typescript-language-server
-      nodePackages.prettier
+      prettier
       eslint_d
     ];
     formatters = {
