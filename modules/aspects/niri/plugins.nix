@@ -44,6 +44,11 @@
           cliPackage = inputs.nfsm.packages.${pkgs.stdenv.hostPlatform.system}.nfsm-cli;
         };
 
+        # Only start under niri — the nfsm module hardcodes graphical-session.target,
+        # which fires under every compositor. Each WM imports XDG_CURRENT_DESKTOP into
+        # the user manager on session start.
+        systemd.user.services.nfsm.Unit.ConditionEnvironment = "XDG_CURRENT_DESKTOP=niri";
+
         programs.niri.settings = {
           # Named workspaces: 1-5 for regular use, "scratch" for scratchpad apps.
           # Alphabetical sort ensures scratch comes last (index 6).
@@ -112,6 +117,11 @@
               open-on-workspace = "scratch";
               open-floating = true;
             }
+            {
+              matches = [ { app-id = "^org.gnome.Nautilus$"; } ];
+              open-on-workspace = "scratch";
+              open-floating = true;
+            }
           ];
 
           # Per-app scratchpad keybinds (nscratch — spawns if not running via -s).
@@ -129,6 +139,13 @@
               "enteauth"
               "-s"
               "enteauth"
+            ];
+            "Mod+Shift+T".action.spawn = [
+              "${nscratch}/bin/nscratch"
+              "-id"
+              "org.gnome.Nautilus"
+              "-s"
+              "nautilus"
             ];
             "Mod+Shift+O".action.spawn = [
               "${nscratch}/bin/nscratch"

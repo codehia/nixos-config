@@ -1,14 +1,21 @@
 # Niri compositor — scrollable-tiling Wayland compositor.
-# Uses the collector pattern: layout.nix, input.nix, binds.nix also define
+# Uses the collector pattern: layout.nix, input.nix, binds.nix, plugins.nix also define
 # den.aspects.niri and their settings are merged together by den.
-{ inputs, ... }:
+#
+# The compositor itself is system-level: the nixos block lives in den.aspects.wm-sessions
+# (a collector shared by all WM aspects, included by graphical-session) so the session
+# registers with services.displayManager.sessionPackages and appears in the greeter.
+# The HM config half reaches every user via the den.aspects.wm-configs collector (den.default).
+{ den, inputs, ... }:
 {
   flake-file.inputs.niri-flake = {
     url = "github:sodiboo/niri-flake";
     inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
-  den.aspects.niri = {
+  den.aspects.wm-configs.includes = [ den.aspects.niri ];
+
+  den.aspects.wm-sessions = {
     nixos =
       { pkgs, ... }:
       {
@@ -19,14 +26,17 @@
           package = pkgs.niri-stable;
         };
       };
+  };
 
+  den.aspects.niri = {
     # HM module is auto-imported by the NixOS module when HM is a NixOS module.
     homeManager =
       { pkgs, ... }:
       {
         home.packages = with pkgs; [
           wl-clipboard
-          grimblast
+          grim
+          slurp
           satty
         ];
 
