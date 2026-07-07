@@ -6,7 +6,7 @@
   inputs = {
     apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
     catppuccin = {
-      url = "github:catppuccin/nix/release-25.11";
+      url = "github:catppuccin/nix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     claude-code = {
