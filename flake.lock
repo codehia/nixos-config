@@ -1583,13 +1583,13 @@
       "locked": {
         "lastModified": 1783315258,
         "narHash": "sha256-07Tmtkw3MP0M6VxwpP3pFSPW4wwTyaQsFVP8I8Gv40A=",
-        "owner": "DreamMaoMao",
+        "owner": "mangowm",
         "repo": "mango",
         "rev": "9d4f4fd46baa096e20e2cb98e629fde10fd7be38",
         "type": "github"
       },
       "original": {
-        "owner": "DreamMaoMao",
+        "owner": "mangowm",
         "repo": "mango",
         "type": "github"
       }

@@ -41,7 +41,7 @@
     import-tree.url = "github:vic/import-tree";
     lzextras.url = "github:BirdeeHub/lzextras";
     mango = {
-      url = "github:DreamMaoMao/mango";
+      url = "github:mangowm/mango";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nfsm.url = "github:gvolpe/nfsm";
