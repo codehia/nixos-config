@@ -9,7 +9,7 @@
 }:
 let
   # dms-settings.json has runningAppsCurrentWorkspace = false.
-  # Hyprland special workspaces (pyprland scratchpads) have negative workspace IDs, so they
+  # Hyprland special workspaces (scratchpads) have negative workspace IDs, so they
   # never match the current regular workspace and would be permanently hidden from the running
   # apps list if this were true.
   baseSettings = builtins.fromJSON (builtins.readFile ./dms-settings.json);
@@ -18,7 +18,6 @@ let
     { host, ... }:
     let
       isLaptop = host.isLaptop or false;
-      isHyprland = host.wm == "hyprland";
       patchBarConfig =
         bar:
         lib.recursiveUpdate bar {
@@ -71,9 +70,10 @@ let
         # Lock session before suspend/hibernate.
         lockBeforeSuspend = true;
 
-        # Night mode via DMS wlr-gamma-control-v1 (SwayfX only — Hyprland uses hyprsunset).
-        nightModeEnabled = !isHyprland;
-        nightModeAutoEnabled = !isHyprland;
+        # Night mode via DMS wlr-gamma-control-v1 — uniform across all compositors
+        # (sway, hyprland, niri, mango all support the protocol).
+        nightModeEnabled = true;
+        nightModeAutoEnabled = true;
       };
     in
     {
@@ -226,10 +226,8 @@ let
               wallpaperCyclingInterval = 300;
 
               # Night light: warm amber after 18:00, neutral during the day.
-              # Uses DMS's built-in wlr-gamma-control-v1 — works on SwayfX.
-              # Skipped on Hyprland — hyprsunset handles it there via hyprland-ctm-control-v1.
-            }
-            // lib.optionalAttrs (!isHyprland) {
+              # DMS's built-in wlr-gamma-control-v1 — one implementation for every
+              # compositor (hyprsunset was removed in favor of this).
               nightModeEnabled = true;
               nightModeAutoEnabled = true;
               nightModeAutoMode = "time";

@@ -14,6 +14,10 @@
       den.provides.define-user
       den.provides.hostname
       den.provides.inputs'
+      # WM home-manager configs for every user — keybinds/settings for each session.
+      # The system half (compositor + session entry) is den.aspects.wm-sessions on the
+      # host side; each WM file contributes to both collectors.
+      den.aspects.wm-configs
       (
         { user, ... }:
         {

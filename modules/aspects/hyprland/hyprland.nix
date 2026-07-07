@@ -1,6 +1,10 @@
 # Hyprland compositor — base config, packages, and settings.
-# Uses the collector pattern: other files (binds.nix, hyprpaper.nix, pyprland.nix) also define
+# Uses the collector pattern: other files (binds.nix, hypridle.nix) also define
 # den.aspects.hyprland and their attrs are merged together by den.
+#
+# The compositor itself is system-level: the nixos block lives in den.aspects.wm-sessions
+# (a collector shared by all WM aspects, included by graphical-session) so the session
+# registers with services.displayManager.sessionPackages and appears in the greeter.
 { den, inputs, ... }:
 let
   hyprlandPackages =
@@ -17,14 +21,18 @@ in
     url = "github:hyprwm/hyprland";
   };
 
-  den.aspects.hyprland = {
+  den.aspects.wm-configs.includes = [ den.aspects.hyprland ];
+
+  den.aspects.wm-sessions = {
     nixos.programs.hyprland = {
       enable = true;
       withUWSM = true;
     };
 
     includes = [ hyprlandPackages ];
+  };
 
+  den.aspects.hyprland = {
     homeManager =
       { pkgs, config, ... }:
       {

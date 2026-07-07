@@ -4,11 +4,6 @@
 # Host-specific aspect selection (wm, extraAspects) is driven by freeform host attrs.
 { den, ... }:
 let
-  wmSelector =
-    { host, ... }:
-    {
-      includes = [ den.aspects.${host.wm} ];
-    };
   extraAspectsSelector =
     { host, ... }:
     {
@@ -26,9 +21,6 @@ in
 
       # Terminal / shell
       den.aspects.terminal
-
-      # Window manager — host.wm selects the aspect by name
-      wmSelector
 
       # Editor / dev
       den.aspects.vcs
