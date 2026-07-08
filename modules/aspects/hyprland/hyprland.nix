@@ -55,6 +55,9 @@ in
           # Avoids version mismatch between the session binary and the HM config.
           package = null;
           portalPackage = null;
+          # stateVersion >= 26.05 defaults to the new Lua config engine — stay on
+          # hyprlang (hyprland.conf) until switching is a deliberate decision.
+          configType = "hyprlang";
           # UWSM owns the session — HM systemd integration must be disabled.
           systemd.enable = false;
           systemd.variables = [ "--all" ];

@@ -10,17 +10,17 @@ let
 in
 {
   den.default = {
-    nixos.system.stateVersion = "25.11";
+    nixos.system.stateVersion = "26.05";
     nixos.time.timeZone = "Asia/Kolkata";
     nixos.i18n = {
       defaultLocale = "en_US.UTF-8";
       extraLocales = [ "all" ];
     };
-    homeManager.home.stateVersion = "25.11";
+    homeManager.home.stateVersion = "26.05";
     includes = [
-      den.provides.define-user
-      den.provides.hostname
-      den.provides.inputs'
+      den.batteries.define-user
+      den.batteries.hostname
+      den.batteries.inputs'
       # WM home-manager configs for every user — keybinds/settings for each session.
       # The system half (compositor + session entry) is den.aspects.wm-sessions on the
       # host side; each WM file contributes to both collectors.
@@ -28,8 +28,4 @@ in
       trustedUsers
     ];
   };
-
-  # Enable mutual-provider at the user context so provides.to-users /
-  # provides.to-hosts routing works across host <-> user boundaries.
-  den.schema.user.includes = [ den.provides.mutual-provider ];
 }

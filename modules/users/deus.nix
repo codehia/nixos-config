@@ -13,8 +13,8 @@ in
 {
   den.aspects.deus = {
     includes = [
-      den.provides.primary-user
-      (den.provides.user-shell "fish")
+      den.batteries.primary-user
+      (den.batteries.user-shell "fish")
 
       # Theming
       den.aspects.appearance
