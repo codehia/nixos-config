@@ -10,19 +10,30 @@
 let
   # Patch MangoWC to use 5 tags instead of the default 9.
   # Tag count is compile-time (src/config/preset.h), so we override the source.
+  # scenefx override: mango 0.14.4 needs scenefx-0.5, but mango's own flake.lock
+  # pins 0.4.1 (and scenefx HEAD renamed its package attr to scenefx-git, so a
+  # follows-override can't work). Drop this once upstream re-locks scenefx.
   patchMango =
     pkgs:
-    inputs.mango.packages.${pkgs.stdenv.hostPlatform.system}.mango.overrideAttrs (old: {
-      postPatch = (old.postPatch or "") + ''
-        substituteInPlace src/config/preset.h \
-          --replace-fail '"1", "2", "3", "4", "5", "6", "7", "8", "9"' \
-                         '"1", "2", "3", "4", "5"'
-      '';
-    });
+    (inputs.mango.packages.${pkgs.stdenv.hostPlatform.system}.mango.override {
+      scenefx = inputs.scenefx.packages.${pkgs.stdenv.hostPlatform.system}.scenefx-git;
+    }).overrideAttrs
+      (old: {
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace src/config/preset.h \
+            --replace-fail '"1", "2", "3", "4", "5", "6", "7", "8", "9"' \
+                           '"1", "2", "3", "4", "5"'
+        '';
+      });
 in
 {
   flake-file.inputs.mango = {
     url = "github:mangowm/mango";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  flake-file.inputs.scenefx = {
+    url = "github:wlrfx/scenefx";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
