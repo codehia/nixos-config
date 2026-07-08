@@ -3,6 +3,21 @@
   lib,
   ...
 }:
+let
+  personalMedia =
+    { user, ... }:
+    lib.optionalAttrs (user.personalApps or false) {
+      homeManager =
+        { pkgs, ... }:
+        {
+          home.packages = with pkgs; [
+            vlc
+            spotify
+            ente-desktop
+          ];
+        };
+    };
+in
 {
   den.aspects.apps = {
     includes = [
@@ -19,20 +34,7 @@
             ];
           };
       }
-      (
-        { user, ... }:
-        lib.optionalAttrs (user.personalApps or false) {
-          homeManager =
-            { pkgs, ... }:
-            {
-              home.packages = with pkgs; [
-                vlc
-                spotify
-                ente-desktop
-              ];
-            };
-        }
-      )
+      personalMedia
     ];
   };
 }

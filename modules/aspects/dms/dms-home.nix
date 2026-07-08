@@ -268,8 +268,8 @@ let
             };
           };
 
-          wayland.windowManager.sway.config.keybindings = lib.mkIf isLaptop (
-            lib.mkOptionDefault { "Mod4+b" = "exec ${batteryToggleScript}"; }
+          wayland.windowManager.sway.config.keybindings = lib.mkOptionDefault (
+            lib.optionalAttrs isLaptop { "Mod4+b" = "exec ${batteryToggleScript}"; }
           );
 
           wayland.windowManager.hyprland.settings.bind = lib.optionals isLaptop [

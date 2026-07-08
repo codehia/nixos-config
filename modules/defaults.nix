@@ -1,6 +1,13 @@
 # Global defaults — config applied to every host and user.
 # den.default sets baseline NixOS and home-manager options across all hosts.
 { den, ... }:
+let
+  trustedUsers =
+    { user, ... }:
+    {
+      nixos.nix.settings.trusted-users = [ user.userName ];
+    };
+in
 {
   den.default = {
     nixos.system.stateVersion = "25.11";
@@ -18,12 +25,7 @@
       # The system half (compositor + session entry) is den.aspects.wm-sessions on the
       # host side; each WM file contributes to both collectors.
       den.aspects.wm-configs
-      (
-        { user, ... }:
-        {
-          nixos.nix.settings.trusted-users = [ user.userName ];
-        }
-      )
+      trustedUsers
     ];
   };
 

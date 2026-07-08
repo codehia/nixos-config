@@ -1,4 +1,12 @@
 { den, ... }:
+let
+  # nh manages GC when nhCleanEnabled — disable the built-in automatic GC in that case.
+  gcConfig =
+    { host }:
+    {
+      nixos.nix.gc.automatic = !(host.nhCleanEnabled or false);
+    };
+in
 {
   den.aspects.nix-config = {
     nixos =
@@ -57,14 +65,6 @@
         };
       };
 
-    includes = [
-      # nh manages GC when nhCleanEnabled — disable the built-in automatic GC in that case.
-      (
-        { host }:
-        {
-          nixos.nix.gc.automatic = !(host.nhCleanEnabled or false);
-        }
-      )
-    ];
+    includes = [ gcConfig ];
   };
 }

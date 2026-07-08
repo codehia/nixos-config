@@ -21,6 +21,56 @@
 #       written via ExecStartPre (pkgs.writeText → cp) to a writable /etc/lact/config.yaml.
 #       The LACT GUI cannot save changes (config is overwritten on each service start).
 { den, ... }:
+let
+  gpuConfig =
+    { host }:
+    let
+      gpuKey = host.gpuKey or null;
+    in
+    {
+      nixos =
+        { lib, pkgs, ... }:
+        let
+          configText = ''
+            daemon:
+              log_level: warn
+              admin_group: wheel
+          ''
+          + lib.optionalString (gpuKey != null) ''
+            gpus:
+              ${gpuKey}:
+                fan_control_enabled: true
+                fan_control_settings:
+                  mode: curve
+                  temperature_key: edge
+                  interval_ms: 500
+                  spindown_delay_ms: 6000
+                  change_threshold: 2
+                  curve:
+                    35: 0.0
+                    50: 0.0
+                    60: 0.20
+                    70: 0.35
+                    78: 0.52
+                    85: 0.72
+                    95: 1.0
+          '';
+          # Store config in the Nix store; ExecStartPre copies it to a writable path.
+          configFile = pkgs.writeText "lact-config.yaml" configText;
+        in
+        {
+          systemd.services.lactd.serviceConfig.ExecStartPre = [
+            # Remove stale socket from previous run (- prefix = ignore failure if missing).
+            "-/run/current-system/sw/bin/rm /run/lactd.sock"
+            # Write Nix-managed config to writable /etc/lact/config.yaml before start.
+            "${pkgs.writeShellScript "lact-write-config" ''
+              mkdir -p /etc/lact
+              cp ${configFile} /etc/lact/config.yaml
+            ''}"
+          ];
+        };
+    };
+in
 {
   den.aspects.lact = {
     nixos = {
@@ -29,56 +79,6 @@
       services.lact.enable = true;
     };
 
-    includes = [
-      (
-        { host }:
-        let
-          gpuKey = host.gpuKey or null;
-        in
-        {
-          nixos =
-            { lib, pkgs, ... }:
-            let
-              configText = ''
-                daemon:
-                  log_level: warn
-                  admin_group: wheel
-              ''
-              + lib.optionalString (gpuKey != null) ''
-                gpus:
-                  ${gpuKey}:
-                    fan_control_enabled: true
-                    fan_control_settings:
-                      mode: curve
-                      temperature_key: edge
-                      interval_ms: 500
-                      spindown_delay_ms: 6000
-                      change_threshold: 2
-                      curve:
-                        35: 0.0
-                        50: 0.0
-                        60: 0.20
-                        70: 0.35
-                        78: 0.52
-                        85: 0.72
-                        95: 1.0
-              '';
-              # Store config in the Nix store; ExecStartPre copies it to a writable path.
-              configFile = pkgs.writeText "lact-config.yaml" configText;
-            in
-            {
-              systemd.services.lactd.serviceConfig.ExecStartPre = [
-                # Remove stale socket from previous run (- prefix = ignore failure if missing).
-                "-/run/current-system/sw/bin/rm /run/lactd.sock"
-                # Write Nix-managed config to writable /etc/lact/config.yaml before start.
-                "${pkgs.writeShellScript "lact-write-config" ''
-                  mkdir -p /etc/lact
-                  cp ${configFile} /etc/lact/config.yaml
-                ''}"
-              ];
-            };
-        }
-      )
-    ];
+    includes = [ gpuConfig ];
   };
 }
