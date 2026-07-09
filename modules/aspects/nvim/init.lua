@@ -16,6 +16,7 @@ end
 require('config.options')
 require('config.keymaps')
 require('config.autocmds')
+require('config.highlights')
 
 -- LSP (native Neovim 0.11)
 require('config.lsp').setup()
