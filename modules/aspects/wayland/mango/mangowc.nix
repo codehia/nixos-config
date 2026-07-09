@@ -55,6 +55,21 @@ in
     homeManager =
       { pkgs, ... }:
       let
+        mangoPkg = patchMango pkgs;
+
+        # "Last workspace" toggle — mango has no prev-tag bind function (view,0
+        # means "show ALL tags", not previous). With view_current_to_back=1,
+        # dispatching view on the current tag jumps to the compositor's own
+        # prevtag; mmsg supplies the current tag (single monitor assumed).
+        # active_tags is [0] in overview mode, so the guard skips it there.
+        viewPrevTag = pkgs.writeShellScript "mango-view-prev-tag" ''
+          cur=$(${mangoPkg}/bin/mmsg get all-monitors \
+            | ${pkgs.jq}/bin/jq -r '.monitors[0].active_tags[0] // 0')
+          if [ "''${cur:-0}" -ge 1 ]; then
+            exec ${mangoPkg}/bin/mmsg dispatch "view,$cur"
+          fi
+        '';
+
         # Screenshots use grim/slurp per mango's own docs — grimblast (hyprctl) and
         # grimshot (swaymsg) only work under their respective compositors.
         screenshotFull = pkgs.writeShellScript "mango-screenshot-full" ''
@@ -92,11 +107,20 @@ in
 
         wayland.windowManager.mango = {
           enable = true;
-          package = patchMango pkgs;
+          package = mangoPkg;
 
           # Import all env vars into systemd so services (DMS, etc.)
           # get PATH, XDG_DATA_DIRS, and other session variables.
           systemd.variables = [ "--all" ];
+
+          # Must be non-empty: the HM module only writes autostart.sh (and its
+          # exec-once line) when this is set, and the systemd activation —
+          # dbus env import + `systemctl --user start mango-session.target`,
+          # which BindsTo graphical-session.target — lives inside that script.
+          # Without it DMS and every graphical-session service never start.
+          autostart_sh = ''
+            # systemd/D-Bus activation is prepended by the HM module
+          '';
 
           settings = {
             ### Appearance — gaps, borders, colors, blur, shadows, animations
@@ -120,23 +144,29 @@ in
             focused_opacity = 1.0;
             unfocused_opacity = 1.0;
 
+            # Durations/curves mirror Hyprland's defaults (the smoothness target):
+            # easeOutQuint 0.23,1,0.32,1; windowsIn ≈ 410ms, windows ≈ 480ms,
+            # windowsOut ≈ 150ms, popin starts at 87% size. The previous
+            # 150-200ms durations were too few frames and read as choppy.
             animations = 1;
             animation_type_open = "zoom";
             animation_type_close = "fade";
-            animation_duration_open = 200;
+            animation_duration_open = 400;
             animation_duration_close = 150;
-            animation_duration_move = 150;
+            animation_duration_move = 400;
+            animation_duration_tag = 300;
+            zoom_initial_ratio = 0.87;
 
-            animation_curve_open = "0.46,1.0,0.29,1";
-            animation_curve_move = "0.46,1.0,0.29,1";
-            animation_curve_tag = "0.46,1.0,0.29,1";
+            animation_curve_open = "0.23,1.0,0.32,1";
+            animation_curve_move = "0.23,1.0,0.32,1";
+            animation_curve_tag = "0.23,1.0,0.32,1";
             animation_curve_close = "0.08,0.92,0,1";
-            animation_curve_focus = "0.46,1.0,0.29,1";
-            animation_curve_opafadein = "0.46,1.0,0.29,1";
+            animation_curve_focus = "0.23,1.0,0.32,1";
+            animation_curve_opafadein = "0.23,1.0,0.32,1";
             animation_curve_opafadeout = "0.5,0.5,0.5,0.5";
 
             ### Layout, input, cursor, monitor
-            default_mfact = 0.62;
+            default_mfact = 0.55;
             default_nmaster = 1;
 
             repeat_delay = 300;
@@ -145,13 +175,39 @@ in
             sloppyfocus = 0;
             warpcursor = 0;
 
+            # Viewing the already-current tag jumps back to the previous one
+            # (Hyprland's workspace_back_and_forth). Required by the SUPER,z
+            # last-workspace script; side effect: SUPER,1-5 on the current
+            # tag also goes back instead of being a no-op.
+            view_current_to_back = 1;
+
             # Keep XWayland running even with no X11 apps open (reduces startup lag).
             # (the old `xwayland` toggle was removed upstream — XWayland is always built in)
             xwayland_persistence = 1;
 
             env = [ "XCURSOR_SIZE,32" ];
 
-            monitorrule = [ "name:*,width:0,height:0,refresh:0,x:0,y:0,scale:1" ];
+            # First matching rule wins — keep the specific rule above the wildcard.
+            monitorrule = [
+              # LG 34" ultrawide: run at its max mode (3440x1440@75.05);
+              # model match survives connector/KVM changes
+              "model:LG HDR WQHD,width:3440,height:1440,refresh:75.05,x:0,y:0,scale:1"
+              "name:*,width:0,height:0,refresh:0,x:0,y:0,scale:1"
+            ];
+
+            # Centered-master layout (mango's closest to centertall) on the
+            # ultrawide only; other monitors keep the default tile layout.
+            tagrule = [
+              "id:1,layout_name:center_tile,monitor_model:LG HDR WQHD"
+              "id:2,layout_name:center_tile,monitor_model:LG HDR WQHD"
+              "id:3,layout_name:center_tile,monitor_model:LG HDR WQHD"
+              "id:4,layout_name:center_tile,monitor_model:LG HDR WQHD"
+              "id:5,layout_name:center_tile,monitor_model:LG HDR WQHD"
+            ];
+
+            # Layouts SUPER,o cycles through (switch_layout); without this it
+            # would cycle all 14 built-in layouts
+            circle_layout = "tile,center_tile,monocle";
 
             ### Named scratchpads — apps ONLY exist as scratchpads; the binds below
             ### lazy-spawn them on first use (like Hyprland's on-created-empty).
@@ -173,13 +229,13 @@ in
               "SUPER,SPACE,spawn,dms ipc launcher toggle"
               "SUPER+SHIFT,Return,spawn,ghostty"
               "SUPER,w,spawn,zen-beta"
-              "SUPER,t,spawn,nautilus"
 
               # Window management
               "SUPER,c,killclient"
-              "SUPER,f,togglemaximizescreen"
+              "SUPER,f,togglefullscreen"
               "SUPER+SHIFT,f,togglefloating"
               "SUPER,x,focuslast"
+              "SUPER,o,switch_layout"
 
               # Master layout — zoom = swap with master (mango has no focus-master)
               "SUPER,Return,zoom"
@@ -203,7 +259,8 @@ in
               "SUPER+CTRL,h,setmfact,-0.02"
 
               # Tag navigation (tags are dwm-style workspaces)
-              "SUPER,z,viewtoleft"
+              # z = last workspace via mmsg script (view,0 would show ALL tags)
+              "SUPER,z,spawn,${viewPrevTag}"
               "SUPER,1,view,1"
               "SUPER,2,view,2"
               "SUPER,3,view,3"
@@ -226,7 +283,7 @@ in
 
               # Named scratchpads — canonical Hyprland keys
               "SUPER,grave,toggle_named_scratchpad,kitty-term,none,kitty --class kitty-term"
-              "SUPER+SHIFT,t,toggle_named_scratchpad,org.gnome.Nautilus,none,nautilus"
+              "SUPER,t,toggle_named_scratchpad,org.gnome.Nautilus,none,nautilus"
               "SUPER+SHIFT,o,toggle_named_scratchpad,1Password,none,1password --silent"
               "SUPER+SHIFT,m,toggle_named_scratchpad,Spotify,none,spotify"
               "SUPER+SHIFT,s,toggle_named_scratchpad,Slack,none,slack"
