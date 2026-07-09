@@ -2,6 +2,9 @@
 -- OPTIONS
 -- =============================================================================
 
+-- Nerd font available (read by mini.statusline for icons)
+vim.g.have_nerd_font = true
+
 -- Make line numbers default with relative numbers
 vim.wo.number = true
 vim.wo.relativenumber = true

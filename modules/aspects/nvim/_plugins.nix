@@ -204,4 +204,8 @@ with pkgs.vimPlugins;
     data = nvim-highlight-colors;
     lazy = false;
   };
+  rainbow-delimiters = {
+    data = rainbow-delimiters-nvim;
+    lazy = true;
+  };
 }

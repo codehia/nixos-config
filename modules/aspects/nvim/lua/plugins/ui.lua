@@ -314,7 +314,7 @@ return {
     'nvim-highlight-colors',
     lazy = false,
     before = function()
-      require('nvim-highlight-colors')
+      require('nvim-highlight-colors').setup({})
       vim.keymap.set('n', '<leader>uc', '<cmd>HighlightColors Toggle<cr>', { desc = '[U]I [C]olor highlight toggle' })
     end,
   },

@@ -87,51 +87,34 @@ return {
   {
     'nvim-treesitter',
     event = 'BufReadPost',
-    -- lzextras.loaders.with_after loads both opt/nvim-treesitter/ AND its /after directory.
-    -- treesitter uses after/ for filetype-specific query overrides; the default
-    -- vim.cmd.packadd only loads the main plugin dir and misses it.
-    load = lzextras.loaders.with_after,
+    -- other plugins (e.g. markview's healthcheck) probe via require('nvim-treesitter')
+    on_require = { 'nvim-treesitter' },
+    -- main-branch rewrite (nixpkgs 26.05+): the configs module and its setup()
+    -- API are gone. Highlighting/folds are native Neovim features enabled per
+    -- buffer; the plugin only ships queries, parser management and indentexpr.
     after = function()
-      require('nvim-treesitter.configs').setup({
-        highlight = { enable = true, additional_vim_regex_highlighting = false },
-        indent = { enable = true },
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = '<C-space>',
-            node_incremental = '<C-space>',
-            scope_incremental = '<C-s>',
-            node_decremental = '<M-space>',
-          },
-        },
-        textobjects = {
-          select = {
-            enable = true,
-            lookahead = true,
-            keymaps = {
-              ['aa'] = '@parameter.outer',
-              ['ia'] = '@parameter.inner',
-              ['af'] = '@function.outer',
-              ['if'] = '@function.inner',
-              ['ac'] = '@class.outer',
-              ['ic'] = '@class.inner',
-            },
-          },
-          move = {
-            enable = true,
-            set_jumps = true,
-            goto_next_start = { [']m'] = '@function.outer', [']]'] = '@class.outer' },
-            goto_next_end = { [']M'] = '@function.outer', [']['] = '@class.outer' },
-            goto_previous_start = { ['[m'] = '@function.outer', ['[['] = '@class.outer' },
-            goto_previous_end = { ['[M'] = '@function.outer', ['[]'] = '@class.outer' },
-          },
-          swap = {
-            enable = true,
-            swap_next = { ['<M-l>'] = '@parameter.inner' },
-            swap_previous = { ['<M-h>'] = '@parameter.inner' },
-          },
-        },
+      local function attach(buf, ft)
+        local lang = vim.treesitter.language.get_lang(ft)
+        if not lang or not pcall(vim.treesitter.start, buf, lang) then
+          return
+        end
+        -- indentexpr is the plugin's (experimental) replacement for indent.enable
+        vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+      end
+
+      vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup('treesitter-attach', { clear = true }),
+        callback = function(args)
+          attach(args.buf, args.match)
+        end,
       })
+
+      -- The buffer that triggered this load may have fired FileType already
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].filetype ~= '' then
+          attach(buf, vim.bo[buf].filetype)
+        end
+      end
 
       -- Set fold method after treesitter loads to avoid E490 race condition
       -- (setting foldmethod=expr globally before treesitter is ready triggers E490)
@@ -139,6 +122,81 @@ return {
       vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
       vim.opt.foldtext = ''
       vim.opt.foldnestmax = 3
+    end,
+  },
+
+  -- ---------------------------------------------------------------------------
+  -- Treesitter textobjects — select/move/swap (main-branch module API)
+  -- pname: nvim-treesitter-textobjects
+  -- Loaded after nvim-treesitter (it requires it, not the other way around)
+  -- ---------------------------------------------------------------------------
+  {
+    'nvim-treesitter-textobjects',
+    on_plugin = { 'nvim-treesitter' },
+    after = function()
+      require('nvim-treesitter-textobjects').setup({
+        select = { lookahead = true },
+        move = { set_jumps = true },
+      })
+
+      local select_maps = {
+        ['aa'] = '@parameter.outer',
+        ['ia'] = '@parameter.inner',
+        ['af'] = '@function.outer',
+        ['if'] = '@function.inner',
+        ['ac'] = '@class.outer',
+        ['ic'] = '@class.inner',
+      }
+      for lhs, query in pairs(select_maps) do
+        vim.keymap.set({ 'x', 'o' }, lhs, function()
+          require('nvim-treesitter-textobjects.select').select_textobject(query, 'textobjects')
+        end)
+      end
+
+      local move_maps = {
+        goto_next_start = { [']m'] = '@function.outer', [']]'] = '@class.outer' },
+        goto_next_end = { [']M'] = '@function.outer', [']['] = '@class.outer' },
+        goto_previous_start = { ['[m'] = '@function.outer', ['[['] = '@class.outer' },
+        goto_previous_end = { ['[M'] = '@function.outer', ['[]'] = '@class.outer' },
+      }
+      for method, maps in pairs(move_maps) do
+        for lhs, query in pairs(maps) do
+          vim.keymap.set({ 'n', 'x', 'o' }, lhs, function()
+            require('nvim-treesitter-textobjects.move')[method](query, 'textobjects')
+          end)
+        end
+      end
+
+      vim.keymap.set('n', '<M-l>', function()
+        require('nvim-treesitter-textobjects.swap').swap_next('@parameter.inner')
+      end)
+      vim.keymap.set('n', '<M-h>', function()
+        require('nvim-treesitter-textobjects.swap').swap_previous('@parameter.inner')
+      end)
+    end,
+  },
+
+  -- ---------------------------------------------------------------------------
+  -- Rainbow delimiters — bracket colors per nesting depth (treesitter-based)
+  -- pname: rainbow-delimiters.nvim
+  -- ---------------------------------------------------------------------------
+  {
+    'rainbow-delimiters.nvim',
+    event = 'BufReadPost',
+    -- the plugin's own FileType autocmd handles future buffers; the buffer
+    -- that triggered this lazy load fired FileType already, so attach manually
+    after = function()
+      local config = require('rainbow-delimiters.config')
+      local lib = require('rainbow-delimiters.lib')
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        local ft = vim.bo[buf].filetype
+        if vim.api.nvim_buf_is_loaded(buf) and ft ~= '' then
+          local lang = vim.treesitter.language.get_lang(ft)
+          if lang and config.enabled_for(lang) and config.enabled_when(buf) then
+            lib.attach(buf)
+          end
+        end
+      end
     end,
   },
 
@@ -387,6 +445,4 @@ return {
   { 'telescope-fzf-native.nvim', dep_of = { 'telescope.nvim' } },
   { 'telescope-ui-select.nvim', dep_of = { 'telescope.nvim' } },
   { 'twilight.nvim', dep_of = { 'zen-mode.nvim' } },
-  -- Loaded after nvim-treesitter (they require it, not the other way around)
-  { 'nvim-treesitter-textobjects', on_plugin = { 'nvim-treesitter' } },
 }

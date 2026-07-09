@@ -46,14 +46,14 @@ M.on_attach = function(client, bufnr)
   end, '[W]orkspace [L]ist Folders')
 
   -- Toggle inlay hints
-  if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+  if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
     map('<leader>th', function()
       vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }))
     end, '[T]oggle Inlay [H]ints')
   end
 
   -- Document highlight on cursor hold
-  if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+  if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
     local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight-' .. bufnr, { clear = true })
     vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
       buffer = bufnr,
