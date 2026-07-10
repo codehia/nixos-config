@@ -7,10 +7,29 @@ vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Moves Line Down' })
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { desc = 'Moves Line Up' })
 
 -- Centered scrolling
-vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Scroll Down' })
-vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Scroll Up' })
-vim.keymap.set('n', 'n', 'nzzzv', { desc = 'Next Search Result' })
-vim.keymap.set('n', 'N', 'Nzzzv', { desc = 'Previous Search Result' })
+-- The centering (zz/zv) must run after mini.animate's scroll animation
+-- finishes — appended directly it fires mid-animation and causes flicker
+-- (:h MiniAnimate.config.scroll)
+local function scroll_centered(key, center)
+  return function()
+    local count = vim.v.count > 0 and vim.v.count or ''
+    local keys = vim.api.nvim_replace_termcodes(key, true, true, true)
+    local ok, err = pcall(vim.cmd, 'normal! ' .. count .. keys)
+    if not ok then
+      vim.notify(err:gsub('^Vim%(%w+%):', ''), vim.log.levels.ERROR)
+      return
+    end
+    if _G.MiniAnimate then
+      MiniAnimate.execute_after('scroll', 'normal! ' .. center)
+    else
+      vim.cmd('normal! ' .. center)
+    end
+  end
+end
+vim.keymap.set('n', '<C-d>', scroll_centered('<C-d>', 'zz'), { desc = 'Scroll Down' })
+vim.keymap.set('n', '<C-u>', scroll_centered('<C-u>', 'zz'), { desc = 'Scroll Up' })
+vim.keymap.set('n', 'n', scroll_centered('n', 'zvzz'), { desc = 'Next Search Result' })
+vim.keymap.set('n', 'N', scroll_centered('N', 'zvzz'), { desc = 'Previous Search Result' })
 
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -24,7 +43,6 @@ vim.keymap.set('n', ']d', function()
   vim.diagnostic.jump({ count = 1, float = true })
 end, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Window navigation
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
