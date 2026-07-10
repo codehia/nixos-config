@@ -4,6 +4,41 @@
 
 local lzextras = require('lzextras')
 
+-- SELECT fires on every list:select() (including prev/next), so this tracks
+-- the last two visited harpoon indices for the <leader>hl toggle
+local harpoon_recent = { cur = nil, prev = nil }
+
+local function harpoon_telescope()
+  local harpoon = require('harpoon')
+  local conf = require('telescope.config').values
+  local harpoon_files = harpoon:list()
+  local function finder()
+    local paths = {}
+    for _, item in ipairs(harpoon_files.items) do
+      table.insert(paths, item.value)
+    end
+    return require('telescope.finders').new_table({ results = paths })
+  end
+  require('telescope.pickers')
+    .new({}, {
+      prompt_title = 'Harpoon',
+      finder = finder(),
+      previewer = conf.file_previewer({}),
+      sorter = conf.generic_sorter({}),
+      attach_mappings = function(prompt_bufnr, map)
+        map('i', '<C-d>', function()
+          local state = require('telescope.actions.state')
+          local selected_entry = state.get_selected_entry()
+          local current_picker = state.get_current_picker(prompt_bufnr)
+          table.remove(harpoon_files.items, selected_entry.index)
+          current_picker:refresh(finder())
+        end)
+        return true
+      end,
+    })
+    :find()
+end
+
 return {
   -- ---------------------------------------------------------------------------
   -- Telescope — fuzzy finder
@@ -243,27 +278,46 @@ return {
               gitsigns.nav_hunk('prev')
             end
           end, { desc = 'Jump to previous git [c]hange' })
-          map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk' })
-          map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk' })
-          map('v', '<leader>hs', function()
+          map('n', '<leader>gs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk' })
+          map('n', '<leader>gr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk' })
+          map('v', '<leader>gs', function()
             gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
           end, { desc = 'stage git hunk' })
-          map('v', '<leader>hr', function()
+          map('v', '<leader>gr', function()
             gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
           end, { desc = 'reset git hunk' })
-          map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
-          map('n', '<leader>hu', gitsigns.undo_stage_hunk, { desc = 'git [u]ndo stage hunk' })
-          map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer' })
-          map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
-          map('n', '<leader>hb', gitsigns.blame_line, { desc = 'git [b]lame line' })
-          map('n', '<leader>hd', gitsigns.diffthis, { desc = 'git [d]iff against index' })
-          map('n', '<leader>hD', function()
-            gitsigns.diffthis('@')
-          end, { desc = 'git [D]iff against last commit' })
-          map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git [b]lame' })
-          map('n', '<leader>tD', gitsigns.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })
+          map('n', '<leader>gS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
+          map('n', '<leader>gu', gitsigns.undo_stage_hunk, { desc = 'git [u]ndo stage hunk' })
+          map('n', '<leader>gR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer' })
+          map('n', '<leader>gp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
+          map('n', '<leader>gb', gitsigns.blame_line, { desc = 'git [b]lame line' })
+          map('n', '<leader>gt', gitsigns.toggle_current_line_blame, { desc = 'git [t]oggle line blame' })
+          map('n', '<leader>gT', gitsigns.toggle_deleted, { desc = 'git [T]oggle show deleted' })
         end,
       })
+    end,
+  },
+
+  -- ---------------------------------------------------------------------------
+  -- Diffview — full-tab diff view + file/branch history
+  -- pname: diffview.nvim
+  -- ---------------------------------------------------------------------------
+  {
+    'diffview.nvim',
+    cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewFileHistory' },
+    keys = {
+      lzextras.key2spec('n', '<leader>gd', function()
+        if next(require('diffview.lib').views) == nil then
+          vim.cmd.DiffviewOpen()
+        else
+          vim.cmd.DiffviewClose()
+        end
+      end, { desc = 'Git [d]iffview (toggle)' }),
+      lzextras.key2spec('n', '<leader>gf', '<cmd>DiffviewFileHistory %<CR>', { desc = 'Git [f]ile history' }),
+      lzextras.key2spec('n', '<leader>gF', '<cmd>DiffviewFileHistory<CR>', { desc = 'Git repo history' }),
+    },
+    after = function()
+      require('diffview').setup()
     end,
   },
 
@@ -313,60 +367,48 @@ return {
   {
     'harpoon2',
     keys = {
-      lzextras.key2spec('n', '<C-e>', function()
-        local harpoon = require('harpoon')
-        local conf = require('telescope.config').values
-        local harpoon_files = harpoon:list()
-        local function finder()
-          local paths = {}
-          for _, item in ipairs(harpoon_files.items) do
-            table.insert(paths, item.value)
-          end
-          return require('telescope.finders').new_table({ results = paths })
-        end
-        require('telescope.pickers')
-          .new({}, {
-            prompt_title = 'Harpoon',
-            finder = finder(),
-            previewer = conf.file_previewer({}),
-            sorter = conf.generic_sorter({}),
-            attach_mappings = function(prompt_bufnr, map)
-              map('i', '<C-d>', function()
-                local state = require('telescope.actions.state')
-                local selected_entry = state.get_selected_entry()
-                local current_picker = state.get_current_picker(prompt_bufnr)
-                table.remove(harpoon_files.items, selected_entry.index)
-                current_picker:refresh(finder())
-              end)
-              return true
-            end,
-          })
-          :find()
-      end, { desc = '[H]arpoon open telescope' }),
-      lzextras.key2spec('n', '<leader>a', function()
+      lzextras.key2spec('n', '<C-e>', harpoon_telescope, { desc = '[H]arpoon open telescope' }),
+      lzextras.key2spec('n', '<leader>hh', harpoon_telescope, { desc = '[H]arpoon open telescope' }),
+      lzextras.key2spec('n', '<leader>ha', function()
         require('harpoon'):list():add()
       end, { desc = '[H]arpoon add file' }),
-      lzextras.key2spec('n', '<leader>1', function()
+      lzextras.key2spec('n', '<leader>h1', function()
         require('harpoon'):list():select(1)
       end, { desc = '[H]arpoon file 1' }),
-      lzextras.key2spec('n', '<leader>2', function()
+      lzextras.key2spec('n', '<leader>h2', function()
         require('harpoon'):list():select(2)
       end, { desc = '[H]arpoon file 2' }),
-      lzextras.key2spec('n', '<leader>3', function()
+      lzextras.key2spec('n', '<leader>h3', function()
         require('harpoon'):list():select(3)
       end, { desc = '[H]arpoon file 3' }),
-      lzextras.key2spec('n', '<leader>4', function()
+      lzextras.key2spec('n', '<leader>h4', function()
         require('harpoon'):list():select(4)
       end, { desc = '[H]arpoon file 4' }),
-      lzextras.key2spec('n', '<leader>p', function()
+      lzextras.key2spec('n', '<leader>hp', function()
         require('harpoon'):list():prev()
       end, { desc = '[H]arpoon prev' }),
-      lzextras.key2spec('n', '<leader>n', function()
+      lzextras.key2spec('n', '<leader>hn', function()
         require('harpoon'):list():next()
       end, { desc = '[H]arpoon next' }),
+      lzextras.key2spec('n', '<leader>hl', function()
+        if harpoon_recent.prev then
+          require('harpoon'):list():select(harpoon_recent.prev)
+        else
+          vim.notify('No previous harpoon file', vim.log.levels.INFO)
+        end
+      end, { desc = '[H]arpoon toggle [l]ast' }),
     },
     after = function()
-      require('harpoon'):setup()
+      local harpoon = require('harpoon')
+      harpoon:setup()
+      harpoon:extend({
+        SELECT = function(ev)
+          if ev.idx and ev.idx ~= harpoon_recent.cur then
+            harpoon_recent.prev = harpoon_recent.cur
+            harpoon_recent.cur = ev.idx
+          end
+        end,
+      })
     end,
   },
 
@@ -443,6 +485,7 @@ return {
 
   -- Dependencies loaded by lze before their parent plugins
   { 'telescope-fzf-native.nvim', dep_of = { 'telescope.nvim' } },
+  { 'nvim-web-devicons', dep_of = { 'diffview.nvim' } },
   { 'telescope-ui-select.nvim', dep_of = { 'telescope.nvim' } },
   { 'twilight.nvim', dep_of = { 'zen-mode.nvim' } },
 }

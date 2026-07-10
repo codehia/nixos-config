@@ -71,6 +71,10 @@ with pkgs.vimPlugins;
     data = gitsigns-nvim;
     lazy = true;
   };
+  diffview = {
+    data = diffview-nvim;
+    lazy = true;
+  };
   which-key = {
     data = which-key-nvim;
     lazy = true;
