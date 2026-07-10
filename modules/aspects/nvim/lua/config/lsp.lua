@@ -87,7 +87,7 @@ M.on_attach = function(client, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 end
 
--- Native Neovim 0.11 LSP setup
+-- Native Neovim 0.12 LSP setup
 M.setup = function()
   vim.lsp.config('*', { on_attach = M.on_attach })
 
