@@ -100,6 +100,23 @@ return {
     require('mini.surround').setup()
 
     -- Mini.animate for animating movements
-    require('mini.animate').setup()
+    -- unit='total' keeps duration fixed regardless of distance (the default is
+    -- 20ms *per step*, which crawls on long scrolls). Scroll timing caps each
+    -- step at 10ms so holding j/k at the window edge doesn't outrun the
+    -- animation (:h MiniAnimate.config.scroll)
+    local animate = require('mini.animate')
+    local quad_out = animate.gen_timing.quadratic({ duration = 100, unit = 'total', easing = 'out' })
+    animate.setup({
+      cursor = { timing = quad_out },
+      scroll = {
+        timing = function(_, n)
+          return math.min(150 / n, 10)
+        end,
+        subscroll = animate.gen_subscroll.equal({ max_output_steps = 120 }),
+      },
+      resize = { timing = quad_out },
+      open = { timing = quad_out },
+      close = { timing = quad_out },
+    })
   end,
 }
