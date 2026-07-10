@@ -8,8 +8,10 @@
 # definition, so the old multi-file collector split cannot merge it.
 { den, inputs, ... }:
 let
-  # Patch MangoWC to use 5 tags instead of the default 9.
+  # Patch MangoWC to use 5 tags + a stash tag "S" instead of the default 9.
   # Tag count is compile-time (src/config/preset.h), so we override the source.
+  # Tag 6 ("S") is the window stash — it has no view/tag number binds, so it is
+  # only reachable through the stash keybindings below.
   # scenefx override: mango 0.14.4 needs scenefx-0.5, but mango's own flake.lock
   # pins 0.4.1 (and scenefx HEAD renamed its package attr to scenefx-git, so a
   # follows-override can't work). Drop this once upstream re-locks scenefx.
@@ -22,7 +24,7 @@ let
         postPatch = (old.postPatch or "") + ''
           substituteInPlace src/config/preset.h \
             --replace-fail '"1", "2", "3", "4", "5", "6", "7", "8", "9"' \
-                           '"1", "2", "3", "4", "5"'
+                           '"1", "2", "3", "4", "5", "S"'
         '';
       });
 in
@@ -67,6 +69,74 @@ in
             | ${pkgs.jq}/bin/jq -r '.monitors[0].active_tags[0] // 0')
           if [ "''${cur:-0}" -ge 1 ]; then
             exec ${mangoPkg}/bin/mmsg dispatch "view,$cur"
+          fi
+        '';
+
+        # Window stash — tag 6 ("S") replaces mango's minimize/scratchpad pool,
+        # which only shows one window at a time and restores floating-centered.
+        # On a normal tag: send the focused window to the stash silently and
+        # record its origin tag. On the stash tag: bounce back to the previous
+        # tag (view_current_to_back) and bring the focused window along.
+        # Origin records live in XDG_RUNTIME_DIR — client ids and the file both
+        # reset with the session, so they stay in sync.
+        stashToggle = pkgs.writeShellScript "mango-stash-toggle" ''
+          mmsg=${mangoPkg}/bin/mmsg
+          jq=${pkgs.jq}/bin/jq
+          state="''${XDG_RUNTIME_DIR:-/tmp}/mango-stash-origins"
+
+          mon=$($mmsg get all-monitors)
+          tags=$(printf '%s' "$mon" | $jq -c '[.monitors[] | select(.active) | .active_tags[]]')
+          cid=$(printf '%s' "$mon" | $jq -r '.monitors[] | select(.active) | .active_client.id // empty')
+          [ -n "$cid" ] || exit 0
+
+          if [ "$tags" = "[6]" ]; then
+            # viewing the stash tag bounces to prevtag (view_current_to_back)
+            $mmsg dispatch "view,6"
+            cur=$($mmsg get all-monitors | $jq -r '.monitors[] | select(.active) | .active_tags[0] // 0')
+            if [ "$cur" -lt 1 ] || [ "$cur" -gt 5 ]; then
+              cur=1
+              $mmsg dispatch "view,1"
+            fi
+            $mmsg dispatch "client,$cid,tagsilent,$cur"
+            $mmsg dispatch "client,$cid,focusid"
+            [ -f "$state" ] && sed -i "/^$cid /d" "$state"
+          else
+            client=$($mmsg get all-clients | $jq -c ".clients[] | select(.id == $cid)")
+            [ -n "$client" ] || exit 0
+            # named scratchpads carry their own toggle state — never stash them
+            [ "$(printf '%s' "$client" | $jq '.is_namedscratchpad')" = "true" ] && exit 0
+            origin=$(printf '%s' "$client" | $jq -r '.tags[0] // 0')
+            if [ "$origin" -ge 1 ] && [ "$origin" -le 5 ]; then
+              touch "$state"
+              { grep -v "^$cid " "$state"; echo "$cid $origin"; } > "$state.new"
+              mv "$state.new" "$state"
+            fi
+            $mmsg dispatch "client,$cid,tagsilent,6"
+          fi
+        '';
+
+        # Restore the focused stashed window to the tag it was stashed from.
+        # Falls back to stashToggle's restore-to-last when no origin record.
+        restoreToOrigin = pkgs.writeShellScript "mango-restore-origin" ''
+          mmsg=${mangoPkg}/bin/mmsg
+          jq=${pkgs.jq}/bin/jq
+          state="''${XDG_RUNTIME_DIR:-/tmp}/mango-stash-origins"
+
+          cid=$($mmsg get all-monitors | $jq -r '.monitors[] | select(.active) | .active_client.id // empty')
+          [ -n "$cid" ] || exit 0
+
+          # only acts on stashed windows
+          on_stash=$($mmsg get all-clients | $jq ".clients[] | select(.id == $cid) | .tags | contains([6])")
+          [ "$on_stash" = "true" ] || exit 0
+
+          origin=""
+          [ -f "$state" ] && origin=$(grep "^$cid " "$state" | cut -d' ' -f2)
+          if [ -n "$origin" ] && [ "$origin" -ge 1 ] && [ "$origin" -le 5 ]; then
+            # tag moves the window, follows the view, and focuses it
+            $mmsg dispatch "client,$cid,tag,$origin"
+            sed -i "/^$cid /d" "$state"
+          else
+            exec ${stashToggle}
           fi
         '';
 
@@ -289,10 +359,12 @@ in
               "SUPER+SHIFT,s,toggle_named_scratchpad,Slack,none,slack"
               "SUPER+SHIFT,e,toggle_named_scratchpad,io.ente.auth,none,enteauth"
 
-              # Minimized pool (≈ Hyprland special:minimized)
-              "SUPER,n,minimized"
-              "SUPER+SHIFT,n,toggle_scratchpad"
-              "SUPER+SHIFT,u,restore_minimized"
+              # Window stash (tag 6, "S") — see stashToggle above.
+              # n stashes / restores to last focused workspace (context-aware);
+              # SHIFT+n toggles the stash view; SHIFT+u restores to origin tag.
+              "SUPER,n,spawn,${stashToggle}"
+              "SUPER+SHIFT,n,view,6"
+              "SUPER+SHIFT,u,spawn,${restoreToOrigin}"
 
               # Alt-Tab cycling
               "ALT,Tab,focusstack,next"

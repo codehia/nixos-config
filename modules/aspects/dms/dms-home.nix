@@ -159,6 +159,21 @@ let
             Install.WantedBy = [ "graphical-session.target" ];
           };
 
+          # Hide the mango stash tag (tag 6, "S") from the bar unless it is the
+          # active tag. DMS has no per-tag filter — with dwlShowAllTags the
+          # switcher renders every tag, so patch the mango branch of the
+          # workspace list. DMS tags are 0-based (MangoService maps index-1),
+          # so the stash is tag.tag === 5; state === 1 means active.
+          # --replace-fail makes a DMS update that restructures this line fail
+          # the build instead of silently regressing.
+          dmsPkg = (inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.dms-shell).overrideAttrs (old: {
+            postInstall = old.postInstall + ''
+              substituteInPlace $out/share/quickshell/dms/Modules/DankBar/Widgets/WorkspaceSwitcher.qml \
+                --replace-fail 'return output.tags.map(tag => ({' \
+                               'return output.tags.filter(tag => tag.tag !== 5 || tag.state === 1).map(tag => ({'
+            '';
+          });
+
           finalSettings = lib.recursiveUpdate settings {
             customThemeFile = "${home}/.config/DankMaterialShell/themes/catppuccin/theme.json";
             currentThemeName = "custom"; # DMS Theme.qml only loads customThemeFile when name === "custom"
@@ -211,6 +226,7 @@ let
 
           programs.dank-material-shell = {
             enable = true;
+            package = dmsPkg;
             dgop.package = inputs.dgop.packages.${pkgs.stdenv.hostPlatform.system}.default;
             quickshell.package = inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.quickshell;
             enableSystemMonitoring = true;
