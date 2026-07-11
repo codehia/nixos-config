@@ -245,6 +245,13 @@ in
             sloppyfocus = 0;
             warpcursor = 0;
 
+            # Mango's default (1) lets any xdg-activation request yank the view
+            # back to the requesting client's tag — fullscreen VLC does this on
+            # workspace switch, so leaving its tag looked impossible. 0 matches
+            # Hyprland's focus_on_activate=false: the client is marked urgent
+            # (border color) instead of stealing the view.
+            focus_on_activate = 0;
+
             # Viewing the already-current tag jumps back to the previous one
             # (Hyprland's workspace_back_and_forth). Required by the SUPER,z
             # last-workspace script; side effect: SUPER,1-5 on the current
