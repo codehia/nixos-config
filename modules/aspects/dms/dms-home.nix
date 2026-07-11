@@ -35,8 +35,14 @@ let
         barConfigs = map patchBarConfig baseSettings.barConfigs;
 
         # Disable matugen — not installed (enableDynamicTheming = false).
+        # runDmsMatugenTemplates must be TRUE, counterintuitively: it only picks
+        # which skip list Theme.qml builds, and its false-branch hardcoded list
+        # omits mangowc/hyprland — so those templates still rendered on every
+        # wallpaper change, rewriting ~/.config/mango/dms/colors.conf, which
+        # MangoService watches → reload_config + "mango: config reloaded" toast.
+        # With true, the per-template flags below apply and cover all templates.
         runUserMatugenTemplates = false;
-        runDmsMatugenTemplates = false;
+        runDmsMatugenTemplates = true;
         matugenTemplateGtk = false;
         matugenTemplateNiri = false;
         matugenTemplateHyprland = false;
@@ -47,6 +53,7 @@ let
         matugenTemplatePywalfox = false;
         matugenTemplateZenBrowser = false;
         matugenTemplateVesktop = false;
+        matugenTemplateVencord = false;
         matugenTemplateEquibop = false;
         matugenTemplateGhostty = false;
         matugenTemplateKitty = false;
@@ -58,6 +65,7 @@ let
         matugenTemplateKcolorscheme = false;
         matugenTemplateVscode = false;
         matugenTemplateEmacs = false;
+        matugenTemplateZed = false;
 
         # Disable audio visualizer — cava not installed (enableAudioWavelength = false).
         audioVisualizerEnabled = false;
