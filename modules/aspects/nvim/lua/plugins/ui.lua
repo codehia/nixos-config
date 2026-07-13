@@ -180,6 +180,20 @@ return {
           message = { enabled = true },
           documentation = { enabled = true },
         },
+        routes = {
+          -- basedpyright re-analyzes on every keystroke; its progress spam is noise
+          {
+            filter = {
+              event = 'lsp',
+              kind = 'progress',
+              cond = function(message)
+                local client = vim.tbl_get(message.opts, 'progress', 'client')
+                return client == 'basedpyright'
+              end,
+            },
+            opts = { skip = true },
+          },
+        },
         presets = {
           bottom_search = true,
           command_palette = true,
