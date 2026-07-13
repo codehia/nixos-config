@@ -83,7 +83,8 @@
   typescript = {
     packages = with pkgs; [
       typescript-language-server
-      prettier
+      # 26.05 prettier builds with insecure pnpm_9; revert to `prettier` once the pnpm_10 bump is backported
+      unstable.prettier
       eslint_d
     ];
     formatters = {

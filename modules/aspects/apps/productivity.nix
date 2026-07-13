@@ -24,10 +24,11 @@
             kdePackages.okular
             _1password-gui
             ente-auth
-            siyuan
           ])
           ++ (with pkgs.unstable; [
             obsidian
+            # 26.05 siyuan builds with insecure pnpm_9; move back once the pnpm bump is backported
+            siyuan
           ])
           ++ [
             inputs.zennotes.packages.${pkgs.stdenv.hostPlatform.system}.zennotes-desktop
