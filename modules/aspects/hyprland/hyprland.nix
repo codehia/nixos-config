@@ -39,8 +39,14 @@ in
         home.sessionVariables.NIXOS_OZONE_WL = "1";
         # Export HM session variables into the UWSM environment so systemd
         # services (DMS, etc.) inherit PATH and other HM-set vars.
-        xdg.configFile."uwsm/env".source =
-          "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
+        # The guard must be unset first: it is already =1 in the login chain's
+        # environment, so sourcing alone is a no-op and nothing (NIXOS_OZONE_WL
+        # included) reaches the systemd activation environment — DMS-launched
+        # Electron apps then silently fall back to XWayland.
+        xdg.configFile."uwsm/env".text = ''
+          unset __HM_SESS_VARS_SOURCED
+          . ${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh
+        '';
         home.packages = with pkgs; [
           grimblast
           satty
@@ -63,11 +69,12 @@ in
           systemd.variables = [ "--all" ];
           xwayland.enable = true;
           settings = {
+            "$modifier" = "SUPER";
+
             input = {
-              kb_options = [
-                "grp:alt_caps_toggle"
-                "caps:super"
-              ];
+              # single hyprlang String — a list would render as repeated lines
+              # and the last one overwrites the rest
+              kb_options = "grp:alt_caps_toggle,caps:super";
               numlock_by_default = false;
               repeat_delay = 300;
               follow_mouse = 0;
@@ -81,7 +88,6 @@ in
             };
 
             general = {
-              "$mod" = "SUPER";
               layout = "master";
               gaps_in = 5;
               gaps_out = 7;
@@ -197,6 +203,12 @@ in
               "float on, match:class io.ente.auth"
               "size 10% 80%, match:class io.ente.auth"
               "center on, match:class io.ente.auth"
+
+              # Apps launched from the filemanager scratchpad inherit its special
+              # workspace (visible-special map + initial_workspace_tracking token).
+              # r+0 resolves to the current REGULAR workspace and applies silently
+              # while a special is up, so the scratchpad stays visible on top.
+              "workspace r+0, match:class vlc"
             ];
           };
         };

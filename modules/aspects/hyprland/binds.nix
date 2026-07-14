@@ -55,7 +55,6 @@
           "$modifier, SPACE, exec, dms ipc launcher toggle"
           "$modifier SHIFT, RETURN, exec, ghostty"
           "$modifier, W, exec, zen-beta"
-          "$modifier, T, exec, nautilus"
 
           "$modifier, M,        layoutmsg, focusmaster"
           "$modifier, RETURN,   layoutmsg, swapwithmaster master"
@@ -114,7 +113,7 @@
 
           # Scratchpads — native special workspaces (only one visible at a time)
           "$modifier, grave, exec, ${hyprToggleScratchpad} term"
-          "$modifier SHIFT, T, exec, ${hyprToggleScratchpad} filemanager"
+          "$modifier, T, exec, ${hyprToggleScratchpad} filemanager"
           "$modifier SHIFT, O, exec, ${hyprToggleScratchpad} pw"
           "$modifier SHIFT, M, exec, ${hyprToggleScratchpad} spotify"
           "$modifier SHIFT, S, exec, ${hyprToggleScratchpad} slack"
@@ -145,6 +144,12 @@
           "$modifier, P, exec, grimblast --notify copysave screen"
           "$modifier CONTROL, P, exec, grimblast --notify copysave area"
           "$modifier ALT, P, exec, ${screenshotAnnotate}"
+        ];
+
+        # Mouse drag move/resize — parity with mango's SUPER+LMB/RMB mousebinds.
+        wayland.windowManager.hyprland.settings.bindm = [
+          "$modifier, mouse:272, movewindow"
+          "$modifier, mouse:273, resizewindow"
         ];
       };
   };
