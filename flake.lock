@@ -480,11 +480,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783997242,
-        "narHash": "sha256-6YSww9P8Rkcw0E58LH3T2L1tAtiRzdMc8DzzqQRYxTU=",
+        "lastModified": 1784032928,
+        "narHash": "sha256-72qyH9/Kr6//1YiSK7UVZ8ymu2vnkEIuYyh7t9E7C4o=",
         "owner": "AvengeMedia",
         "repo": "DankMaterialShell",
-        "rev": "9ff751b82a89b35f2ee04d694de04c15db7bef8c",
+        "rev": "f1e9121295b823003388b965e308cad6ff9e4b00",
         "type": "github"
       },
       "original": {
@@ -1269,11 +1269,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1784011574,
-        "narHash": "sha256-GXDxqbyAzexP8Rih20Z4nRfTJnPCcS0SWvCH2j6xCHY=",
+        "lastModified": 1784025900,
+        "narHash": "sha256-ZAnvkVf1o8A+r0BQ6JOR3CNA+1NVbnvO3KUXNqV8Gfs=",
         "owner": "hyprwm",
         "repo": "hyprland",
-        "rev": "30983d6ff0ed5fc614daf3178ad311aa45f8d9e1",
+        "rev": "e0d9283897724403ea8574b3ed419d2678a39231",
         "type": "github"
       },
       "original": {
@@ -2645,8 +2645,7 @@
         "tuigreet": "tuigreet",
         "wallpapers": "wallpapers",
         "wrappers": "wrappers",
-        "zen-browser": "zen-browser",
-        "zennotes": "zennotes"
+        "zen-browser": "zen-browser"
       }
     },
     "rust-analyzer-src": {
@@ -3246,26 +3245,6 @@
       "original": {
         "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "type": "github"
-      }
-    },
-    "zennotes": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1783735288,
-        "narHash": "sha256-BpUSHqSbURq1VzILqRQ0JglRUHqPhK3PQM4MHD9b1kY=",
-        "owner": "ZenNotes",
-        "repo": "zennotes",
-        "rev": "a2fb27dc7037308c5f07cdeb44a9661e963af47d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ZenNotes",
-        "repo": "zennotes",
         "type": "github"
       }
     }
