@@ -1,10 +1,5 @@
-{ den, inputs, ... }:
+{ den, ... }:
 {
-  flake-file.inputs.zennotes = {
-    url = "github:ZenNotes/zennotes";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-
   den.aspects.apps = {
     includes = [
       (den._.unfree [
@@ -29,10 +24,7 @@
             obsidian
             # 26.05 siyuan builds with insecure pnpm_9; move back once the pnpm bump is backported
             siyuan
-          ])
-          ++ [
-            inputs.zennotes.packages.${pkgs.stdenv.hostPlatform.system}.zennotes-desktop
-          ];
+          ]);
       };
   };
 }
