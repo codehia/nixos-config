@@ -16,7 +16,7 @@ let
         { pkgs, config, ... }:
         let
           tuigreet = "${inputs.tuigreet.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/tuigreet";
-          # Aggregated session entries from all WMs (sway, hyprland, niri, mango, …).
+          # Aggregated session entries from all WMs (sway, hyprland, mango, …).
           sessionsDir = "${config.services.displayManager.sessionData.desktops}/share/wayland-sessions";
         in
         {

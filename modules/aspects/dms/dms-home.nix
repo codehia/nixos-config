@@ -79,7 +79,7 @@ let
         lockBeforeSuspend = true;
 
         # Night mode via DMS wlr-gamma-control-v1 — uniform across all compositors
-        # (sway, hyprland, niri, mango all support the protocol).
+        # (sway, hyprland, mango all support the protocol).
         nightModeEnabled = true;
         nightModeAutoEnabled = true;
       };
