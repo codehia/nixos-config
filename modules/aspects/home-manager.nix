@@ -35,9 +35,11 @@
             NPM_CONFIG_USERCONFIG = "$HOME/.config/npm/npmrc";
             COOKIECUTTER_CONFIG = "$HOME/.config/cookiecutter/config.yaml";
           };
+          # npmrc supports ''${VAR} env substitution only — no shell :-defaults;
+          # unexpanded values become literal relative dirs in whatever cwd npm runs
           file.".config/npm/npmrc".text = ''
-            cache=''${XDG_CACHE_HOME:-$HOME/.cache}/npm
-            prefix=''${XDG_DATA_HOME:-$HOME/.local/share}/npm
+            cache=${config.xdg.cacheHome}/npm
+            prefix=${config.xdg.dataHome}/npm
           '';
         };
       };
