@@ -22,7 +22,7 @@
           nix-tree
           manix
           nix-output-monitor
-          nixfmt-classic
+          nixfmt
         ];
       };
   };
