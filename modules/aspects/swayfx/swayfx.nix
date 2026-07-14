@@ -53,16 +53,10 @@
           # Bind to the sway session only — with all WMs' HM configs active per user,
           # graphical-session.target would start this under every compositor.
           systemdTargets = [ "sway-session.target" ];
-          events = [
-            {
-              event = "before-sleep";
-              command = "${pkgs.playerctl}/bin/playerctl -a pause";
-            }
-            {
-              event = "lock";
-              command = "${pkgs.playerctl}/bin/playerctl -a pause";
-            }
-          ];
+          events = {
+            before-sleep = "${pkgs.playerctl}/bin/playerctl -a pause";
+            lock = "${pkgs.playerctl}/bin/playerctl -a pause";
+          };
         };
 
         home = {
