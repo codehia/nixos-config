@@ -238,6 +238,9 @@ in
             ### Layout, input, cursor, monitor
             default_mfact = 0.55;
             default_nmaster = 1;
+            # center_tile: master spans the full width while it has no stack
+            # windows (otherwise a lone window sits centered at mfact width)
+            center_master_overspread = 1;
 
             repeat_delay = 300;
             repeat_rate = 25;
