@@ -68,6 +68,10 @@
           hyprland.enable = false;
           rofi.enable = false;
           fish.enable = true; # no stylix fish target
+          # module targets HM's renamed programs.gemini-cli (removed on catppuccin
+          # main, not yet on release-26.05) — delete this line when the input
+          # update turns it into a removed-option error
+          gemini-cli.enable = false;
         };
 
         stylix = {
