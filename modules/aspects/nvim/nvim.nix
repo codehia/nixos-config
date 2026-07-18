@@ -60,13 +60,28 @@ let
                 {
                   pkgs,
                   wlib,
+                  config,
                   ...
                 }:
                 {
                   imports = [ wlib.wrapperModules.neovim ];
                   package = nvimPkg;
                   inherit runtimePkgs;
-                  specs = import ./_plugins.nix { inherit pkgs lzextrasLatest; };
+                  specs = import ./_plugins.nix {
+                    inherit pkgs lzextrasLatest;
+                    # postPatch: upstream typo makes multi-rule merge unreachable for
+                    # sameLine sources (pyright/ruff) — appends a 2nd ignore comment
+                    # instead of merging. --replace-fail breaks the build when upstream
+                    # fixes it, signalling the patch can be dropped.
+                    rulebookPlugin =
+                      (config.nvim-lib.mkPlugin "nvim-rulebook" inputs.nvim-rulebook).overrideAttrs
+                        (old: {
+                          postPatch = ''
+                            substituteInPlace lua/rulebook/diagnostic-actions.lua \
+                              --replace-fail 'location == "location"' 'location == "sameLine"'
+                          '';
+                        });
+                  };
                   info = {
                     nixdExtras.nixpkgs = "import ${pkgs.path} {}";
                     inherit categories;
@@ -95,6 +110,10 @@ in
 {
   flake-file.inputs.wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
   flake-file.inputs.lzextras.url = "github:BirdeeHub/lzextras";
+  flake-file.inputs.nvim-rulebook = {
+    url = "github:chrisgrieser/nvim-rulebook";
+    flake = false;
+  };
 
   den.aspects.nvim = {
     includes = [ nvimPerUser ];

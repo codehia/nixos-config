@@ -50,6 +50,10 @@
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nvim-rulebook = {
+      url = "github:chrisgrieser/nvim-rulebook";
+      flake = false;
+    };
     pam-fde-boot-pw = {
       url = "git+https://git.sr.ht/~kennylevinsen/pam_fde_boot_pw";
       flake = false;

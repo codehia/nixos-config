@@ -1,6 +1,7 @@
 {
   pkgs,
   lzextrasLatest,
+  rulebookPlugin,
 }:
 with pkgs.vimPlugins;
 {
@@ -210,6 +211,10 @@ with pkgs.vimPlugins;
   };
   rainbow-delimiters = {
     data = rainbow-delimiters-nvim;
+    lazy = true;
+  };
+  rulebook = {
+    data = rulebookPlugin;
     lazy = true;
   };
 }
