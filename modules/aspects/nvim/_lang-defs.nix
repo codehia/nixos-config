@@ -60,23 +60,19 @@
   python = {
     packages = with pkgs; [
       basedpyright
-      python3Packages.flake8
-      python3Packages.autopep8
-      isort
+      ruff
     ];
     formatters = {
       fast = {
-        python = [ ];
-      };
-      slow = {
         python = [
-          "isort"
-          "autopep8"
+          "ruff_organize_imports"
+          "ruff_format"
         ];
       };
+      slow = { };
     };
     linters = {
-      python = [ "flake8" ];
+      python = [ "ruff" ];
     };
   };
 
