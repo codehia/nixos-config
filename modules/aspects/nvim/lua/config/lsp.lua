@@ -92,7 +92,7 @@ M.setup = function()
   vim.lsp.config('*', { on_attach = M.on_attach })
 
   vim.diagnostic.config({
-    float = { border = 'rounded' },
+    float = { border = 'rounded', source = true },
     signs = {
       text = {
         [vim.diagnostic.severity.ERROR] = '✘',
