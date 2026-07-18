@@ -71,20 +71,10 @@ return {
           use_nvim_cmp_as_default = true,
           nerd_font_variant = 'mono',
         },
-        snippets = {
-          expand = function(snippet)
-            require('luasnip').lsp_expand(snippet)
-          end,
-          active = function(filter)
-            if filter and filter.direction then
-              return require('luasnip').jumpable(filter.direction)
-            end
-            return require('luasnip').in_snippet()
-          end,
-          jump = function(direction)
-            require('luasnip').jump(direction)
-          end,
-        },
+        -- preset wires expand/active/jump AND sources the luasnip registry;
+        -- the default snippets source only reads VSCode-JSON from rtp and
+        -- never sees ls.add_snippets() entries (config/snippets.lua)
+        snippets = { preset = 'luasnip' },
         sources = {
           default = { 'lsp', 'snippets', 'copilot', 'buffer' },
           providers = {
@@ -173,7 +163,46 @@ return {
         updateevents = 'TextChanged,TextChangedI',
         enable_autosnippets = true,
       })
+
+      -- Custom snippets (singleton, den aspect skeletons, lze specs, ...)
+      require('config.snippets')
     end,
+  },
+
+  -- ---------------------------------------------------------------------------
+  -- Rulebook — insert ignore comments / look up rule docs for diagnostics
+  -- pname: nvim-rulebook
+  -- ---------------------------------------------------------------------------
+  {
+    'nvim-rulebook',
+    after = function()
+      -- no-space bracket style to match hand-written comments and pyright docs;
+      -- merge detection only recognizes comments matching the configured template.
+      -- Both keys needed: basedpyright aliases Pyright by table ref in defaults,
+      -- partial override on Pyright alone would not propagate.
+      require('rulebook').setup({
+        ignoreComments = {
+          Pyright = { comment = '# pyright: ignore[%s]' },
+          basedpyright = { comment = '# pyright: ignore[%s]' },
+        },
+      })
+    end,
+    keys = {
+      {
+        '<leader>ci',
+        function()
+          require('rulebook').ignoreRule()
+        end,
+        desc = '[C]ode [I]gnore rule',
+      },
+      {
+        '<leader>cL',
+        function()
+          require('rulebook').lookupRule()
+        end,
+        desc = '[C]ode rule [L]ookup',
+      },
+    },
   },
 
   -- ---------------------------------------------------------------------------
