@@ -47,6 +47,7 @@
       den.aspects.lact
       den.aspects.ios-devices
       den.aspects.gaming
+      den.aspects.kanata
     ];
   };
 }
