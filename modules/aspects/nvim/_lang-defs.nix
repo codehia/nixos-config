@@ -18,15 +18,19 @@
       shfmt
       shellcheck
       markdownlint-cli
+      djlint
     ];
     formatters = {
       fast = {
         sh = [ "shfmt" ];
         markdown = [ "markdownlint" ];
+        htmldjango = [ "djlint" ];
       };
       slow = { };
     };
-    linters = { };
+    linters = {
+      htmldjango = [ "djlint" ];
+    };
   };
 
   lua = {
