@@ -3,7 +3,12 @@
 (defalias
   entctl (tap-hold-release 200 250 ret rctl)
   delctl (tap-hold-release 200 250 del lctl)
-  spcnav (tap-hold-release 200 250 spc (layer-toggle nav))
+  ;; space: nav-layer tap-hold, EXCEPT when caps/super already held →
+  ;; plain spc immediately (fixes SUPER+SPACE leaking a delayed space).
+  spcnav (fork
+    (tap-hold-release 200 250 spc (layer-toggle nav))
+    spc
+    (caps lmet rmet))
 )
 
 (defsrc
