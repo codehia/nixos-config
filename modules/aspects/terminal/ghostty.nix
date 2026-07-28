@@ -17,6 +17,7 @@
             shell-integration-features = "no-cursor";
             window-padding-balance = true;
             window-decoration = false;
+            gtk-single-instance = true; # route every `ghostty` to the clean systemd service
             keybind = "ctrl+enter=unbind";
           };
         };
