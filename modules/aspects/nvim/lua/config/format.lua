@@ -58,6 +58,7 @@ function M.format_fast(bufnr)
       formatters = fast,
       timeout_ms = 500,
       lsp_format = 'fallback',
+      stop_after_first = true,
     }, function(err)
       if err and err:match('timeout$') then
         slow_format_filetypes[ft] = true

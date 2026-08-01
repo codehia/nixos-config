@@ -352,6 +352,11 @@ return {
           return fmt.format_after_save(bufnr)
         end,
         formatters_by_ft = formatters_by_ft,
+        formatters = {
+          biome = { require_cwd = true },
+          rustfmt = { require_cwd = true },
+          djlint = { require_cwd = true },
+        },
       })
 
       -- <leader>cf: run all formatters (fast sync + slow async)
@@ -386,11 +391,79 @@ return {
       end
       lint.linters_by_ft = linters_by_ft
 
+      -- Gate table for linters that are noisy/opinionated without a project
+      -- config. This is a LOOKUP, not a run list: resolve() only ever walks
+      -- linters_by_ft[current filetype] and consults this table per name —
+      -- lua entries are never touched for js buffers, etc.
+      --
+      -- Semantics per linter in the ft list (order matters):
+      --   * not in this table  -> always runs (shellcheck, statix, ...)
+      --   * in this table      -> runs only when one of its config files is
+      --     found upward from the buffer; the FIRST gated linter that matches
+      --     wins and later gated ones are skipped (biome over eslint,
+      --     selene over luacheck)
+      --   * actionlint         -> special-cased: path-gated on .github/workflows
+      --
+      -- eslint is gated (not an ungated fallback) so it can't run alongside
+      -- biome in biome repos; consequence: a repo with NO js lint config gets
+      -- no js linting at all (ts_ls still provides type diagnostics).
+      -- Alternative considered: drop the eslint file list and give ungated
+      -- linters fallback semantics ("skip if an earlier gated linter matched"
+      -- via `if not picked`) — revisit if the list becomes a burden.
+      local config_gates = {
+        biomejs = { 'biome.json', 'biome.jsonc' },
+        eslint = {
+          '.eslintrc',
+          '.eslintrc.js',
+          '.eslintrc.cjs',
+          '.eslintrc.yaml',
+          '.eslintrc.yml',
+          '.eslintrc.json',
+          'eslint.config.js',
+          'eslint.config.mjs',
+          'eslint.config.cjs',
+          'eslint.config.ts',
+        },
+        selene = { 'selene.toml' },
+        luacheck = { '.luacheckrc' },
+        markdownlint = {
+          '.markdownlint.json',
+          '.markdownlint.jsonc',
+          '.markdownlint.yaml',
+          '.markdownlint.yml',
+          '.markdownlintrc',
+        },
+        yamllint = { '.yamllint', '.yamllint.yaml', '.yamllint.yml' },
+      }
+
+      local function resolve(names, bufname)
+        local dir = bufname ~= '' and vim.fs.dirname(bufname) or vim.fn.getcwd()
+        local to_run, picked = {}, false
+        for _, name in ipairs(names) do
+          if name == 'actionlint' then
+            -- path-gated: GitHub workflow files only
+            if bufname:find('%.github/workflows/') then
+              table.insert(to_run, name)
+            end
+          elseif config_gates[name] == nil then
+            table.insert(to_run, name)
+          elseif not picked and #vim.fs.find(config_gates[name], { upward = true, path = dir }) > 0 then
+            table.insert(to_run, name)
+            picked = true
+          end
+        end
+        return to_run
+      end
+
       local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
       vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
         group = lint_augroup,
         callback = function()
-          lint.try_lint()
+          local names = lint.linters_by_ft[vim.bo.filetype]
+          if not names then
+            return
+          end
+          lint.try_lint(resolve(names, vim.api.nvim_buf_get_name(0)))
         end,
       })
     end,

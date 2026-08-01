@@ -103,140 +103,107 @@ M.setup = function()
     },
   })
 
-  -- WHY nix_has_feature() guards:
-  -- extraPackages in nvim.nix is filtered by the same `languages` list that populates
-  -- info.categories. If a language is not enabled, its server binary is NOT on PATH.
-  -- Without these guards, vim.lsp.enable('gopls') would still be called, Neovim would
-  -- try to spawn the missing binary on the first .go file open, and show an error.
-  --
-  -- Alternative: vim.fn.executable('gopls') == 1 — same safety without needing Nix metadata.
-  --
-  -- Note: each server below calls nix_has_feature twice — once for vim.lsp.config and
-  -- once to build the servers list. A table-driven loop would eliminate this duplication
-  -- (see modules/nvim/README.md for the refactor pattern).
+  vim.lsp.config('lua_ls', {
+    cmd = { 'lua-language-server' },
+    filetypes = { 'lua' },
+    root_markers = { '.luarc.json', '.luarc.jsonc', '.stylua.toml', 'stylua.toml', '.git' },
+    settings = {
+      Lua = {
+        runtime = { version = 'LuaJIT' },
+        formatters = { ignoreComments = true },
+        signatureHelp = { enabled = true },
+        diagnostics = { globals = { 'vim' }, disable = { 'missing-fields' } },
+        telemetry = { enabled = false },
+      },
+    },
+  })
 
-  if nix_has_feature('lua') then
-    vim.lsp.config('lua_ls', {
-      cmd = { 'lua-language-server' },
-      filetypes = { 'lua' },
-      root_markers = { '.luarc.json', '.luarc.jsonc', '.stylua.toml', 'stylua.toml', '.git' },
-      settings = {
-        Lua = {
-          runtime = { version = 'LuaJIT' },
-          formatters = { ignoreComments = true },
-          signatureHelp = { enabled = true },
-          diagnostics = { globals = { 'vim' }, disable = { 'missing-fields' } },
-          telemetry = { enabled = false },
+  vim.lsp.config('nixd', {
+    cmd = { 'nixd' },
+    filetypes = { 'nix' },
+    root_markers = { 'flake.nix', '.git' },
+    settings = {
+      nixd = {
+        nixpkgs = { expr = nix_info('nixdExtras', 'nixpkgs') or 'import <nixpkgs> {}' },
+        formatting = { command = { 'nixfmt' } },
+        diagnostic = { suppress = { 'sema-escaping-with' } },
+      },
+    },
+  })
+
+  vim.lsp.config('basedpyright', {
+    cmd = { 'basedpyright-langserver', '--stdio' },
+    filetypes = { 'python' },
+    root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
+    settings = {
+      basedpyright = {
+        analysis = {
+          typeCheckingMode = 'basic',
+          autoSearchPaths = true,
+          useLibraryCodeForTypes = true,
+          diagnosticMode = 'openFilesOnly',
         },
       },
-    })
-  end
+    },
+  })
 
-  if nix_has_feature('nix') then
-    vim.lsp.config('nixd', {
-      cmd = { 'nixd' },
-      filetypes = { 'nix' },
-      root_markers = { 'flake.nix', '.git' },
-      settings = {
-        nixd = {
-          nixpkgs = { expr = nix_info('nixdExtras', 'nixpkgs') or 'import <nixpkgs> {}' },
-          formatting = { command = { 'nixfmt' } },
-          diagnostic = { suppress = { 'sema-escaping-with' } },
-        },
+  vim.lsp.config('ts_ls', {
+    cmd = { 'typescript-language-server', '--stdio' },
+    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+    root_markers = { 'tsconfig.json', 'jsconfig.json', 'package.json', '.git' },
+  })
+
+  vim.lsp.config('astro', {
+    cmd = { 'astro-ls', '--stdio' },
+    filetypes = { 'astro' },
+    root_markers = { 'package.json', 'tsconfig.json', 'jsconfig.json', '.git' },
+    init_options = { typescript = {} },
+  })
+
+  vim.lsp.config('gopls', {
+    cmd = { 'gopls' },
+    filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+    root_markers = { 'go.mod', 'go.work', '.git' },
+  })
+
+  vim.lsp.config('rust_analyzer', {
+    cmd = { 'rust-analyzer' },
+    filetypes = { 'rust' },
+    root_markers = { 'Cargo.toml', 'Cargo.lock', '.git' },
+    settings = {
+      ['rust-analyzer'] = {
+        checkOnSave = { command = 'clippy' },
       },
-    })
-  end
+    },
+  })
 
-  if nix_has_feature('python') then
-    vim.lsp.config('basedpyright', {
-      cmd = { 'basedpyright-langserver', '--stdio' },
-      filetypes = { 'python' },
-      root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
-      settings = {
-        basedpyright = {
-          analysis = {
-            typeCheckingMode = 'basic',
-            autoSearchPaths = true,
-            useLibraryCodeForTypes = true,
-            diagnosticMode = 'openFilesOnly',
-          },
+  vim.lsp.config('texlab', {
+    cmd = { 'texlab' },
+    filetypes = { 'tex', 'plaintex', 'bib' },
+    root_markers = { '.latexmkrc', '.texlabroot', 'texlabroot', 'Tectonic.toml', '.git' },
+    settings = {
+      texlab = {
+        build = {
+          executable = 'latexrun',
+          args = { '%f' },
+          onSave = false,
+          forwardSearchAfter = false,
         },
+        chktex = { onOpenAndSave = true, onEdit = false },
       },
-    })
-  end
+    },
+  })
 
-  if nix_has_feature('typescript') then
-    vim.lsp.config('ts_ls', {
-      cmd = { 'typescript-language-server', '--stdio' },
-      filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-      root_markers = { 'tsconfig.json', 'jsconfig.json', 'package.json', '.git' },
-    })
-  end
-
-  if nix_has_feature('go') then
-    vim.lsp.config('gopls', {
-      cmd = { 'gopls' },
-      filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
-      root_markers = { 'go.mod', 'go.work', '.git' },
-    })
-  end
-
-  if nix_has_feature('rust') then
-    vim.lsp.config('rust_analyzer', {
-      cmd = { 'rust-analyzer' },
-      filetypes = { 'rust' },
-      root_markers = { 'Cargo.toml', 'Cargo.lock', '.git' },
-      settings = {
-        ['rust-analyzer'] = {
-          checkOnSave = { command = 'clippy' },
-        },
-      },
-    })
-  end
-
-  if nix_has_feature('latex') then
-    vim.lsp.config('texlab', {
-      cmd = { 'texlab' },
-      filetypes = { 'tex', 'plaintex', 'bib' },
-      root_markers = { '.latexmkrc', '.texlabroot', 'texlabroot', 'Tectonic.toml', '.git' },
-      settings = {
-        texlab = {
-          build = {
-            executable = 'latexrun',
-            args = { '%f' },
-            onSave = false,
-            forwardSearchAfter = false,
-          },
-          chktex = { onOpenAndSave = true, onEdit = false },
-        },
-      },
-    })
-  end
-
-  -- Enable all configured servers
-  local servers = {}
-  if nix_has_feature('lua') then
-    table.insert(servers, 'lua_ls')
-  end
-  if nix_has_feature('nix') then
-    table.insert(servers, 'nixd')
-  end
-  if nix_has_feature('python') then
-    table.insert(servers, 'basedpyright')
-  end
-  if nix_has_feature('typescript') then
-    table.insert(servers, 'ts_ls')
-  end
-  if nix_has_feature('go') then
-    table.insert(servers, 'gopls')
-  end
-  if nix_has_feature('rust') then
-    table.insert(servers, 'rust_analyzer')
-  end
-  if nix_has_feature('latex') then
-    table.insert(servers, 'texlab')
-  end
-  vim.lsp.enable(servers)
+  vim.lsp.enable({
+    'lua_ls',
+    'nixd',
+    'basedpyright',
+    'ts_ls',
+    'astro',
+    'gopls',
+    'rust_analyzer',
+    'texlab',
+  })
 end
 
 return M

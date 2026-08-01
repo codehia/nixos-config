@@ -8,18 +8,7 @@ let
   wlib = inputs.wrappers.lib;
 
   nvimPerUser =
-    {
-      host,
-      user,
-      ...
-    }:
-    let
-      languages =
-        user.nvimLanguages or host.nvimLanguages or [
-          "lua"
-          "nix"
-        ];
-    in
+    { user, ... }:
     {
       homeManager =
         { pkgs, ... }:
@@ -29,7 +18,7 @@ let
           lzextrasLatest = inputs.lzextras.packages.${pkgs.stdenv.hostPlatform.system}.lzextras-vimPlugin;
 
           langDefs = import ./_lang-defs.nix { inherit pkgs; };
-          enabledLangs = [ "general" ] ++ languages;
+          enabledLangs = lib.attrNames langDefs;
 
           # Collect packages from all enabled languages
           runtimePkgs = lib.concatMap (l: langDefs.${l}.packages) enabledLangs;

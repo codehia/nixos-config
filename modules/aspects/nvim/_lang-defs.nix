@@ -19,6 +19,8 @@
       shellcheck
       markdownlint-cli
       djlint
+      yamllint
+      actionlint
     ];
     formatters = {
       fast = {
@@ -30,6 +32,15 @@
     };
     linters = {
       htmldjango = [ "djlint" ];
+      sh = [ "shellcheck" ];
+      bash = [ "shellcheck" ];
+      fish = [ "fish" ];
+      # config-gated in coding.lua: silent unless the repo has a config
+      markdown = [ "markdownlint" ];
+      yaml = [
+        "yamllint" # config-gated
+        "actionlint" # path-gated: .github/workflows only
+      ];
     };
   };
 
@@ -37,6 +48,8 @@
     packages = with pkgs; [
       lua-language-server
       stylua
+      selene
+      luajitPackages.luacheck
     ];
     formatters = {
       fast = {
@@ -44,13 +57,21 @@
       };
       slow = { };
     };
-    linters = { };
+    linters = {
+      # both config-gated in coding.lua; first with a config wins
+      lua = [
+        "selene"
+        "luacheck"
+      ];
+    };
   };
 
   nix = {
     packages = with pkgs; [
       nixd
       nixfmt
+      statix
+      deadnix
     ];
     formatters = {
       fast = {
@@ -58,7 +79,12 @@
       };
       slow = { };
     };
-    linters = { };
+    linters = {
+      nix = [
+        "statix"
+        "deadnix"
+      ];
+    };
   };
 
   python = {
@@ -86,23 +112,48 @@
       # 26.05 prettier builds with insecure pnpm_9; revert to `prettier` once the pnpm_10 bump is backported
       unstable.prettier
       eslint_d
+      biome
     ];
     formatters = {
-      fast = { };
-      slow = {
-        javascript = [ "prettier" ];
-        typescript = [ "prettier" ];
-        javascriptreact = [ "prettier" ];
-        typescriptreact = [ "prettier" ];
+      fast = {
+        javascript = [
+          "biome"
+          "prettier"
+        ];
+        typescript = [
+          "biome"
+          "prettier"
+        ];
+        javascriptreact = [
+          "biome"
+          "prettier"
+        ];
+        typescriptreact = [
+          "biome"
+          "prettier"
+        ];
         json = [ "prettier" ];
         yaml = [ "prettier" ];
       };
+      slow = { };
     };
     linters = {
-      javascript = [ "eslint" ];
-      typescript = [ "eslint" ];
-      javascriptreact = [ "eslint" ];
-      typescriptreact = [ "eslint" ];
+      javascript = [
+        "biomejs"
+        "eslint"
+      ];
+      typescript = [
+        "biomejs"
+        "eslint"
+      ];
+      javascriptreact = [
+        "biomejs"
+        "eslint"
+      ];
+      typescriptreact = [
+        "biomejs"
+        "eslint"
+      ];
     };
   };
 
@@ -139,6 +190,22 @@
     linters = {
       rust = [ "clippy" ];
     };
+  };
+
+  astro = {
+    packages = with pkgs; [
+      astro-language-server
+    ];
+    formatters = {
+      fast = {
+        astro = [
+          "biome"
+          "prettier"
+        ];
+      };
+      slow = { };
+    };
+    linters = { };
   };
 
   latex = {
