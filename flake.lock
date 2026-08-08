@@ -455,17 +455,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1784432656,
-        "narHash": "sha256-rtvxOgXfrcG7ObcnUZTiYt/aSrFVfAzlI7NR/lQ1s0U=",
+        "lastModified": 1786198551,
+        "narHash": "sha256-+vFzppOik5+KP+oz39j1PlIMlLY6R0dKmfhnDqsgYjg=",
         "owner": "AvengeMedia",
         "repo": "dgop",
-        "rev": "267c9d25adb784a4ac2daa90eae0c281074ea03f",
+        "rev": "f559f2f31d2a35a29a096df174e688da9cc089c9",
         "type": "github"
       },
       "original": {
         "owner": "AvengeMedia",
         "repo": "dgop",
-        "rev": "267c9d25adb784a4ac2daa90eae0c281074ea03f",
         "type": "github"
       }
     },
@@ -498,11 +497,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786163519,
-        "narHash": "sha256-yiMcSA5i1+PpH8tM2EK/d/9GyV8gNIXMUjnglPNwz3A=",
+        "lastModified": 1786209128,
+        "narHash": "sha256-FxpoN0kujIrM4/i+fXajm1KQy/p3em+25hBIOi2NJys=",
         "owner": "AvengeMedia",
         "repo": "DankMaterialShell",
-        "rev": "bde4decc5d6f4b1765b4492b5969a2c926586284",
+        "rev": "8e2168ecf854b722d07410b0dc43c56ecc9ddb12",
         "type": "github"
       },
       "original": {
@@ -1245,11 +1244,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1786137477,
-        "narHash": "sha256-H2BW655hSVJUVB1TpkQb+Is77heIg9Vjh/64sEqRzds=",
+        "lastModified": 1786221700,
+        "narHash": "sha256-Sacc1INSGm7Rak2JBvr5oWJBzhBq9dpXH7C91t1pCL8=",
         "owner": "hyprwm",
         "repo": "hyprland",
-        "rev": "65be579e9c4486d1b2a96914ece96ac1f669c892",
+        "rev": "006bcc69a1f8fff284557345657bdb0b1c0cd49d",
         "type": "github"
       },
       "original": {
@@ -1600,11 +1599,11 @@
         "scenefx": "scenefx"
       },
       "locked": {
-        "lastModified": 1786188990,
-        "narHash": "sha256-Rn9JLfS98PH6FJVaBtBkIoh1S9IhBcRSdeEDifz0DmM=",
+        "lastModified": 1786199029,
+        "narHash": "sha256-L0qIAdI7+Xnmh1nUfhPKHjnVi43tzxmNDZIrqmIL/hw=",
         "owner": "mangowm",
         "repo": "mango",
-        "rev": "d5ad8bf59f680a36f2cc0f6d6e0d2fa417b191c6",
+        "rev": "eb8901799c2fc65647bed899555dcd6424804944",
         "type": "github"
       },
       "original": {
@@ -2172,11 +2171,11 @@
     },
     "nixpkgs_8": {
       "locked": {
-        "lastModified": 1785989512,
-        "narHash": "sha256-HFQhkQcl5D1hUNoen3SGHCSFCt2Bg6uP+HgbrnA3InQ=",
+        "lastModified": 1786089803,
+        "narHash": "sha256-ZuvZfVW2tB5tXYEcpcfhVXB3N4OhdZLOqOviy4OD4b4=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "445d861c6d31b4af0c79d8d4be2331f762a361d7",
+        "rev": "ee48b147c18c7de1e6ec97dc74792be42724bed1",
         "type": "github"
       },
       "original": {
