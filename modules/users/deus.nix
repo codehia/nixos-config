@@ -62,6 +62,7 @@ in
         };
         users.users.deus = {
           description = "Soumyaranjan Acharya";
+          extraGroups = [ "video" ]; # direct backlight write (brightnessctl udev rule)
           hashedPasswordFile = config.sops.secrets.deus_password.path;
           openssh.authorizedKeys.keys = [
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF8QcSgwXXrWmVdjcDcKZbBPkQWybWAZih/8YjFno+cK dev@sacharya.dev"
