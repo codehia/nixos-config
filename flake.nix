@@ -15,7 +15,7 @@
     };
     den.url = "github:vic/den/latest";
     dgop = {
-      url = "github:AvengeMedia/dgop/267c9d25adb784a4ac2daa90eae0c281074ea03f";
+      url = "github:AvengeMedia/dgop";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     disko = {
