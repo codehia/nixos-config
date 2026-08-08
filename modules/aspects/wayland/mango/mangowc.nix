@@ -8,25 +8,19 @@
 # definition, so the old multi-file collector split cannot merge it.
 { den, inputs, ... }:
 let
-  # Patch MangoWC to use 5 tags + a stash tag "S" instead of the default 9.
-  # Tag count is compile-time (src/config/preset.h), so we override the source.
-  # Tag 6 ("S") is the window stash — it has no view/tag number binds, so it is
-  # only reachable through the stash keybindings below.
+  # MangoWC uses 5 workspace tags + tag 6 as a window stash. Tag count is now a
+  # runtime option (`tag_num` in settings below) — mango exposes `config.tag_num`,
+  # so the old compile-time source patch of src/config/preset.h is gone.
+  # Tag 6 is the window stash — it has no view/tag number binds, so it is only
+  # reachable through the stash keybindings below.
   # scenefx override: mango 0.14.4 needs scenefx-0.5, but mango's own flake.lock
   # pins 0.4.1 (and scenefx HEAD renamed its package attr to scenefx-git, so a
   # follows-override can't work). Drop this once upstream re-locks scenefx.
   patchMango =
     pkgs:
-    (inputs.mango.packages.${pkgs.stdenv.hostPlatform.system}.mango.override {
+    inputs.mango.packages.${pkgs.stdenv.hostPlatform.system}.mango.override {
       scenefx = inputs.scenefx.packages.${pkgs.stdenv.hostPlatform.system}.scenefx-git;
-    }).overrideAttrs
-      (old: {
-        postPatch = (old.postPatch or "") + ''
-          substituteInPlace src/config/preset.h \
-            --replace-fail '"1", "2", "3", "4", "5", "6", "7", "8", "9"' \
-                           '"1", "2", "3", "4", "5", "S"'
-        '';
-      });
+    };
 in
 {
   flake-file.inputs.mango = {
@@ -236,6 +230,8 @@ in
             animation_curve_opafadeout = "0.5,0.5,0.5,0.5";
 
             ### Layout, input, cursor, monitor
+            # 5 workspace tags + tag 6 as the window stash (see stashToggle).
+            tag_num = 6;
             default_mfact = 0.55;
             default_nmaster = 1;
             # center_tile: master spans the full width while it has no stack
