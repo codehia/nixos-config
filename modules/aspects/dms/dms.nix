@@ -12,8 +12,13 @@
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    # Pinned: dgop HEAD (d57055f "go: update dependencies", 2026-08-05) ships a
+    # stale vendorHash in its own flake.nix — go.mod deps changed but the hash
+    # wasn't bumped, so it fails with a fixed-output hash mismatch. 267c9d2 is
+    # the last good rev ("flake: update vendorHash for go.mod changes").
+    # Unpin once upstream fixes the vendorHash.
     dgop = {
-      url = "github:AvengeMedia/dgop";
+      url = "github:AvengeMedia/dgop/267c9d25adb784a4ac2daa90eae0c281074ea03f";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     # Override quickshell — DMS stable pins 2025-12-25 which predates:
