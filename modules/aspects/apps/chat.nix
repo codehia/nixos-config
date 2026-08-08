@@ -7,7 +7,7 @@ let
         { pkgs, ... }:
         {
           home.packages = with pkgs; [
-            # telegram-desktop # build failing on 6.4.1, skip until nixpkgs updates
+            telegram-desktop
             signal-desktop
           ];
         };
@@ -18,6 +18,7 @@ in
     includes = [
       (den._.unfree [
         "signal-desktop"
+        "telegram-desktop"
         "discord"
       ])
       personalChat
