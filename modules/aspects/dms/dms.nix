@@ -32,7 +32,6 @@
         imports = [ inputs.dms.nixosModules.dank-material-shell ];
         programs.dank-material-shell = {
           enable = true;
-          dgop.package = inputs.dgop.packages.${pkgs.stdenv.hostPlatform.system}.default;
           quickshell.package = inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.quickshell;
         };
         # DMS enables power-profiles-daemon by default, which conflicts with TLP.

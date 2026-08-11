@@ -235,7 +235,6 @@ let
           programs.dank-material-shell = {
             enable = true;
             package = dmsPkg;
-            dgop.package = inputs.dgop.packages.${pkgs.stdenv.hostPlatform.system}.default;
             quickshell.package = inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.quickshell;
             enableSystemMonitoring = true;
             enableVPN = true;
