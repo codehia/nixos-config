@@ -43,7 +43,7 @@ let
 in
 {
   flake-file.inputs.tuigreet = {
-    url = "github:NotAShelf/tuigreet";
+    url = "github:tuigreet/tuigreet";
     inputs.nixpkgs.follows = "nixpkgs";
   };
   den.aspects.greetd = {
