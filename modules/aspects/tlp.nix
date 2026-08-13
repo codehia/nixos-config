@@ -7,6 +7,13 @@
       { pkgs, ... }:
       {
         environment.systemPackages = [ pkgs.tlp ];
+        # rtsx_pci calls pm_runtime_allow() at probe, so the reader runtime-
+        # suspends and misses card-insert events. Must match ACTION=="bind" —
+        # "add" fires before probe and the driver overwrites it.
+        # The TLP denylist below only stops TLP from setting it back to auto.
+        services.udev.extraRules = ''
+          ACTION=="bind", SUBSYSTEM=="pci", DRIVER=="rtsx_pci", ATTR{power/control}="on"
+        '';
         services.tlp = {
           enable = true;
           settings = {
@@ -44,6 +51,10 @@
             # ----- PCIe / Runtime PM -----
             RUNTIME_PM_ON_AC = "on";
             RUNTIME_PM_ON_BAT = "auto";
+            # RTS522A card reader misses card-insert while runtime-suspended —
+            # keep it awake (default denylist + rtsx_pci). Matches by driver, so
+            # it covers both thinkpad and workstation regardless of PCI address.
+            RUNTIME_PM_DRIVER_DENYLIST = "mei_me nouveau radeon rtsx_pci";
             PCIE_ASPM_ON_AC = "default";
             PCIE_ASPM_ON_BAT = "powersupersave";
 
