@@ -8,7 +8,9 @@ let
         {
           home.packages = with pkgs; [
             inkscape
-            obs-studio
+            (unstable.wrapOBS {
+              plugins = with unstable.obs-studio-plugins; [ obs-backgroundremoval ];
+            })
           ];
         };
     };
