@@ -6,7 +6,7 @@
   den.aspects.kanata = {
     nixos = {
       services.kanata = {
-        enable = true;
+        enable = false;
         keyboards.kinesis = {
           devices = [
             "/dev/input/by-id/usb-Kinesis_Kinesis_Adv360_360555127546-event-if02"
