@@ -284,6 +284,21 @@ let
                 warningThreshold = 15;
               };
             };
+            # Launcher plugin: search Bitwarden entries via rbw, copy/type fields.
+            # Runtime deps rbw + wtype come from apps/productivity.nix.
+            plugins.dankBitwarden = {
+              src = pkgs.fetchFromGitHub {
+                owner = "pacman99";
+                repo = "DankBitwarden";
+                rev = "6fd83d8b6ab54d2d6a996bed7291b70316c99965";
+                hash = "sha256-ukcJy4ecyOiqSm9FO87hsq8BZ37EQVuduhDfoDw0LE4=";
+              };
+              settings = {
+                trigger = "pass";
+                noTrigger = false;
+                loginAction = "autotype";
+              };
+            };
             managePluginSettings = true;
             systemd = {
               enable = true;
