@@ -7,7 +7,12 @@ let
   unstableOverlay = final: _: {
     unstable = import inputs.nixpkgs-unstable {
       inherit (final.stdenv.hostPlatform) system;
-      config.allowUnfree = true;
+      config = {
+        allowUnfree = true;
+        # beekeeper-studio bundles an EOL Electron. Allowed by name (not by
+        # pinned version) so it survives version bumps.
+        allowInsecurePredicate = pkg: lib.getName pkg == "beekeeper-studio";
+      };
     };
   };
 in
