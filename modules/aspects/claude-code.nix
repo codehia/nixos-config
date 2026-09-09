@@ -11,9 +11,9 @@
       (den._.unfree [ "claude-code" ])
       {
         homeManager =
-          { pkgs, ... }:
+          { inputs', ... }:
           {
-            home.packages = [ pkgs.claude-code ];
+            home.packages = [ inputs'.claude-code.packages.default ];
           };
       }
     ];

@@ -497,11 +497,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788973341,
-        "narHash": "sha256-XeZJk+yJu+jC9hJa9Vg3BtcvXOUP5Fs20z9g5889dsw=",
+        "lastModified": 1788980411,
+        "narHash": "sha256-a79wAhlH0J4bMMIxUPnzhi2LqqhPG7NipLE5CFPpJyI=",
         "owner": "AvengeMedia",
         "repo": "DankMaterialShell",
-        "rev": "ba2b4a4d5d795270cfddb2eb44c060691a999010",
+        "rev": "65fb97d247e1e8d14408f1ccf0c32fc8c6bcbd7b",
         "type": "github"
       },
       "original": {
@@ -2912,11 +2912,11 @@
         "nixpkgs": "nixpkgs_13"
       },
       "locked": {
-        "lastModified": 1788891837,
-        "narHash": "sha256-3mM/4Nv4rKU17EiYOhRt0AWp0IbV5gFLlogh7yNZUwU=",
+        "lastModified": 1788981141,
+        "narHash": "sha256-7xWS16u13YGlRNKWaAPzRbEyh4OLOXJe31k7h4AnXNU=",
         "owner": "BirdeeHub",
         "repo": "nix-wrapper-modules",
-        "rev": "f57daa2c7c7e7af7382fbaab9a330bc39c6fd30c",
+        "rev": "1db3c116a6aa61823f8d8f3c47c306846428fc54",
         "type": "github"
       },
       "original": {
