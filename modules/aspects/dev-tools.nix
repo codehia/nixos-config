@@ -24,6 +24,9 @@ in
             devbox
             cruft
             cookiecutter
+            nodejs # claude-code plugin hooks (caveman) shell out to `node`
+            python3
+            python3Packages.ipython
           ])
           ++ (with pkgs.unstable; [
             httpie-desktop
