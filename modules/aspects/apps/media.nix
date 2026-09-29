@@ -13,7 +13,8 @@ let
           home.packages = with pkgs; [
             vlc
             spotify
-            ente-desktop
+            # stable's ente-desktop still builds on EOL electron_41
+            unstable.ente-desktop
           ];
         };
     };
