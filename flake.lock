@@ -497,11 +497,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790741705,
-        "narHash": "sha256-PcKzyloAknS2zmaPrkD9XhYBDpAvOmc/yo/1C68rXJU=",
+        "lastModified": 1790786813,
+        "narHash": "sha256-MSU55V/ulJoLxoWW4jcYGzQ6+4wNVRUNsfILP02+new=",
         "owner": "AvengeMedia",
         "repo": "DankMaterialShell",
-        "rev": "73759d575210e8a4eb99b308283046b650df2ac3",
+        "rev": "adccc05397d5b2d6dac50c30ce0eabb90b19f145",
         "type": "github"
       },
       "original": {
@@ -1204,11 +1204,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1790770258,
-        "narHash": "sha256-FBZfrL5mAzLQhwJXamqcjbFgnNzHVr+TmOy6HTb6Z2M=",
+        "lastModified": 1790784609,
+        "narHash": "sha256-0eBOu6Wf9ozx7vsgNNsWe0YRE4CTBPIaHF0G8NEG5co=",
         "owner": "hyprwm",
         "repo": "hyprland",
-        "rev": "a6bca359b4099a73a255061ffcf2f77a450659cd",
+        "rev": "156276e5144dea5c18a232e0280058e4c0f83a74",
         "type": "github"
       },
       "original": {
