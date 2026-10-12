@@ -128,7 +128,9 @@
         };
 
         gtk.iconTheme = {
-          package = lib.mkForce pkgs.tela-circle-icon-theme;
+          # unstable: 26.05's 2026-07-07 bump fails noBrokenSymlinks; revert to
+          # pkgs.* once backport NixOS/nixpkgs#571518 lands in nixos-26.05
+          package = lib.mkForce pkgs.unstable.tela-circle-icon-theme;
           name = lib.mkForce "Tela-circle-dark";
         };
 
