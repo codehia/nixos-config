@@ -178,7 +178,7 @@ in
           systemd.variables = [ "--all" ];
 
           # Must be non-empty: the HM module only writes autostart.sh (and its
-          # exec-once line) when this is set, and the systemd activation —
+          # exec_once line) when this is set, and the systemd activation —
           # dbus env import + `systemctl --user start mango-session.target`,
           # which BindsTo graphical-session.target — lives inside that script.
           # Without it DMS and every graphical-session service never start.
@@ -189,17 +189,17 @@ in
           settings = {
             ### Appearance — gaps, borders, colors, blur, shadows, animations
             ### (matching the Hyprland look)
-            gappih = 7;
-            gappiv = 7;
-            gappoh = 7;
-            gappov = 7;
+            gap_inner_horizontal = 7;
+            gap_inner_vertical = 7;
+            gap_outer_horizontal = 7;
+            gap_outer_vertical = 7;
 
-            borderpx = 4;
+            border_px = 4;
             border_radius = 7;
 
-            focuscolor = "0x33ccffee";
-            bordercolor = "0x595959aa";
-            urgentcolor = "0xff5555ff";
+            focus_color = "0x33ccffee";
+            border_color = "0x595959aa";
+            urgent_color = "0xff5555ff";
 
             blur = 1;
             blur_optimized = 1;
@@ -226,23 +226,23 @@ in
             animation_curve_tag = "0.23,1.0,0.32,1";
             animation_curve_close = "0.08,0.92,0,1";
             animation_curve_focus = "0.23,1.0,0.32,1";
-            animation_curve_opafadein = "0.23,1.0,0.32,1";
-            animation_curve_opafadeout = "0.5,0.5,0.5,0.5";
+            animation_curve_opacity_fade_in = "0.23,1.0,0.32,1";
+            animation_curve_opacity_fade_out = "0.5,0.5,0.5,0.5";
 
             ### Layout, input, cursor, monitor
             # 5 workspace tags + tag 6 as the window stash (see stashToggle).
             tag_num = 6;
-            default_mfact = 0.55;
-            default_nmaster = 1;
+            default_master_factor = 0.55;
+            default_master_count = 1;
             # center_tile: master spans the full width while it has no stack
             # windows (otherwise a lone window sits centered at mfact width)
             center_master_overspread = 1;
 
             repeat_delay = 300;
             repeat_rate = 25;
-            numlockon = 0;
-            sloppyfocus = 0;
-            warpcursor = 0;
+            numlock_on = 0;
+            sloppy_focus = 0;
+            warp_cursor = 0;
 
             # Mango's default (1) lets any xdg-activation request yank the view
             # back to the requesting client's tag — fullscreen VLC does this on
@@ -264,7 +264,7 @@ in
             env = [ "XCURSOR_SIZE,32" ];
 
             # First matching rule wins — keep the specific rule above the wildcard.
-            monitorrule = [
+            monitor_rule = [
               # LG 34" ultrawide: run at its max mode (3440x1440@75.05);
               # model match survives connector/KVM changes
               "model:LG HDR WQHD,width:3440,height:1440,refresh:75.05,x:0,y:0,scale:1"
@@ -273,7 +273,7 @@ in
 
             # Centered-master layout (mango's closest to centertall) on the
             # ultrawide only; other monitors keep the default tile layout.
-            tagrule = [
+            tag_rule = [
               "id:1,layout_name:center_tile,monitor_model:LG HDR WQHD"
               "id:2,layout_name:center_tile,monitor_model:LG HDR WQHD"
               "id:3,layout_name:center_tile,monitor_model:LG HDR WQHD"
@@ -290,13 +290,15 @@ in
             scratchpad_width_ratio = 0.7;
             scratchpad_height_ratio = 0.7;
 
-            windowrule = [
-              "isnamedscratchpad:1,appid:kitty-term"
-              "isnamedscratchpad:1,appid:org.gnome.Nautilus"
-              "isnamedscratchpad:1,appid:1Password"
-              "isnamedscratchpad:1,appid:Spotify"
-              "isnamedscratchpad:1,appid:Slack"
-              "isnamedscratchpad:1,appid:io.ente.auth"
+            window_rule = [
+              # kitty-term floats at map, so scratchpad_*_ratio never applies;
+              # size it explicitly or it opens at kitty's own requested size.
+              "is_named_scratchpad:1,app_id:kitty-term,width:0.7,height:0.7"
+              "is_named_scratchpad:1,app_id:org.gnome.Nautilus"
+              "is_named_scratchpad:1,app_id:1Password"
+              "is_named_scratchpad:1,app_id:Spotify"
+              "is_named_scratchpad:1,app_id:Slack"
+              "is_named_scratchpad:1,app_id:io.ente.auth"
             ];
 
             ### Keybindings — canonical Hyprland scheme wherever mango has an equivalent
