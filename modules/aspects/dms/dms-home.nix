@@ -243,6 +243,8 @@ let
             enableCalendarEvents = false;
             settings = finalSettings;
             session = {
+              # session.json is a read-only HM symlink, so DMS can't record dismissing "What's New"
+              changelogSeenVersion = lib.versions.majorMinor dmsPkg.version;
               wallpaperPath = "${home}/Pictures/Wallpapers/active/wallpaper";
               wallpaperCyclingEnabled = true;
               wallpaperCyclingMode = "interval";
