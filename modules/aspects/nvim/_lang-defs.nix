@@ -225,4 +225,41 @@
       tex = [ "chktex" ];
     };
   };
+
+  c = {
+    packages = with pkgs; [
+      clang-tools # clangd, clang-format, clang-tidy
+    ];
+    formatters = {
+      fast = {
+        c = [ "clang-format" ];
+      };
+      slow = { };
+    };
+    linters = { }; # clangd runs clang-tidy diagnostics itself
+  };
+
+  qml = {
+    packages = with pkgs; [
+      kdePackages.qtdeclarative # qmlls, qmlformat, qmllint
+    ];
+    formatters = {
+      fast = {
+        qml = [ "qmlformat" ];
+      };
+      slow = { };
+    };
+    linters = { }; # qmlls already reports qmllint diagnostics
+  };
+
+  scheme = {
+    packages = with pkgs; [
+      mitscheme # conjure's default scheme REPL (client/scheme/stdio)
+    ];
+    formatters = {
+      fast = { };
+      slow = { };
+    };
+    linters = { };
+  };
 }

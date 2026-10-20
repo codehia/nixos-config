@@ -217,4 +217,12 @@ with pkgs.vimPlugins;
     data = rulebookPlugin;
     lazy = true;
   };
+  conjure = {
+    data = conjure;
+    lazy = true;
+  };
+  paredit = {
+    data = nvim-paredit;
+    lazy = true;
+  };
 }

@@ -194,6 +194,18 @@ M.setup = function()
     },
   })
 
+  vim.lsp.config('clangd', {
+    cmd = { 'clangd', '--background-index', '--clang-tidy' },
+    filetypes = { 'c', 'cpp' },
+    root_markers = { 'compile_commands.json', 'compile_flags.txt', '.clangd', '.git' },
+  })
+
+  vim.lsp.config('qmlls', {
+    cmd = { 'qmlls' },
+    filetypes = { 'qml', 'qmljs' },
+    root_markers = { '.qmlls.ini', 'CMakeLists.txt', '.git' },
+  })
+
   vim.lsp.enable({
     'lua_ls',
     'nixd',
@@ -203,6 +215,8 @@ M.setup = function()
     'gopls',
     'rust_analyzer',
     'texlab',
+    'clangd',
+    'qmlls',
   })
 end
 

@@ -236,6 +236,25 @@ return {
   },
 
   -- ---------------------------------------------------------------------------
+  -- Conjure — Lisp REPL eval (scheme → mit-scheme via client/scheme/stdio)
+  -- pname: conjure
+  -- self-inits the triggering buffer on load (mapping.lua M.init)
+  -- ---------------------------------------------------------------------------
+  { 'conjure', ft = 'scheme' },
+
+  -- ---------------------------------------------------------------------------
+  -- Paredit — structural s-expression editing
+  -- pname: nvim-paredit
+  -- ---------------------------------------------------------------------------
+  {
+    'nvim-paredit',
+    ft = 'scheme',
+    after = function()
+      require('nvim-paredit').setup()
+    end,
+  },
+
+  -- ---------------------------------------------------------------------------
   -- Gitsigns — inline git blame, hunk staging, diff
   -- pname: gitsigns.nvim
   -- ---------------------------------------------------------------------------
