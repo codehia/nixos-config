@@ -183,7 +183,7 @@ let
           });
 
           finalSettings = lib.recursiveUpdate settings {
-            customThemeFile = "${home}/.config/DankMaterialShell/themes/catppuccin/theme.json";
+            customThemeFile = "${home}/.config/dms/themes/catppuccin/theme.json";
             currentThemeName = "custom"; # DMS Theme.qml only loads customThemeFile when name === "custom"
             currentThemeCategory = "custom";
           };
@@ -191,7 +191,7 @@ let
         {
           imports = [ inputs.dms.homeModules.dank-material-shell ];
 
-          home.file.".config/DankMaterialShell/themes/catppuccin/theme.json".source = ./catppuccin-theme.json;
+          home.file.".config/dms/themes/catppuccin/theme.json".source = ./catppuccin-theme.json;
           home.file.".face".source = "${self}/assets/profile.jpg";
 
           # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
@@ -229,8 +229,8 @@ let
 
           # force=true replaces the stale real directory (from a pre-nix manual DMS install)
           # with the nix-managed symlink. DMS only reads plugin dirs — state goes to
-          # ~/.local/state/DankMaterialShell/plugins/ — so read-only nix store is fine.
-          xdg.configFile."DankMaterialShell/plugins/dankPomodoroTimer".force = true;
+          # ~/.local/state/dms/plugins/ — so read-only nix store is fine.
+          xdg.configFile."dms/plugins/dankPomodoroTimer".force = true;
 
           programs.dank-material-shell = {
             enable = true;
