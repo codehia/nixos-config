@@ -306,7 +306,7 @@ in
               # Application launchers
               "SUPER,SPACE,spawn,dms ipc launcher toggle"
               "SUPER+SHIFT,Return,spawn,ghostty"
-              "SUPER,w,spawn,zen-beta"
+              "SUPER,w,spawn,helium"
 
               # Window management
               "SUPER,c,killclient"
