@@ -497,11 +497,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792634293,
-        "narHash": "sha256-RDk4oMEIGlRVcc072IQ4/b4DEAHnncHg+4IHsoAxlVI=",
+        "lastModified": 1792663598,
+        "narHash": "sha256-+7kZ55cqjyp0eBn23NevBleTdJkpfN/Nq8yvr+KPYZY=",
         "owner": "AvengeMedia",
         "repo": "DankMaterialShell",
-        "rev": "47c9d8d89bfbf70aa667ec90c1c5f30d9a726d6d",
+        "rev": "39a58f77ec302d5e8aa4159bbc571cdfdc48f449",
         "type": "github"
       },
       "original": {
@@ -1556,11 +1556,11 @@
         "scenefx": "scenefx"
       },
       "locked": {
-        "lastModified": 1792654104,
-        "narHash": "sha256-67x//KqupzaNMuXKV6qykj229UC8nql57ahsG77EDGw=",
+        "lastModified": 1792656482,
+        "narHash": "sha256-B2yYMXj1rqanf1mW9Nn3plVuOqvMijy8B+8FZk9v5z4=",
         "owner": "mangowm",
         "repo": "mango",
-        "rev": "bd212725c3282c87fc857b7b7e61f83f5b32afbf",
+        "rev": "1df1e13f71d229dacc19cf955a55c9839606c275",
         "type": "github"
       },
       "original": {
