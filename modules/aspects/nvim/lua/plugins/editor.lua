@@ -240,7 +240,15 @@ return {
   -- pname: conjure
   -- self-inits the triggering buffer on load (mapping.lua M.init)
   -- ---------------------------------------------------------------------------
-  { 'conjure', ft = 'scheme' },
+  {
+    'conjure',
+    ft = 'scheme',
+    before = function()
+      -- no HUD popup; view full output via log split (<localleader>lv)
+      vim.g['conjure#log#hud#enabled'] = false
+      vim.g['conjure#log#jump_to_latest#enabled'] = true
+    end,
+  },
 
   -- ---------------------------------------------------------------------------
   -- Paredit — structural s-expression editing
