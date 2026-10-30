@@ -306,16 +306,8 @@ return {
     after = function()
       require('markview').setup({
         preview = {
+          enable = false, -- raw text by default; <leader>mt to render
           icon_provider = 'devicons',
-          callbacks = {
-            on_attach = function(buffer, wins)
-              -- Auto-open splitview for markdown buffers
-              require('markview.actions').splitOpen(buffer)
-              for _, win in ipairs(wins) do
-                vim.wo[win].conceallevel = 3
-              end
-            end,
-          },
         },
       })
 
