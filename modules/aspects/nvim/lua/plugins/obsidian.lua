@@ -31,12 +31,6 @@ return {
             name = 'personal',
             path = '/home/deus/workspace/personal/vault',
           },
-          {
-            name = 'buf-parent',
-            path = function()
-              return assert(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
-            end,
-          },
         },
 
         picker = { name = 'telescope' },
@@ -47,14 +41,11 @@ return {
         },
 
         frontmatter = { enabled = true },
+        ui = { enable = false },
         legacy_commands = false,
 
         note_id_func = function(title)
           return title or tostring(os.time())
-        end,
-
-        follow_url_func = function(url)
-          vim.fn.jobstart({ 'xdg-open', url })
         end,
       })
     end,
