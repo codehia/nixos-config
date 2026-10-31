@@ -233,6 +233,7 @@
     formatters = {
       fast = {
         c = [ "clang-format" ];
+        cpp = [ "clang-format" ];
       };
       slow = { };
     };
