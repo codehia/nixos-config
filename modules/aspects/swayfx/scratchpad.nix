@@ -53,9 +53,6 @@
 
         wayland.windowManager.sway.config.floating.criteria = [
           { app_id = "kitty-dropterm"; }
-          { app_id = "1password"; }
-          { class = "Spotify"; }
-          { class = "Slack"; }
           { app_id = "io.ente.auth"; }
           { app_id = "org.gnome.Nautilus"; }
         ];
@@ -65,14 +62,6 @@
         # Only applies to startup apps — on-demand apps (kitty-dropterm, nautilus, slack)
         # are NOT listed here so their first sway-scratch invocation shows them directly.
         wayland.windowManager.sway.config.window.commands = [
-          {
-            criteria.app_id = "1password";
-            command = "move scratchpad";
-          }
-          {
-            criteria.class = "Spotify";
-            command = "move scratchpad";
-          }
           {
             criteria.app_id = "io.ente.auth";
             command = "move scratchpad";

@@ -164,8 +164,7 @@ in
               # Scratchpads — lazy: app starts only on first toggle (on-created-empty)
               "special:term, on-created-empty:kitty --class kitty-term"
               "special:filemanager, on-created-empty:nautilus"
-              "special:pw, on-created-empty:1password --silent"
-              "special:spotify, on-created-empty:spotify"
+              "special:pw, on-created-empty:bitwarden"
               "special:slack, on-created-empty:slack"
               "special:ente, on-created-empty:enteauth"
             ];
@@ -184,15 +183,10 @@ in
               "size 70% 70%, match:class org.gnome.Nautilus"
               "center on, match:class org.gnome.Nautilus"
 
-              "workspace special:pw silent, match:class 1Password"
-              "float on, match:class 1Password"
-              "size 30% 50%, match:class 1Password"
-              "center on, match:class 1Password"
-
-              "workspace special:spotify silent, match:class Spotify"
-              "float on, match:class Spotify"
-              "size 40% 60%, match:class Spotify"
-              "center on, match:class Spotify"
+              "workspace special:pw silent, match:class bitwarden"
+              "float on, match:class bitwarden"
+              "size 30% 50%, match:class bitwarden"
+              "center on, match:class bitwarden"
 
               "workspace special:slack silent, match:class Slack"
               "float on, match:class Slack"

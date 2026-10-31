@@ -26,7 +26,6 @@
         nscratch = inputs.niri-scratchpad.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
         # Wrapper scripts for apps with arguments (nscratch -s takes a single command).
-        spawn1password = pkgs.writeShellScript "spawn-1password" "exec 1password";
         spawnKittyDropdown = pkgs.writeShellScript "spawn-kitty-dropdown" "exec kitty --class kitty-dropdown";
       in
       {
@@ -67,18 +66,7 @@
 
             # Scratchpad apps — window rules redirect to "scratch" workspace
             { argv = [ "slack" ]; }
-            {
-              argv = [
-                "1password"
-                "--silent"
-              ];
-            }
-            {
-              argv = [
-                "spotify"
-                "--minimized"
-              ];
-            }
+            { argv = [ "bitwarden" ]; }
             { argv = [ "enteauth" ]; }
             {
               argv = [
@@ -98,12 +86,7 @@
               open-floating = true;
             }
             {
-              matches = [ { app-id = "^1password$"; } ];
-              open-on-workspace = "scratch";
-              open-floating = true;
-            }
-            {
-              matches = [ { app-id = "^Spotify$"; } ];
+              matches = [ { app-id = "^bitwarden$"; } ];
               open-on-workspace = "scratch";
               open-floating = true;
             }
@@ -150,16 +133,9 @@
             "Mod+Shift+O".action.spawn = [
               "${nscratch}/bin/nscratch"
               "-id"
-              "1password"
+              "bitwarden"
               "-s"
-              "${spawn1password}"
-            ];
-            "Mod+Shift+M".action.spawn = [
-              "${nscratch}/bin/nscratch"
-              "-id"
-              "Spotify"
-              "-s"
-              "spotify"
+              "bitwarden"
             ];
             "Mod+Grave".action.spawn = [
               "${nscratch}/bin/nscratch"

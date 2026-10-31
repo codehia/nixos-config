@@ -115,7 +115,6 @@
           "$modifier, grave, exec, ${hyprToggleScratchpad} term"
           "$modifier, T, exec, ${hyprToggleScratchpad} filemanager"
           "$modifier SHIFT, O, exec, ${hyprToggleScratchpad} pw"
-          "$modifier SHIFT, M, exec, ${hyprToggleScratchpad} spotify"
           "$modifier SHIFT, S, exec, ${hyprToggleScratchpad} slack"
           "$modifier SHIFT, E, exec, ${hyprToggleScratchpad} ente"
           "$modifier, N, exec, ${hyprMinimizeRestore}"

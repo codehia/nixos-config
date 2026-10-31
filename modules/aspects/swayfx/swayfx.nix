@@ -17,6 +17,8 @@
         programs.sway = {
           enable = true;
           package = pkgs.swayfx;
+          # default pulls foot, wmenu, swaylock, swayidle, grim, brightnessctl, pulseaudio — none used
+          extraPackages = [ ];
         };
 
         xdg.portal = {
@@ -92,8 +94,6 @@
             defaultWorkspace = "workspace number 1";
 
             startup = [
-              { command = "1password --silent"; }
-              { command = "spotify --minimized"; }
               { command = "enteauth"; }
               # swayrd tracks window focus history — required by the swayr
               # focus-last/urgent binds (Mod+x / Mod+u) in binds.nix.

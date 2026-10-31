@@ -295,8 +295,7 @@ in
               # size it explicitly or it opens at kitty's own requested size.
               "is_named_scratchpad:1,app_id:kitty-term,width:0.7,height:0.7"
               "is_named_scratchpad:1,app_id:org.gnome.Nautilus"
-              "is_named_scratchpad:1,app_id:1Password"
-              "is_named_scratchpad:1,app_id:Spotify"
+              "is_named_scratchpad:1,app_id:bitwarden"
               "is_named_scratchpad:1,app_id:Slack"
               "is_named_scratchpad:1,app_id:io.ente.auth"
             ];
@@ -362,8 +361,7 @@ in
               # Named scratchpads — canonical Hyprland keys
               "SUPER,grave,toggle_named_scratchpad,kitty-term,none,kitty --class kitty-term"
               "SUPER,t,toggle_named_scratchpad,org.gnome.Nautilus,none,nautilus"
-              "SUPER+SHIFT,o,toggle_named_scratchpad,1Password,none,1password --silent"
-              "SUPER+SHIFT,m,toggle_named_scratchpad,Spotify,none,spotify"
+              "SUPER+SHIFT,o,toggle_named_scratchpad,bitwarden,none,bitwarden"
               "SUPER+SHIFT,s,toggle_named_scratchpad,Slack,none,slack"
               "SUPER+SHIFT,e,toggle_named_scratchpad,io.ente.auth,none,enteauth"
 

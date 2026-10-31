@@ -101,9 +101,7 @@
               "${mod}+grave" =
                 ''exec sway-scratch show --app-id kitty-dropterm --exec "kitty --class kitty-dropterm" --resize "set 70 ppt 70 ppt"'';
               "${mod}+Shift+o" =
-                ''exec sway-scratch show --app-id 1password --exec "1password --silent" --resize "set 70 ppt 70 ppt"'';
-              "${mod}+Shift+m" =
-                ''exec sway-scratch show --class Spotify --exec spotify --resize "set 70 ppt 70 ppt"'';
+                ''exec sway-scratch show --app-id bitwarden --exec bitwarden --resize "set 70 ppt 70 ppt"'';
               "${mod}+Shift+s" =
                 ''exec sway-scratch show --class Slack --exec slack --resize "set 70 ppt 70 ppt"'';
               # Mod+Shift+e matches the Hyprland ente scratchpad bind
