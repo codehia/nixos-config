@@ -36,14 +36,12 @@ return {
     })
 
     -- Mini.statusline
-    vim.o.showcmdloc = 'statusline'
     local statusline = require('mini.statusline')
     statusline.setup({ use_icons = vim.g.have_nerd_font })
 
     -- Custom highlight groups (Catppuccin Mocha)
     vim.api.nvim_set_hl(0, 'MiniStatuslineMacro', { fg = '#fab387', bg = '#313244', bold = true })
     vim.api.nvim_set_hl(0, 'MiniStatuslineSearch', { fg = '#1e1e2e', bg = '#fab387' })
-    vim.api.nvim_set_hl(0, 'MiniStatuslineShowcmd', { fg = '#cba6f7', bg = '#313244' })
 
     local function section_macro()
       local reg = vim.fn.reg_recording()
@@ -65,9 +63,9 @@ return {
       local mode, mode_hl = statusline.section_mode({ trunc_width = 20000 })
       local git = statusline.section_git({ trunc_width = 40 })
       local filename = statusline.section_filename({ trunc_width = 20000 })
-      local fileinfo = statusline.section_fileinfo({ trunc_width = 20000 })
+      local ft = vim.bo.filetype
+      local fileinfo = (ft ~= '' and MiniIcons) and MiniIcons.get('filetype', ft) or ft
       local location = statusline.section_location()
-      local showcmd = vim.api.nvim_eval_statusline('%S', {}).str
 
       return statusline.combine_groups({
         { hl = mode_hl, strings = { mode } },
@@ -76,7 +74,6 @@ return {
         '%<', -- Mark general truncate point
         { hl = 'MiniStatuslineFilename', strings = { filename } },
         '%=', -- End left alignment
-        { hl = 'MiniStatuslineShowcmd', strings = { showcmd } },
         { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
         { hl = 'MiniStatuslineSearch', strings = { section_search() } },
         { hl = mode_hl, strings = { location } },
