@@ -1,6 +1,6 @@
 # Combined appearance aspect: stylix (base16 theming) + catppuccin/nix (per-app modules).
 # stylix handles: fonts, cursor, zen, base16 color schemes for most apps.
-# catppuccin/nix handles: fish, bat, fzf, lazygit, ghostty, kitty, rofi, kvantum.
+# catppuccin/nix handles: fish, bat, fzf, lazygit, ghostty, kitty, kvantum.
 {
   inputs,
   lib,
@@ -66,7 +66,6 @@
           delta.enable = false; # managed via git.nix with mellow-barbet
           tmux.enable = false;
           hyprland.enable = false;
-          rofi.enable = false;
           fish.enable = true; # no stylix fish target
         };
 
@@ -103,12 +102,10 @@
 
           targets = {
             dank-material-shell.enable = false;
-            waybar.enable = false;
             hyprland.enable = false;
             hyprlock.enable = false;
             kitty.fonts.enable = false; # Iosevka font set directly in kitty config
             ghostty.enable = false; # JetBrainsMono set directly in ghostty config
-            rofi.fonts.enable = false;
             # catppuccin/nix handles these with purpose-built mocha colors
             bat.enable = false;
             fzf.enable = false;
