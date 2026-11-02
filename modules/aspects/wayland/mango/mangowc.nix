@@ -19,7 +19,16 @@ let
   patchMango =
     pkgs:
     inputs.mango.packages.${pkgs.stdenv.hostPlatform.system}.mango.override {
-      scenefx = inputs.scenefx.packages.${pkgs.stdenv.hostPlatform.system}.scenefx-git;
+      # mesa 26.1 rejects scenefx's `int clamp` GLES2 shim (redefines built-in) →
+      # FX renderer fails, mango exits at login. Rename shim; drop when upstream fixes.
+      scenefx =
+        inputs.scenefx.packages.${pkgs.stdenv.hostPlatform.system}.scenefx-git.overrideAttrs
+          (old: {
+            postPatch = (old.postPatch or "") + ''
+              sed -i -e 's/int clamp(/int clamp_i(/' -e 's/= clamp(int(/= clamp_i(int(/' \
+                render/fx_renderer/shaders/gradient.frag
+            '';
+          });
     };
 in
 {
@@ -268,7 +277,7 @@ in
               # LG 34" ultrawide: run at its max mode (3440x1440@75.05);
               # model match survives connector/KVM changes
               "model:LG HDR WQHD,width:3440,height:1440,refresh:75.05,x:0,y:0,scale:1"
-              "name:*,width:0,height:0,refresh:0,x:0,y:0,scale:1"
+              "name:.*,width:0,height:0,refresh:0,x:0,y:0,scale:1"
             ];
 
             # Centered-master layout (mango's closest to centertall) on the
