@@ -13,23 +13,10 @@ let
   # so the old compile-time source patch of src/config/preset.h is gone.
   # Tag 6 is the window stash — it has no view/tag number binds, so it is only
   # reachable through the stash keybindings below.
-  # scenefx override: mango 0.14.4 needs scenefx-0.5, but mango's own flake.lock
-  # pins 0.4.1 (and scenefx HEAD renamed its package attr to scenefx-git, so a
-  # follows-override can't work). Drop this once upstream re-locks scenefx.
-  patchMango =
-    pkgs:
-    inputs.mango.packages.${pkgs.stdenv.hostPlatform.system}.mango.override {
-      # mesa 26.1 rejects scenefx's `int clamp` GLES2 shim (redefines built-in) →
-      # FX renderer fails, mango exits at login. Rename shim; drop when upstream fixes.
-      scenefx =
-        inputs.scenefx.packages.${pkgs.stdenv.hostPlatform.system}.scenefx-git.overrideAttrs
-          (old: {
-            postPatch = (old.postPatch or "") + ''
-              sed -i -e 's/int clamp(/int clamp_i(/' -e 's/= clamp(int(/= clamp_i(int(/' \
-                render/fx_renderer/shaders/gradient.frag
-            '';
-          });
-    };
+  # mango uses its own locked scenefx (0.5, pre-gradients). Don't override it with
+  # scenefx HEAD: its gradient.frag `int clamp` shim breaks on mesa 26.1 (FX renderer
+  # fails, mango exits at login).
+  mangoFor = pkgs: inputs.mango.packages.${pkgs.stdenv.hostPlatform.system}.mango;
 in
 {
   flake-file.inputs.mango = {
@@ -37,30 +24,20 @@ in
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  flake-file.inputs.scenefx = {
-    url = "github:wlrfx/scenefx";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-
   den.aspects.wm-configs.includes = [ den.aspects.mangowc ];
 
   den.aspects.wm-sessions = {
-    nixos =
-      { pkgs, ... }:
-      {
-        imports = [ inputs.mango.nixosModules.mango ];
-        programs.mango = {
-          enable = true;
-          package = patchMango pkgs;
-        };
-      };
+    nixos = {
+      imports = [ inputs.mango.nixosModules.mango ];
+      programs.mango.enable = true;
+    };
   };
 
   den.aspects.mangowc = {
     homeManager =
       { pkgs, ... }:
       let
-        mangoPkg = patchMango pkgs;
+        mangoPkg = mangoFor pkgs;
 
         # "Last workspace" toggle — mango has no prev-tag bind function (view,0
         # means "show ALL tags", not previous). With view_current_to_back=1,
