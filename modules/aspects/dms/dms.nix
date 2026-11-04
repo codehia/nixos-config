@@ -133,6 +133,13 @@ let
           # Detects max connected-display width via kernel DRM sysfs (no Wayland or DMS required),
           # populates ~/Pictures/Wallpapers/active/ with symlinks from the right resolution folder.
           # Idempotent — safe to re-trigger on display hotplug (e.g. from Kanshi).
+          # Tools the script needs; shared by the service and the activation below.
+          wallpaperSelectPath = lib.makeBinPath [
+            pkgs.gawk
+            pkgs.findutils
+            pkgs.coreutils
+          ];
+
           wallpaperSelectScript = pkgs.writeShellScript "dms-wallpaper-select" ''
             WALLPAPER_BASE="$HOME/Pictures/Wallpapers"
             ACTIVE_DIR="$WALLPAPER_BASE/active"
@@ -176,13 +183,7 @@ let
               Type = "oneshot";
               ExecStart = "${wallpaperSelectScript}";
               RemainAfterExit = true;
-              Environment = "PATH=/run/current-system/sw/bin:${
-                lib.makeBinPath [
-                  pkgs.gawk
-                  pkgs.findutils
-                  pkgs.coreutils
-                ]
-              }";
+              Environment = "PATH=/run/current-system/sw/bin:${wallpaperSelectPath}";
             };
             Install.WantedBy = [ "graphical-session.target" ];
           };
@@ -213,25 +214,7 @@ let
               $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete --no-perms --chmod=D755,F644 --exclude='active' "$wallpaperSrc/" "$wallpaperDst/"
 
               # Pre-populate active/ so DMS has a wallpaper even before the service runs.
-              # Same DRM detection as the service — widest single connected display.
-              WIDTH=$(
-                for d in /sys/class/drm/card*-*/; do
-                  [ "$(cat "$d/status" 2>/dev/null)" = "connected" ] && cat "$d/modes" 2>/dev/null
-                done | ${pkgs.gawk}/bin/awk -Fx '{print $1}' | sort -n | tail -1
-              ) || true
-              if [ "''${WIDTH:-0}" -ge 3440 ]; then
-                folder="$wallpaperDst/ultrawide"
-              else
-                folder="$wallpaperDst/regular"
-              fi
-              mkdir -p "$wallpaperDst/active"
-              find "$wallpaperDst/active" -maxdepth 1 -type l -delete
-              for f in "$folder"/*; do
-                [ -f "$f" ] || continue
-                ln -sf "$f" "$wallpaperDst/active/$(basename "$f")"
-              done
-              FIRST=$(ls "$folder" 2>/dev/null | head -1) || true
-              [ -n "$FIRST" ] && ln -sf "$folder/$FIRST" "$wallpaperDst/active/wallpaper" || true
+              PATH="${wallpaperSelectPath}:$PATH" $DRY_RUN_CMD ${wallpaperSelectScript} || true
             fi
           '';
 
