@@ -2,7 +2,7 @@
 # Provides fan control, power cap, and clock monitoring for AMD discrete GPUs.
 # NOT useful for laptop APUs (fan is EC-controlled, not GPU-controlled).
 #
-# gpuKey is a freeform host attribute (set in hosts.nix) — read via perHost.
+# gpuKey is a typed host option (schema.nix), set in the host declaration.
 # Usage: den.aspects.lact
 #
 # gpuKey format: "<vendor>:<device>-<subvendor>:<subdevice>-<pci_addr>"
@@ -25,7 +25,7 @@ let
   gpuConfig =
     { host }:
     let
-      gpuKey = host.gpuKey or null;
+      inherit (host) gpuKey;
     in
     {
       nixos =

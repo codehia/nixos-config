@@ -6,7 +6,7 @@
 let
   personalMedia =
     { user, ... }:
-    lib.optionalAttrs (user.personalApps or false) {
+    lib.optionalAttrs user.personalApps {
       homeManager =
         { pkgs, ... }:
         {
