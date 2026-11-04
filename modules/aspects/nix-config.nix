@@ -26,10 +26,6 @@ in
 
         environment.binsh = "${pkgs.bash}/bin/bash";
         nix = {
-          optimise = {
-            automatic = true;
-            dates = [ "03:45" ];
-          };
           settings = {
             download-buffer-size = 524288000; # 500 MiB
             experimental-features = [
