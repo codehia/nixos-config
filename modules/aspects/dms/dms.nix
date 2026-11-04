@@ -96,11 +96,6 @@ let
 
         # Lock session before suspend/hibernate.
         lockBeforeSuspend = true;
-
-        # Night mode via DMS wlr-gamma-control-v1 — uniform across all compositors
-        # (sway, hyprland, mango all support the protocol).
-        nightModeEnabled = true;
-        nightModeAutoEnabled = true;
       };
     in
     {
