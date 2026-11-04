@@ -13,6 +13,7 @@
     extraAspects = [
       "rclone"
       "music-arr"
+      "gaming"
     ];
     extraBrowsers = [
       "firefox-esr"
@@ -44,12 +45,9 @@
       den.aspects.tailscale
       den.aspects.desktop-services
       den.aspects.mullvad
-      den.aspects.avahi
-      den.aspects.samba
       den.aspects.ios-devices
       den.aspects.laptop
       den.aspects.bluetooth
-      den.aspects.gaming
     ];
   };
 }

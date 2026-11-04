@@ -13,6 +13,7 @@
     extraAspects = [
       "rclone"
       "localsend"
+      "gaming"
     ];
     extraBrowsers = [
       "firefox-esr"
@@ -37,11 +38,8 @@
       den.aspects.tailscale
       den.aspects.desktop-services
       den.aspects.mullvad
-      den.aspects.avahi
-      den.aspects.samba
       den.aspects.lact
       den.aspects.ios-devices
-      den.aspects.gaming
       den.aspects.kanata
     ];
   };
