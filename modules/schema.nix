@@ -20,6 +20,14 @@
           default = [ ];
           description = "Aspect names deus gets on this host only (users/deus.nix).";
         };
+        defaultBrowser = lib.mkOption {
+          type = lib.types.enum [
+            "zen"
+            "helium"
+          ];
+          default = "zen";
+          description = "Default browser (mimeApps, $BROWSER, WM launch bind); see browsers/_<name>.nix.";
+        };
         extraBrowsers = lib.mkOption {
           type = lib.types.listOf lib.types.str;
           default = [ ];

@@ -42,7 +42,6 @@ in
         ];
       };
 
-    homeManager.home.sessionVariables.BROWSER = "zen-beta";
     homeManager.programs.git.settings.user = {
       name = "codehia";
       email = "dev@sacharya.dev";

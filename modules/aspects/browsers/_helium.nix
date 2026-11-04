@@ -3,6 +3,7 @@
     url = "github:AlvaroParker/helium-nix";
   };
   package = inputs': inputs'.helium.packages.default;
+  command = "helium";
   mimeApps = {
     enable = true;
     defaultApplications = {

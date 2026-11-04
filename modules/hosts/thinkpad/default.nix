@@ -15,6 +15,7 @@
       "music-arr"
       "gaming"
     ];
+    defaultBrowser = "helium";
     extraBrowsers = [
       "firefox-esr"
       "google-chrome"
