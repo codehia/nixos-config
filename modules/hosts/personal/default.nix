@@ -5,7 +5,6 @@
   den.hosts.x86_64-linux.personal = {
     home-manager.enable = true;
     gpuKey = "1002:7340-1043:04E6-0000:2d:00.0";
-    nhCleanEnabled = true;
     greetdUser = "deus";
     greetdSessionBin = "mango";
     # Aspects added here are picked up by deus's extraAspectsSelector and included only on this host.

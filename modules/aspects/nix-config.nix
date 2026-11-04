@@ -1,12 +1,4 @@
-{ den, ... }:
-let
-  # nh manages GC when nhCleanEnabled — disable the built-in automatic GC in that case.
-  gcConfig =
-    { host }:
-    {
-      nixos.nix.gc.automatic = !(host.nhCleanEnabled or false);
-    };
-in
+# GC is handled by programs.nh.clean (nix-tools.nix); nix.gc.automatic stays at its default (off).
 {
   den.aspects.nix-config = {
     nixos =
@@ -52,13 +44,7 @@ in
             max-substitution-jobs = 128;
             fallback = true; # build locally if a cached NAR is advertised but missing
           };
-          gc = {
-            dates = "weekly";
-            options = "--delete-older-than 7d";
-          };
         };
       };
-
-    includes = [ gcConfig ];
   };
 }

@@ -5,7 +5,6 @@
   den.hosts.x86_64-linux.thinkpad = {
     home-manager.enable = true;
     isLaptop = true;
-    nhCleanEnabled = true;
     greetdUser = "deus";
     greetdSessionBin = "mango";
     # Aspects added here are picked up by deus's extraAspectsSelector and included only on this host.
