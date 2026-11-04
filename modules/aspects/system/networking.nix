@@ -5,12 +5,6 @@
 {
   den.aspects.networking = {
     nixos.networking.networkmanager.enable = true;
-    nixos.networking.firewall = {
-      enable = true;
-      allowedTCPPorts = [
-        7498
-        2231
-      ];
-    };
+    nixos.networking.firewall.enable = true;
   };
 }
