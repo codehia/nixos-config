@@ -89,9 +89,15 @@ return {
 
     -- Mini.icons
     require('mini.icons').setup()
+    -- Serve require('nvim-web-devicons') for plugins that use it (diffview, telescope, ...)
+    MiniIcons.mock_nvim_web_devicons()
 
     -- Mini.ai for better text objects
-    require('mini.ai').setup({ n_lines = 500 })
+    require('mini.ai').setup({
+      n_lines = 500,
+      -- an/in are nvim 0.12 built-in incremental selection; keep them free
+      mappings = { around_next = 'aN', inside_next = 'iN' },
+    })
 
     -- Mini.surround for surround operations
     require('mini.surround').setup()

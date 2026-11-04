@@ -114,3 +114,9 @@ vim.keymap.set('n', '<leader>fn', '<cmd>enew<cr>', { desc = 'New File' })
 
 -- Quit
 vim.keymap.set('n', '<leader>qq', '<cmd>qa<cr>', { desc = 'Quit All' })
+
+-- Built-in undotree (nvim 0.12, packadd nvim.undotree)
+vim.keymap.set('n', '<leader>tu', function()
+  vim.cmd.packadd('nvim.undotree')
+  vim.cmd.Undotree()
+end, { desc = '[T]oggle [U]ndotree' })

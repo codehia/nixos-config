@@ -73,7 +73,7 @@ return {
         -- never sees ls.add_snippets() entries (config/snippets.lua)
         snippets = { preset = 'luasnip' },
         sources = {
-          default = { 'lsp', 'snippets', 'copilot', 'buffer' },
+          default = { 'lsp', 'snippets', 'buffer' },
           providers = {
             snippets = {},
             buffer = {
@@ -86,11 +86,6 @@ return {
                 end,
               },
             },
-            copilot = {
-              name = 'copilot',
-              module = 'blink-cmp-copilot',
-              async = true,
-            },
           },
         },
         completion = {
@@ -100,29 +95,13 @@ return {
               components = {
                 kind_icon = {
                   text = function(ctx)
-                    local icon = ctx.kind_icon
-                    if vim.tbl_contains({ 'Path' }, ctx.source_name) then
-                      local dev_icon, _ = require('nvim-web-devicons').get_icon(ctx.label)
-                      if dev_icon then
-                        icon = dev_icon
-                      end
-                    else
-                      icon = require('lspkind').symbol_map[ctx.kind] or ctx.kind_icon
-                    end
-
+                    local cat = ctx.source_name == 'Path' and 'file' or 'lsp'
+                    local icon = require('mini.icons').get(cat, cat == 'file' and ctx.label or ctx.kind)
                     return icon .. ctx.icon_gap
                   end,
-                  -- Optionally, use the highlight groups from nvim-web-devicons
-                  -- You can also add the same function for `kind.highlight` if you want to
-                  -- keep the highlight groups in sync with the icons.
                   highlight = function(ctx)
-                    local hl = ctx.kind_hl
-                    if vim.tbl_contains({ 'Path' }, ctx.source_name) then
-                      local dev_icon, dev_hl = require('nvim-web-devicons').get_icon(ctx.label)
-                      if dev_icon then
-                        hl = dev_hl
-                      end
-                    end
+                    local cat = ctx.source_name == 'Path' and 'file' or 'lsp'
+                    local _, hl = require('mini.icons').get(cat, cat == 'file' and ctx.label or ctx.kind)
                     return hl
                   end,
                 },
@@ -200,111 +179,6 @@ return {
         desc = '[C]ode rule [L]ookup',
       },
     },
-  },
-
-  -- ---------------------------------------------------------------------------
-  -- Copilot — GitHub Copilot (panel/suggestions off; blink-cmp-copilot handles)
-  -- pname: copilot.lua
-  -- ---------------------------------------------------------------------------
-  {
-    'copilot.lua',
-    event = { 'InsertEnter' },
-    keys = {
-      {
-        '<leader>tc',
-        function()
-          if require('copilot.client').is_disabled() then
-            require('copilot.command').enable()
-            vim.notify('Copilot enabled')
-          else
-            require('copilot.command').disable()
-            vim.notify('Copilot disabled')
-          end
-        end,
-        desc = '[T]oggle [C]opilot',
-      },
-    },
-    after = function()
-      require('copilot').setup({
-        panel = { enabled = false },
-        suggestion = { enabled = false },
-      })
-      require('copilot.command').disable()
-    end,
-  },
-
-  -- ---------------------------------------------------------------------------
-  -- blink-cmp-copilot — copilot source for blink-cmp (dep, loaded lazily)
-  -- pname: blink-cmp-copilot
-  -- ---------------------------------------------------------------------------
-  {
-    'blink-cmp-copilot',
-    dep_of = { 'blink.cmp' },
-    lazy = true,
-  },
-
-  -- ---------------------------------------------------------------------------
-  -- CopilotChat — GitHub Copilot chat interface
-  -- pname: CopilotChat.nvim
-  -- ---------------------------------------------------------------------------
-  {
-    'CopilotChat.nvim',
-    cmd = 'CopilotChat',
-    after = function()
-      require('CopilotChat').setup({
-        model = 'auto',
-        question_header = '  User ',
-        answer_header = '  Copilot ',
-        window = { layout = 'vertical', width = 0.3, border = 'rounded' },
-        show_help = true,
-        auto_follow_cursor = true,
-        auto_insert_mode = false,
-        clear_chat_on_new_prompt = false,
-        highlight_selection = true,
-        context = 'buffer',
-        selection_spec = 'visual',
-        chat_autocomplete = true,
-        separator = '─',
-        show_folds = true,
-        mappings = {
-          close = { insert = '' },
-          reset = { normal = '', insert = '' },
-          submit_prompt = { normal = '<CR>', insert = '<C-s>' },
-          accept_diff = { normal = '<C-y>', insert = '<C-y>' },
-          show_diff = { normal = '<leader>ad' },
-          show_system_prompt = { normal = '<leader>as' },
-          show_user_selection = { normal = '<leader>al' },
-        },
-      })
-
-      vim.keymap.set({ 'n', 'x' }, '<leader>aa', '<cmd>CopilotChatToggle<CR>', {
-        desc = 'CopilotChat: toggle',
-      })
-      vim.keymap.set({ 'n', 'x' }, '<leader>aq', function()
-        vim.ui.input({ prompt = 'Ask AI: ' }, function(input)
-          if input and input ~= '' then
-            require('CopilotChat').ask(input)
-          end
-        end)
-      end, { desc = 'CopilotChat: quick chat' })
-      vim.keymap.set({ 'n', 'v' }, '<leader>ax', function()
-        require('CopilotChat').reset()
-      end, { desc = 'CopilotChat: reset' })
-      vim.keymap.set({ 'n', 'x' }, '<leader>ap', function()
-        local ok, integ = pcall(require, 'CopilotChat.integrations.telescope')
-        if ok then
-          integ.pick(require('CopilotChat.actions').prompt_actions())
-        end
-      end, { desc = 'CopilotChat: prompt actions' })
-
-      vim.api.nvim_create_autocmd('BufEnter', {
-        pattern = 'copilot-chat',
-        callback = function()
-          vim.opt_local.relativenumber = false
-          vim.opt_local.number = false
-        end,
-      })
-    end,
   },
 
   -- ---------------------------------------------------------------------------

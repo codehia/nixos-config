@@ -91,6 +91,14 @@ end
 M.setup = function()
   vim.lsp.config('*', { on_attach = M.on_attach })
 
+  -- Built-in LSP features (no-op for servers that don't support them)
+  vim.lsp.linked_editing_range.enable()
+  vim.lsp.on_type_formatting.enable()
+  vim.lsp.codelens.enable()
+  -- nvim-highlight-colors covers LSP and non-LSP colors; avoid double swatches.
+  -- TODO: drop the plugin once built-in document_color handles non-LSP colors.
+  vim.lsp.document_color.enable(false)
+
   vim.diagnostic.config({
     float = { border = 'rounded', source = true },
     signs = {

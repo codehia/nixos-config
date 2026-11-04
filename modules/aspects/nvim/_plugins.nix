@@ -44,10 +44,6 @@ with pkgs.vimPlugins;
     data = blink-cmp;
     lazy = true;
   };
-  blink-cmp-cp = {
-    data = blink-cmp-copilot;
-    lazy = true;
-  };
   navic = {
     data = nvim-navic;
     lazy = true;
@@ -124,14 +120,6 @@ with pkgs.vimPlugins;
     data = nvim-nio;
     lazy = true;
   };
-  copilot = {
-    data = copilot-lua;
-    lazy = true;
-  };
-  startuptime = {
-    data = vim-startuptime;
-    lazy = true;
-  };
   snippets = {
     data = friendly-snippets;
     lazy = true;
@@ -145,10 +133,6 @@ with pkgs.vimPlugins;
     lazy = true;
   };
 
-  copilot-chat = {
-    data = CopilotChat-nvim;
-    lazy = true;
-  };
   nui = {
     data = nui-nvim;
     lazy = true;
@@ -169,24 +153,8 @@ with pkgs.vimPlugins;
     data = todo-comments-nvim;
     lazy = true;
   };
-  zen-mode = {
-    data = zen-mode-nvim;
-    lazy = true;
-  };
-  twilight = {
-    data = twilight-nvim;
-    lazy = true;
-  };
   octo = {
     data = octo-nvim;
-    lazy = true;
-  };
-  lspkind = {
-    data = lspkind-nvim;
-    lazy = true;
-  };
-  web-devicons = {
-    data = nvim-web-devicons;
     lazy = true;
   };
   hardtime = {

@@ -101,6 +101,11 @@ return {
         git = { enabled = true },
       })
 
+      -- Zen: snacks.zen (dims inactive code via snacks.dim by default)
+      vim.keymap.set('n', '<leader>zz', function()
+        Snacks.zen()
+      end, { desc = '[Z]en mode' })
+
       vim.keymap.set('n', '<leader>gg', function()
         Snacks.lazygit()
       end, { desc = 'Lazygit' })
@@ -122,7 +127,6 @@ return {
     after = function()
       require('which-key').setup()
       require('which-key').add({
-        { '<leader>a', group = '[A]I' },
         { '<leader>b', group = '[B]uffer' },
         { '<leader>c', group = '[C]ode' },
         { '<leader>d', group = '[D]ocument / Debug' },
@@ -163,6 +167,8 @@ return {
 
   -- ---------------------------------------------------------------------------
   -- Noice — cmdline, messages, popupmenu UI
+  -- TODO: replace with built-in ui2 (require('vim._core.ui2').enable()) once it
+  -- is no longer experimental (nvim 0.12: experimental)
   -- ---------------------------------------------------------------------------
   {
     'noice.nvim',
@@ -203,15 +209,6 @@ return {
         },
       })
     end,
-  },
-
-  -- ---------------------------------------------------------------------------
-  -- Lspkind — vscode-style completion icons (dep of blink-cmp)
-  -- ---------------------------------------------------------------------------
-  {
-    'lspkind.nvim',
-    dep_of = { 'blink.cmp' },
-    lazy = true,
   },
 
   -- ---------------------------------------------------------------------------
@@ -287,17 +284,6 @@ return {
   },
 
   -- ---------------------------------------------------------------------------
-  -- Vim-startuptime — :StartupTime profiler
-  -- ---------------------------------------------------------------------------
-  {
-    'vim-startuptime',
-    cmd = { 'StartupTime' },
-    before = function()
-      vim.g.startuptime_event_width = 0
-      vim.g.startuptime_tries = 0
-    end,
-  },
-  -- ---------------------------------------------------------------------------
   -- Markview — Markdown/LaTeX/Typst previewer (must not be lazy-loaded)
   -- ---------------------------------------------------------------------------
   {
@@ -307,7 +293,7 @@ return {
       require('markview').setup({
         preview = {
           enable = false, -- raw text by default; <leader>mt to render
-          icon_provider = 'devicons',
+          icon_provider = 'mini',
         },
       })
 

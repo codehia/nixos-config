@@ -484,21 +484,6 @@ return {
   },
 
   -- ---------------------------------------------------------------------------
-  -- Zen-mode + Twilight — distraction-free editing
-  -- pnames: zen-mode.nvim, twilight.nvim
-  -- ---------------------------------------------------------------------------
-  {
-    'zen-mode.nvim',
-    keys = {
-      lzextras.key2spec('n', '<leader>zz', '<cmd>ZenMode<CR>', { desc = '[Z]en mode' }),
-    },
-    after = function()
-      require('twilight').setup()
-      require('zen-mode').setup({ plugins = { twilight = { enabled = true } } })
-    end,
-  },
-
-  -- ---------------------------------------------------------------------------
   -- Octo — GitHub issues/PRs inside nvim
   -- pname: octo.nvim
   -- ---------------------------------------------------------------------------
@@ -512,7 +497,5 @@ return {
 
   -- Dependencies loaded by lze before their parent plugins
   { 'telescope-fzf-native.nvim', dep_of = { 'telescope.nvim' } },
-  { 'nvim-web-devicons', dep_of = { 'diffview.nvim' } },
   { 'telescope-ui-select.nvim', dep_of = { 'telescope.nvim' } },
-  { 'twilight.nvim', dep_of = { 'zen-mode.nvim' } },
 }
