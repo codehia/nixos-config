@@ -3,7 +3,6 @@
 # initial_session auto-logs greetdUser into /run/current-system/sw/bin/<greetdSessionBin>
 # (override with host.greetdSessionCmd); after logout, tuigreet lists every session that
 # the WM modules register via services.displayManager.sessionPackages.
-{ den, ... }:
 let
   greetdConfig =
     { host }:

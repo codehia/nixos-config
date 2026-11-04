@@ -1,5 +1,4 @@
 # Bluetooth — hardware config + WirePlumber auto-connect policy for audio profiles.
-{ den, ... }:
 {
   den.aspects.bluetooth = {
     nixos = {

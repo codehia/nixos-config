@@ -1,7 +1,6 @@
 # yazi — terminal file manager with preview support.
 # Catppuccin Mocha theming via catppuccin/nix (stylix target disabled in appearance.nix).
 # Shell wrapper "y" changes cwd on exit.
-{ den, ... }:
 {
   den.aspects.shell-tools = {
     homeManager =

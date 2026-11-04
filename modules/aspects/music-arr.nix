@@ -2,7 +2,6 @@
 # slskd (Soulseek, for rare/niche) + Navidrome (stream the library).
 # All run as system services. A shared `media` group lets every service and
 # the user (deus, via host.extraAspects) read-write one library tree so hardlinks work across the arr pipeline.
-{ den, ... }:
 let
   mediaDir = "/var/lib/media";
   musicDir = "${mediaDir}/music";

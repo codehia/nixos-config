@@ -1,5 +1,4 @@
 # Desktop integration services — flatpak, appimage, WebKit/GTK runtime libs.
-{ den, ... }:
 {
   den.aspects.desktop-services = {
     nixos =

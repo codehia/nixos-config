@@ -1,7 +1,6 @@
 # Kanata keyboard remapping — Kinesis Advantage 360 config.
 # uinput prerequisites (kernel module, group, udev rule) come from the kanata
 # module itself via hardware.uinput.enable.
-{ den, ... }:
 {
   den.aspects.kanata = {
     nixos = {

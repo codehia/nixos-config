@@ -4,7 +4,6 @@
 # HM reuses the NixOS package via osConfig, so there is one patched dms-shell build.
 {
   inputs,
-  den,
   lib,
   self,
   ...

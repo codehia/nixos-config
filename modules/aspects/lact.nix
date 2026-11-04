@@ -20,7 +20,6 @@
 #       startup, so a read-only Nix store symlink causes an immediate crash. Config is
 #       written via ExecStartPre (pkgs.writeText → cp) to a writable /etc/lact/config.yaml.
 #       The LACT GUI cannot save changes (config is overwritten on each service start).
-{ den, ... }:
 let
   gpuConfig =
     { host }:

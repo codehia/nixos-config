@@ -1,6 +1,5 @@
 # hypridle — idle management for Hyprland.
 # Pauses media on lock and before sleep.
-{ den, ... }:
 {
   den.aspects.hyprland = {
     homeManager =

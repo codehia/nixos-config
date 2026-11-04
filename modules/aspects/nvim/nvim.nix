@@ -1,7 +1,6 @@
 {
   inputs,
   lib,
-  den,
   ...
 }:
 let
@@ -10,7 +9,7 @@ let
   nvimHome =
     { pkgs, inputs', ... }:
     let
-      nvimPkg = inputs'.nixpkgs.legacyPackages.neovim-unwrapped;
+      nvimPkg = pkgs.neovim-unwrapped;
 
       lzextrasLatest = inputs'.lzextras.packages.lzextras-vimPlugin;
 
@@ -57,14 +56,12 @@ let
                 # sameLine sources (pyright/ruff) — appends a 2nd ignore comment
                 # instead of merging. --replace-fail breaks the build when upstream
                 # fixes it, signalling the patch can be dropped.
-                rulebookPlugin =
-                  (config.nvim-lib.mkPlugin "nvim-rulebook" inputs.nvim-rulebook).overrideAttrs
-                    (old: {
-                      postPatch = ''
-                        substituteInPlace lua/rulebook/diagnostic-actions.lua \
-                          --replace-fail 'location == "location"' 'location == "sameLine"'
-                      '';
-                    });
+                rulebookPlugin = (config.nvim-lib.mkPlugin "nvim-rulebook" inputs.nvim-rulebook).overrideAttrs (_: {
+                  postPatch = ''
+                    substituteInPlace lua/rulebook/diagnostic-actions.lua \
+                      --replace-fail 'location == "location"' 'location == "sameLine"'
+                  '';
+                });
               };
               info = {
                 nixdExtras.nixpkgs = "import ${pkgs.path} {}";

@@ -1,5 +1,4 @@
 # GUI file manager — Nautilus with archive integration and USB auto-mount.
-{ den, ... }:
 {
   den.aspects.apps = {
     homeManager =
