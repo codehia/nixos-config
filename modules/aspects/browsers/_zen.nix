@@ -1,9 +1,8 @@
-{ inputs }:
 {
   flakeInput = {
     url = "github:0xc000022070/zen-browser-flake";
   };
-  package = pkgs: inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.beta;
+  package = inputs': inputs'.zen-browser.packages.beta;
   mimeApps = {
     enable = true;
     defaultApplications = {

@@ -7,17 +7,14 @@
 # module's structured `settings` option is a oneOf type that permits only ONE
 # definition, so the old multi-file collector split cannot merge it.
 { den, inputs, ... }:
-let
-  # MangoWC uses 5 workspace tags + tag 6 as a window stash. Tag count is now a
-  # runtime option (`tag_num` in settings below) — mango exposes `config.tag_num`,
-  # so the old compile-time source patch of src/config/preset.h is gone.
-  # Tag 6 is the window stash — it has no view/tag number binds, so it is only
-  # reachable through the stash keybindings below.
-  # mango uses its own locked scenefx (0.5, pre-gradients). Don't override it with
-  # scenefx HEAD: its gradient.frag `int clamp` shim breaks on mesa 26.1 (FX renderer
-  # fails, mango exits at login).
-  mangoFor = pkgs: inputs.mango.packages.${pkgs.stdenv.hostPlatform.system}.mango;
-in
+# MangoWC uses 5 workspace tags + tag 6 as a window stash. Tag count is now a
+# runtime option (`tag_num` in settings below) — mango exposes `config.tag_num`,
+# so the old compile-time source patch of src/config/preset.h is gone.
+# Tag 6 is the window stash — it has no view/tag number binds, so it is only
+# reachable through the stash keybindings below.
+# mango uses its own locked scenefx (0.5, pre-gradients). Don't override it with
+# scenefx HEAD: its gradient.frag `int clamp` shim breaks on mesa 26.1 (FX renderer
+# fails, mango exits at login).
 {
   flake-file.inputs.mango = {
     url = "github:mangowm/mango";
@@ -35,9 +32,9 @@ in
 
   den.aspects.mangowc = {
     homeManager =
-      { pkgs, ... }:
+      { pkgs, inputs', ... }:
       let
-        mangoPkg = mangoFor pkgs;
+        mangoPkg = inputs'.mango.packages.mango;
 
         # "Last workspace" toggle — mango has no prev-tag bind function (view,0
         # means "show ALL tags", not previous). With view_current_to_back=1,

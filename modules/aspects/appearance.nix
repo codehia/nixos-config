@@ -43,9 +43,9 @@
       };
 
     homeManager =
-      { pkgs, ... }:
+      { pkgs, inputs', ... }:
       let
-        apple = inputs.apple-fonts.packages.${pkgs.stdenv.hostPlatform.system};
+        apple = inputs'.apple-fonts.packages;
       in
       {
         imports = [

@@ -1,4 +1,4 @@
-{ den, inputs, ... }:
+{ den, ... }:
 let
   extraBrowsersConfig =
     { host, ... }:
@@ -6,11 +6,11 @@ let
       homeManager =
         { pkgs, ... }:
         {
-          home.packages = map (name: pkgs.${name}) (host.extraBrowsers or [ ]);
+          home.packages = map (name: pkgs.${name}) host.extraBrowsers;
         };
     };
-  zen = import ./_zen.nix { inherit inputs; };
-  helium = import ./_helium.nix { inherit inputs; };
+  zen = import ./_zen.nix;
+  helium = import ./_helium.nix;
 in
 {
   flake-file.inputs = {
@@ -29,11 +29,11 @@ in
     ];
 
     homeManager =
-      { pkgs, ... }:
+      { inputs', ... }:
       {
         home.packages = [
-          (zen.package pkgs)
-          (helium.package pkgs)
+          (zen.package inputs')
+          (helium.package inputs')
         ];
         xdg.mimeApps = zen.mimeApps;
       };

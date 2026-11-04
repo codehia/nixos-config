@@ -1,9 +1,8 @@
-{ inputs }:
 {
   flakeInput = {
     url = "github:AlvaroParker/helium-nix";
   };
-  package = pkgs: inputs.helium.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  package = inputs': inputs'.helium.packages.default;
   mimeApps = {
     enable = true;
     defaultApplications = {

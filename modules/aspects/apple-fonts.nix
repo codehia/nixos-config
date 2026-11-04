@@ -1,12 +1,11 @@
-{ inputs, ... }:
 {
   flake-file.inputs.apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
 
   den.aspects.apple-fonts = {
     nixos =
-      { pkgs, ... }:
+      { inputs', ... }:
       {
-        fonts.packages = with inputs.apple-fonts.packages.${pkgs.stdenv.hostPlatform.system}; [
+        fonts.packages = with inputs'.apple-fonts.packages; [
           sf-pro
           sf-mono
           ny

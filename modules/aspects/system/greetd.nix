@@ -3,7 +3,7 @@
 # initial_session auto-logs greetdUser into /run/current-system/sw/bin/<greetdSessionBin>
 # (override with host.greetdSessionCmd); after logout, tuigreet lists every session that
 # the WM modules register via services.displayManager.sessionPackages.
-{ den, inputs, ... }:
+{ den, ... }:
 let
   greetdConfig =
     { host }:
@@ -13,9 +13,9 @@ let
     in
     {
       nixos =
-        { pkgs, config, ... }:
+        { inputs', config, ... }:
         let
-          tuigreet = "${inputs.tuigreet.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/tuigreet";
+          tuigreet = "${inputs'.tuigreet.packages.default}/bin/tuigreet";
           # Aggregated session entries from all WMs (sway, hyprland, mango, …).
           sessionsDir = "${config.services.displayManager.sessionData.desktops}/share/wayland-sessions";
         in
