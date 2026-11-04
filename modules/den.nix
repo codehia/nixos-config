@@ -4,8 +4,7 @@
 # flake-file:   Lets individual modules declare flake inputs inline; aggregated by `nix run .#write-flake`.
 # import-tree:  Auto-discovers all .nix files in modules/ (files prefixed with _ are excluded).
 # flake-parts:  The underlying flake module system (mkFlake).
-# flake-aspects: Provides the aspect composition primitives used by den.
-{ inputs, den, ... }:
+{ inputs, ... }:
 {
   imports = [
     inputs.flake-file.flakeModules.dendritic
@@ -14,7 +13,7 @@
 
   flake-file.inputs = {
     den = {
-      url = "github:vic/den/latest";
+      url = "github:denful/den/latest";
     };
     flake-file = {
       url = "github:vic/flake-file";
@@ -24,9 +23,6 @@
     };
     import-tree = {
       url = "github:vic/import-tree";
-    };
-    flake-aspects = {
-      url = "github:vic/flake-aspects";
     };
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-26.05";
@@ -38,7 +34,4 @@
 
   # Only building for x86_64-linux (thinkpad). Add more systems here for other architectures.
   systems = [ "x86_64-linux" ];
-
-  # Enable angle bracket syntax: <aspect>, <aspect/sub>, <den.provides.battery>
-  _module.args.__findFile = den.lib.__findFile;
 }

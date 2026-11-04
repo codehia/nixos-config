@@ -340,13 +340,13 @@
       "locked": {
         "lastModified": 1790283496,
         "narHash": "sha256-QTPzBJpxfetqU3u29+tQev8SlAC6EaRvHks0+FHAclY=",
-        "owner": "vic",
+        "owner": "denful",
         "repo": "den",
         "rev": "37eb88ce28a9e42d5b367b967a9097030ff4f665",
         "type": "github"
       },
       "original": {
-        "owner": "vic",
+        "owner": "denful",
         "ref": "latest",
         "repo": "den",
         "type": "github"
@@ -545,21 +545,6 @@
       "original": {
         "owner": "rafaelmardojai",
         "repo": "firefox-gnome-theme",
-        "type": "github"
-      }
-    },
-    "flake-aspects": {
-      "locked": {
-        "lastModified": 1788209328,
-        "narHash": "sha256-LTU8Ea+VbDtPtOFOAufZHe+cW1ISdEt96Au0+cIUZ4Y=",
-        "owner": "vic",
-        "repo": "flake-aspects",
-        "rev": "e5bbf7be955e8289d545c783673808b18d48c780",
-        "type": "github"
-      },
-      "original": {
-        "owner": "vic",
-        "repo": "flake-aspects",
         "type": "github"
       }
     },
@@ -2398,7 +2383,6 @@
         "dgop": "dgop",
         "disko": "disko",
         "dms": "dms",
-        "flake-aspects": "flake-aspects",
         "flake-file": "flake-file",
         "flake-parts": "flake-parts",
         "helium": "helium",
