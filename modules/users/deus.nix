@@ -13,36 +13,9 @@ in
 {
   den.aspects.deus = {
     includes = [
-      den.batteries.primary-user
-      (den.batteries.user-shell "fish")
-
-      # Theming
-      den.aspects.appearance
-
-      # Terminal / shell
-      den.aspects.terminal
-
-      # Editor / dev
-      den.aspects.vcs
-      den.aspects.editor
-      den.aspects.dev-tools
-
-      # Browser
-      den.aspects.browser
-
-      # Secrets / SSH
-      den.aspects.secrets
-      den.aspects.ssh
-
-      # Packages and tools
-      den.aspects.packages
-      den.aspects.shell-tools
-      den.aspects.tui
-      den.aspects.cli-utils
-      den.aspects.apps
+      den.aspects.base-user
       den.aspects.zoom
       den.aspects.qbittorrent
-      den.aspects.dms-home
 
       # Host-specific extras — aspects needed on only some hosts, not all.
       # Add aspect name strings to host.extraAspects; extraAspectsSelector resolves

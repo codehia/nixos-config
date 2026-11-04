@@ -5,39 +5,8 @@
 {
   den.aspects.soumya = {
     includes = [
-      den.batteries.primary-user
-      (den.batteries.user-shell "fish")
-
-      # Theming
-      den.aspects.appearance
-
-      # Terminal / shell
-      den.aspects.terminal
-
-      # Editor / dev
-      den.aspects.vcs
-      den.aspects.editor
-
-      # Browser
-      den.aspects.browser
-
-      # Secrets / SSH
-      den.aspects.secrets
-      den.aspects.ssh
-
-      # Packages and tools
-      den.aspects.shell-tools
-      den.aspects.tui
-      den.aspects.cli-utils
-      den.aspects.packages
-      den.aspects.dev-tools
-      den.aspects.apps
-
-      # Work
+      den.aspects.base-user
       den.aspects.work
-
-      # Desktop shell
-      den.aspects.dms-home
     ];
 
     nixos.sops.secrets.soumya_password = {
