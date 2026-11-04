@@ -18,14 +18,6 @@
       "firefox-esr"
       "google-chrome"
     ];
-    nvimLanguages = [
-      "lua"
-      "nix"
-      "python"
-      "typescript"
-      "go"
-      "latex"
-    ];
     users.deus = {
       personalApps = true;
     };

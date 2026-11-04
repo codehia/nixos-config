@@ -18,25 +18,10 @@
       "firefox-esr"
       "google-chrome"
     ];
-    nvimLanguages = [
-      "lua"
-      "nix"
-      "python"
-      "typescript"
-      "go"
-      "latex"
-    ];
-    users.soumya = {
-      nvimLanguages = [
-        "nix"
-        "lua"
-        "python"
-        "typescript"
-      ];
-    };
     users.deus = {
       personalApps = true;
     };
+    users.soumya = { };
   };
 
   den.aspects.thinkpad = {
