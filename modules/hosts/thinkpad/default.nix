@@ -12,7 +12,6 @@
     # Useful when deus needs an aspect on some hosts but not all (e.g. work tools on a work laptop).
     extraAspects = [
       "rclone"
-      "music-arr"
       "gaming"
     ];
     defaultBrowser = "helium";
