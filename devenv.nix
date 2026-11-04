@@ -14,11 +14,7 @@
 
   git-hooks = {
     enable = true;
-    default_stages = [
-      "pre-commit"
-      "post-commit"
-      "commit-msg"
-    ];
+    default_stages = [ "pre-commit" ];
     hooks = {
       stylua.enable = true;
       nixfmt.enable = true;
