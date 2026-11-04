@@ -33,8 +33,8 @@
             bind > swap-pane -D       # swap current pane with the next one
             bind < swap-pane -U       # swap current pane with the previous one
 
-            # maximize current pane
-            bind + run "cut -c3- '#{TMUX_CONF}' | sh -s _maximize_pane '#{session_name}' '#D'"
+            # maximize current pane (toggle)
+            bind + resize-pane -Z
 
             # pane resizing
             bind -r H resize-pane -L 2
