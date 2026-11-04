@@ -77,7 +77,6 @@
             modifier = "Mod4";
             floating.modifier = "Mod4";
             terminal = "ghostty";
-            menu = "rofi -show drun";
             defaultWorkspace = "workspace number 1";
 
             startup = [

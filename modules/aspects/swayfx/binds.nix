@@ -33,8 +33,8 @@
             lib.mkOptionDefault {
               # ── App launchers ──
               "${mod}+space" = "exec dms ipc launcher toggle";
-              # null kills the sway default (opens a terminal) without rebinding
-              "${mod}+Return" = null;
+              # replaces the sway default (opens a terminal); mode-aware, see layouts.nix
+              "${mod}+Return" = "exec promote-master";
               "${mod}+Shift+Return" = "exec ghostty";
               "${mod}+w" = "exec zen-beta";
 
@@ -140,7 +140,6 @@
 
               # ── Layout management (persway) ──
               "${mod}+m" = "exec layout-switch";
-              # "${mod}+Return" = "exec promote-master";
               "${mod}+Tab" = "exec persway stack-focus-next";
               "${mod}+Shift+Tab" = "exec persway stack-focus-prev";
               "${mod}+bracketright" = "exec persway stack-main-rotate-next";
