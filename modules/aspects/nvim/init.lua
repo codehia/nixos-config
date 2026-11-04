@@ -5,9 +5,6 @@ vim.g.maplocalleader = ' '
 
 -- NIX INFO HELPER (replaces nixCats API)
 local _nix = require(vim.g.nix_info_plugin_name)
-_G.nix_has_feature = function(name)
-  return _nix(false, 'info', 'categories', name) == true
-end
 _G.nix_info = function(...)
   return _nix(nil, 'info', ...)
 end
