@@ -30,7 +30,6 @@
     homeManager =
       { pkgs, config, ... }:
       {
-        home.sessionVariables.NIXOS_OZONE_WL = "1";
         # Export HM session variables into the UWSM environment so systemd
         # services (DMS, etc.) inherit PATH and other HM-set vars.
         # The guard must be unset first: it is already =1 in the login chain's
