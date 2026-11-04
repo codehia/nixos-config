@@ -9,7 +9,12 @@
   };
 
   den.default = {
-    nixos.home-manager.backupFileExtension = "hm-backup";
+    nixos.home-manager = {
+      backupFileExtension = "hm-backup";
+      # Homes reuse the host's pkgs (overlays + unfree predicate) instead of
+      # evaluating nixpkgs again per user.
+      useGlobalPkgs = true;
+    };
 
     homeManager =
       { config, ... }:

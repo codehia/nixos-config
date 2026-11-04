@@ -1,7 +1,7 @@
 # Unstable overlay — makes nixpkgs-unstable packages available as pkgs.unstable.*
 # This avoids needing specialArgs; any module can use `pkgs.unstable.<pkg>`.
 #
-# den.default: applied to every host's NixOS and home-manager evaluations.
+# Applied on the NixOS side; homes see it too via home-manager.useGlobalPkgs.
 { inputs, ... }:
 let
   unstableOverlay = final: _: {
@@ -16,6 +16,5 @@ in
 {
   den.default = {
     nixos.nixpkgs.overlays = [ unstableOverlay ];
-    homeManager.nixpkgs.overlays = [ unstableOverlay ];
   };
 }
