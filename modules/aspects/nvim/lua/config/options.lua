@@ -90,3 +90,6 @@ vim.wo.wrap = false
 vim.opt.foldcolumn = '0'
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
+
+-- Default border for all floating windows (K hover, signature help, plugins that defer to it)
+vim.o.winborder = 'rounded'
