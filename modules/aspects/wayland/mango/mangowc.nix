@@ -288,7 +288,7 @@
               # Application launchers
               "SUPER,SPACE,spawn,dms ipc launcher toggle"
               "SUPER+SHIFT,Return,spawn,ghostty"
-              "SUPER,w,spawn,helium"
+              "SUPER,w,spawn,default-browser"
 
               # Window management
               "SUPER,c,killclient"

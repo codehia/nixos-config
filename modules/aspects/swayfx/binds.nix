@@ -36,7 +36,7 @@
               # replaces the sway default (opens a terminal); mode-aware, see layouts.nix
               "${mod}+Return" = "exec promote-master";
               "${mod}+Shift+Return" = "exec ghostty";
-              "${mod}+w" = "exec zen-beta";
+              "${mod}+w" = "exec default-browser";
 
               # ── Window management ──
               "${mod}+c" = "kill";

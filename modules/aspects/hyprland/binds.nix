@@ -52,7 +52,7 @@
         wayland.windowManager.hyprland.settings.bind = [
           "$modifier, SPACE, exec, dms ipc launcher toggle"
           "$modifier SHIFT, RETURN, exec, ghostty"
-          "$modifier, W, exec, zen-beta"
+          "$modifier, W, exec, default-browser"
 
           "$modifier, M,        layoutmsg, focusmaster"
           "$modifier, RETURN,   layoutmsg, swapwithmaster master"
