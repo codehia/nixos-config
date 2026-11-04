@@ -40,26 +40,22 @@
       den.aspects.dms-home
     ];
 
-    nixos =
-      { config, ... }:
+    nixos.sops.secrets.soumya_password = {
+      sopsFile = ../../secrets/soumya.yaml;
+      key = "user_password";
+      neededForUsers = true;
+    };
+
+    user =
+      { osConfig, ... }:
       {
-        sops.secrets.soumya_password = {
-          sopsFile = ../../secrets/soumya.yaml;
-          key = "user_password";
-          neededForUsers = true;
-        };
-        users.users.soumya = {
-          description = "Soumyaranjan Acharya";
-          hashedPasswordFile = config.sops.secrets.soumya_password.path;
-          openssh.authorizedKeys.keys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIv1y8DzCwaUGK6DO+64qjctEC1Aia0LW/jhLhrYGSUB soumya@workstation"
-          ];
-        };
+        description = "Soumyaranjan Acharya";
+        hashedPasswordFile = osConfig.sops.secrets.soumya_password.path;
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIv1y8DzCwaUGK6DO+64qjctEC1Aia0LW/jhLhrYGSUB soumya@workstation"
+        ];
       };
 
-    homeManager.home = {
-      homeDirectory = "/home/soumya";
-    };
     homeManager.programs.git.settings.user = {
       name = "Soumyaranjan Acharya";
       email = "";

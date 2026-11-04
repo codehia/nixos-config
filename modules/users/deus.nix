@@ -7,7 +7,7 @@ let
   extraAspectsSelector =
     { host, ... }:
     {
-      includes = map (a: den.aspects.${a}) (host.extraAspects or [ ]);
+      includes = map (a: den.aspects.${a}) host.extraAspects;
     };
 in
 {
@@ -52,29 +52,24 @@ in
       extraAspectsSelector
     ];
 
-    nixos =
-      { config, ... }:
+    nixos.sops.secrets.deus_password = {
+      sopsFile = ../../secrets/deus.yaml;
+      key = "user_password";
+      neededForUsers = true;
+    };
+
+    user =
+      { osConfig, ... }:
       {
-        sops.secrets.deus_password = {
-          sopsFile = ../../secrets/deus.yaml;
-          key = "user_password";
-          neededForUsers = true;
-        };
-        users.users.deus = {
-          description = "Soumyaranjan Acharya";
-          extraGroups = [ "video" ]; # direct backlight write (brightnessctl udev rule)
-          hashedPasswordFile = config.sops.secrets.deus_password.path;
-          openssh.authorizedKeys.keys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF8QcSgwXXrWmVdjcDcKZbBPkQWybWAZih/8YjFno+cK dev@sacharya.dev"
-          ];
-        };
+        description = "Soumyaranjan Acharya";
+        extraGroups = [ "video" ]; # direct backlight write (brightnessctl udev rule)
+        hashedPasswordFile = osConfig.sops.secrets.deus_password.path;
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF8QcSgwXXrWmVdjcDcKZbBPkQWybWAZih/8YjFno+cK dev@sacharya.dev"
+        ];
       };
 
-    homeManager.home = {
-      homeDirectory = "/home/deus";
-      sessionVariables.BROWSER = "zen-beta";
-      file."Public/.keep".text = "";
-    };
+    homeManager.home.sessionVariables.BROWSER = "zen-beta";
     homeManager.programs.git.settings.user = {
       name = "codehia";
       email = "dev@sacharya.dev";
