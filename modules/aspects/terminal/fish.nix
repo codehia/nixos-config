@@ -92,16 +92,12 @@
               inherit (plugin-sudope) src;
             }
             {
-              name = "z";
-              src = z;
-            }
-            {
               name = "sponge";
-              src = sponge;
+              inherit (sponge) src;
             }
             {
               name = "colored-man-pages";
-              src = colored-man-pages;
+              inherit (colored-man-pages) src;
             }
           ];
           functions = {
