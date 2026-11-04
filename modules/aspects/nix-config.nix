@@ -1,6 +1,23 @@
-# GC is handled by programs.nh.clean (nix-tools.nix); nix.gc.automatic stays at its default (off).
+let
+  # GC policy: host.nhCleanEnabled picks nh clean or the built-in nix.gc timer.
+  # Both are set from the one flag so they can never run together.
+  gcPolicy =
+    { host }:
+    {
+      nixos = {
+        programs.nh.clean.enable = host.nhCleanEnabled;
+        nix.gc = {
+          automatic = !host.nhCleanEnabled;
+          dates = "weekly";
+          options = "--delete-older-than 7d";
+        };
+      };
+    };
+in
 {
   den.aspects.nix-config = {
+    includes = [ gcPolicy ];
+
     nixos =
       { pkgs, config, ... }:
       {

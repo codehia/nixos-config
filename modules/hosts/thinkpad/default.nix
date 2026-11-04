@@ -4,6 +4,7 @@
 {
   den.hosts.x86_64-linux.thinkpad = {
     home-manager.enable = true;
+    nhCleanEnabled = true;
     isLaptop = true;
     greetdUser = "deus";
     greetdSessionBin = "mango";

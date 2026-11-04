@@ -4,6 +4,7 @@
 {
   den.hosts.x86_64-linux.personal = {
     home-manager.enable = true;
+    nhCleanEnabled = true;
     gpuKey = "1002:7340-1043:04E6-0000:2d:00.0";
     greetdUser = "deus";
     greetdSessionBin = "mango";

@@ -30,6 +30,11 @@
           default = null;
           description = "LACT GPU key (sudo lact cli list) for the fan curve in lact.nix.";
         };
+        nhCleanEnabled = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = "GC via nh clean (true) or the built-in nix.gc timer (false). Exactly one runs.";
+        };
         greetdUser = lib.mkOption {
           type = lib.types.str;
           description = "User greetd auto-logs into on boot.";

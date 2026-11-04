@@ -4,6 +4,7 @@
 {
   den.hosts.x86_64-linux.workstation = {
     home-manager.enable = true;
+    nhCleanEnabled = true;
     greetdUser = "soumya";
     # Auto-login straight into Hyprland under UWSM (matches the greeter session entry).
     greetdSessionCmd = "/run/current-system/sw/bin/uwsm start -- Hyprland";
