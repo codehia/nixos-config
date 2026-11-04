@@ -9,10 +9,13 @@
       programs.gamemode.enable = true;
       hardware.graphics.enable32Bit = true;
 
+      # Creates the `uinput` group and makes /dev/uinput 0660 root:uinput.
+      hardware.uinput.enable = true;
+
       # steam-devices tags uinput "uaccess" → logind manages an ACL on /dev/uinput,
       # which freezes the plain group perms at "---" and breaks group-based access
-      # (kanata). Untag it: uinput stays plain 0660 root:uinput. deus keeps Steam
-      # Input virtual-gamepad access via uinput group membership instead.
+      # (kanata). Untag it: uinput stays plain 0660 root:uinput. The gaming user keeps
+      # Steam Input virtual-gamepad access via uinput group membership instead.
       services.udev.extraRules = ''
         KERNEL=="uinput", TAG-="uaccess"
       '';
