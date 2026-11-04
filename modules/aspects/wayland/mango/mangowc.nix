@@ -32,8 +32,34 @@
 
   den.aspects.mangowc = {
     homeManager =
-      { pkgs, inputs', ... }:
+      {
+        lib,
+        pkgs,
+        inputs',
+        ...
+      }:
       let
+        mangoMods = {
+          none = "NONE";
+          super = "SUPER";
+          "super+shift" = "SUPER+SHIFT";
+        };
+        dmsBinds = map (
+          b: "${mangoMods.${b.mods}},${if b.key == "space" then "SPACE" else b.key},spawn,${b.cmd}"
+        ) (import ../_dms-binds.nix);
+
+        workspaceBinds = lib.concatMap (
+          n:
+          let
+            s = toString n;
+          in
+          [
+            "SUPER,${s},view,${s}"
+            "SUPER+SHIFT,${s},tag,${s}"
+            "SUPER+CTRL,${s},tagsilent,${s}"
+          ]
+        ) (lib.range 1 5);
+
         mangoPkg = inputs'.mango.packages.mango;
 
         # "Last workspace" toggle — mango has no prev-tag bind function (view,0
@@ -284,105 +310,75 @@
             ];
 
             ### Keybindings — canonical Hyprland scheme wherever mango has an equivalent
-            bind = [
-              # Application launchers
-              "SUPER,SPACE,spawn,dms ipc launcher toggle"
-              "SUPER+SHIFT,Return,spawn,ghostty"
-              "SUPER,w,spawn,default-browser"
+            bind =
+              dmsBinds
+              ++ workspaceBinds
+              ++ [
+                # Application launchers (launcher: dmsBinds)
+                "SUPER+SHIFT,Return,spawn,ghostty"
+                "SUPER,w,spawn,default-browser"
 
-              # Window management
-              "SUPER,c,killclient"
-              "SUPER,f,togglefullscreen"
-              "SUPER+SHIFT,f,togglefloating"
-              "SUPER,x,focuslast"
-              "SUPER,o,switch_layout"
+                # Window management
+                "SUPER,c,killclient"
+                "SUPER,f,togglefullscreen"
+                "SUPER+SHIFT,f,togglefloating"
+                "SUPER,x,focuslast"
+                "SUPER,o,switch_layout"
 
-              # Master layout — zoom = swap with master (mango has no focus-master)
-              "SUPER,Return,zoom"
-              "SUPER+ALT,i,incnmaster,+1"
-              "SUPER+ALT,d,incnmaster,-1"
+                # Master layout — zoom = swap with master (mango has no focus-master)
+                "SUPER,Return,zoom"
+                "SUPER+ALT,i,incnmaster,+1"
+                "SUPER+ALT,d,incnmaster,-1"
 
-              # Vim-style focus navigation
-              "SUPER,h,focusdir,left"
-              "SUPER,l,focusdir,right"
-              "SUPER,k,focusdir,up"
-              "SUPER,j,focusdir,down"
+                # Vim-style focus navigation
+                "SUPER,h,focusdir,left"
+                "SUPER,l,focusdir,right"
+                "SUPER,k,focusdir,up"
+                "SUPER,j,focusdir,down"
 
-              # Vim-style window moving (swap with neighbor)
-              "SUPER+SHIFT,h,exchange_client,left"
-              "SUPER+SHIFT,l,exchange_client,right"
-              "SUPER+SHIFT,k,exchange_client,up"
-              "SUPER+SHIFT,j,exchange_client,down"
+                # Vim-style window moving (swap with neighbor)
+                "SUPER+SHIFT,h,exchange_client,left"
+                "SUPER+SHIFT,l,exchange_client,right"
+                "SUPER+SHIFT,k,exchange_client,up"
+                "SUPER+SHIFT,j,exchange_client,down"
 
-              # Resize master factor
-              "SUPER+CTRL,l,setmfact,+0.02"
-              "SUPER+CTRL,h,setmfact,-0.02"
+                # Resize master factor
+                "SUPER+CTRL,l,setmfact,+0.02"
+                "SUPER+CTRL,h,setmfact,-0.02"
 
-              # Tag navigation (tags are dwm-style workspaces)
-              # z = last workspace via mmsg script (view,0 would show ALL tags)
-              "SUPER,z,spawn,${viewPrevTag}"
-              "SUPER,1,view,1"
-              "SUPER,2,view,2"
-              "SUPER,3,view,3"
-              "SUPER,4,view,4"
-              "SUPER,5,view,5"
+                # Tag navigation (tags are dwm-style workspaces)
+                # z = last workspace via mmsg script (view,0 would show ALL tags)
+                "SUPER,z,spawn,${viewPrevTag}"
+                # 1-5 view / tag / tagsilent: workspaceBinds above
 
-              # Move window to tag
-              "SUPER+SHIFT,1,tag,1"
-              "SUPER+SHIFT,2,tag,2"
-              "SUPER+SHIFT,3,tag,3"
-              "SUPER+SHIFT,4,tag,4"
-              "SUPER+SHIFT,5,tag,5"
+                # Named scratchpads — canonical Hyprland keys
+                "SUPER,grave,toggle_named_scratchpad,kitty-term,none,kitty --class kitty-term"
+                "SUPER,t,toggle_named_scratchpad,org.gnome.Nautilus,none,nautilus"
+                "SUPER+SHIFT,o,toggle_named_scratchpad,bitwarden,none,bitwarden"
+                "SUPER+SHIFT,s,toggle_named_scratchpad,Slack,none,slack"
+                "SUPER+SHIFT,e,toggle_named_scratchpad,io.ente.auth,none,enteauth"
 
-              # Move window to tag silently (stay on current)
-              "SUPER+CTRL,1,tagsilent,1"
-              "SUPER+CTRL,2,tagsilent,2"
-              "SUPER+CTRL,3,tagsilent,3"
-              "SUPER+CTRL,4,tagsilent,4"
-              "SUPER+CTRL,5,tagsilent,5"
+                # Window stash (tag 6, "S") — see stashToggle above.
+                # n stashes / restores to last focused workspace (context-aware);
+                # SHIFT+n toggles the stash view; SHIFT+u restores to origin tag.
+                "SUPER,n,spawn,${stashToggle}"
+                "SUPER+SHIFT,n,view,6"
+                "SUPER+SHIFT,u,spawn,${restoreToOrigin}"
 
-              # Named scratchpads — canonical Hyprland keys
-              "SUPER,grave,toggle_named_scratchpad,kitty-term,none,kitty --class kitty-term"
-              "SUPER,t,toggle_named_scratchpad,org.gnome.Nautilus,none,nautilus"
-              "SUPER+SHIFT,o,toggle_named_scratchpad,bitwarden,none,bitwarden"
-              "SUPER+SHIFT,s,toggle_named_scratchpad,Slack,none,slack"
-              "SUPER+SHIFT,e,toggle_named_scratchpad,io.ente.auth,none,enteauth"
+                # Alt-Tab cycling
+                "ALT,Tab,focusstack,next"
 
-              # Window stash (tag 6, "S") — see stashToggle above.
-              # n stashes / restores to last focused workspace (context-aware);
-              # SHIFT+n toggles the stash view; SHIFT+u restores to origin tag.
-              "SUPER,n,spawn,${stashToggle}"
-              "SUPER+SHIFT,n,view,6"
-              "SUPER+SHIFT,u,spawn,${restoreToOrigin}"
+                # Media/brightness + DMS toggles: dmsBinds (wayland/_dms-binds.nix)
 
-              # Alt-Tab cycling
-              "ALT,Tab,focusstack,next"
+                # Screenshots
+                "SUPER,p,spawn,${screenshotFull}"
+                "SUPER+CTRL,p,spawn,${screenshotArea}"
+                "SUPER+ALT,p,spawn,${screenshotAnnotate}"
 
-              # Media / brightness (DMS)
-              "NONE,F1,spawn,dms ipc audio mute"
-              "NONE,F2,spawn,dms ipc audio decrement 5"
-              "NONE,F3,spawn,dms ipc audio increment 5"
-              "NONE,F4,spawn,dms ipc audio micmute"
-              "NONE,F5,spawn,dms ipc brightness decrement 10 backlight:amdgpu_bl1"
-              "NONE,F6,spawn,dms ipc brightness increment 10 backlight:amdgpu_bl1"
-
-              # DMS toggles
-              "SUPER+SHIFT,p,spawn,dms ipc powermenu toggle"
-              "SUPER+SHIFT,d,spawn,dms ipc notifications toggleDoNotDisturb"
-              "SUPER+SHIFT,i,spawn,dms ipc notepad toggle"
-              "SUPER+SHIFT,v,spawn,dms ipc clipboard toggle"
-              "SUPER+SHIFT,b,spawn,dms ipc notifications toggle"
-              "SUPER+SHIFT,g,spawn,dms ipc control-center toggle"
-
-              # Screenshots
-              "SUPER,p,spawn,${screenshotFull}"
-              "SUPER+CTRL,p,spawn,${screenshotArea}"
-              "SUPER+ALT,p,spawn,${screenshotAnnotate}"
-
-              # Session
-              "SUPER+SHIFT,c,reload_config"
-              "SUPER+SHIFT,q,quit"
-            ];
+                # Session
+                "SUPER+SHIFT,c,reload_config"
+                "SUPER+SHIFT,q,quit"
+              ];
 
             mousebind = [
               "SUPER,btn_left,moveresize,move"

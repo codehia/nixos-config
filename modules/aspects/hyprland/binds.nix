@@ -3,8 +3,29 @@
 {
   den.aspects.hyprland = {
     homeManager =
-      { pkgs, ... }:
+      { lib, pkgs, ... }:
       let
+        hyprMods = {
+          none = "";
+          super = "$modifier";
+          "super+shift" = "$modifier SHIFT";
+        };
+        dmsBinds = map (b: "${hyprMods.${b.mods}}, ${lib.toUpper b.key}, exec, ${b.cmd}") (
+          import ../wayland/_dms-binds.nix
+        );
+
+        workspaceBinds = lib.concatMap (
+          n:
+          let
+            s = toString n;
+          in
+          [
+            "$modifier, ${s}, workspace, ${s}"
+            "$modifier SHIFT, ${s}, movetoworkspace, ${s}"
+            "$modifier CONTROL, ${s}, movetoworkspacesilent, ${s}"
+          ]
+        ) (lib.range 1 5);
+
         # Minimize/restore toggle: if special:minimized is visible restore focused window,
         # otherwise dismiss any other visible scratchpad and send current window to special:minimized.
         hyprMinimizeRestore = pkgs.writeShellScript "hypr-minimize-restore" ''
@@ -49,99 +70,70 @@
         '';
       in
       {
-        wayland.windowManager.hyprland.settings.bind = [
-          "$modifier, SPACE, exec, dms ipc launcher toggle"
-          "$modifier SHIFT, RETURN, exec, ghostty"
-          "$modifier, W, exec, default-browser"
+        wayland.windowManager.hyprland.settings.bind =
+          dmsBinds
+          ++ workspaceBinds
+          ++ [
+            "$modifier SHIFT, RETURN, exec, ghostty"
+            "$modifier, W, exec, default-browser"
 
-          "$modifier, M,        layoutmsg, focusmaster"
-          "$modifier, RETURN,   layoutmsg, swapwithmaster master"
-          "$modifier  SHIFT, R, layoutmsg, rollnext"
-          "$modifier ALT, R, layoutmsg, rollprev"
+            "$modifier, M,        layoutmsg, focusmaster"
+            "$modifier, RETURN,   layoutmsg, swapwithmaster master"
+            "$modifier  SHIFT, R, layoutmsg, rollnext"
+            "$modifier ALT, R, layoutmsg, rollprev"
 
-          "$modifier, C, killactive"
-          "$modifier, F, fullscreen,"
+            "$modifier, C, killactive"
+            "$modifier, F, fullscreen,"
 
-          "$modifier SHIFT, F, togglefloating,"
+            "$modifier SHIFT, F, togglefloating,"
 
-          # WINDOW FOCUS AND MOVES
-          "$modifier, X, focuscurrentorlast"
-          "$modifier, U, focusurgentorlast"
+            # WINDOW FOCUS AND MOVES
+            "$modifier, X, focuscurrentorlast"
+            "$modifier, U, focusurgentorlast"
 
-          "$modifier, h, movefocus, l"
-          "$modifier, l, movefocus, r"
-          "$modifier, k, movefocus, u"
-          "$modifier, j, movefocus, d"
+            "$modifier, h, movefocus, l"
+            "$modifier, l, movefocus, r"
+            "$modifier, k, movefocus, u"
+            "$modifier, j, movefocus, d"
 
-          "$modifier SHIFT, h, movewindow, l"
-          "$modifier SHIFT, l, movewindow, r"
-          "$modifier SHIFT, k, movewindow, u"
-          "$modifier SHIFT, j, movewindow, d"
+            "$modifier SHIFT, h, movewindow, l"
+            "$modifier SHIFT, l, movewindow, r"
+            "$modifier SHIFT, k, movewindow, u"
+            "$modifier SHIFT, j, movewindow, d"
 
-          "$modifier CONTROL, l, resizeactive, 10 0"
-          "$modifier CONTROL, h, resizeactive, -10 0"
-          "$modifier CONTROL, k, resizeactive, 0 -10"
-          "$modifier CONTROL, j, resizeactive, 0 10"
+            "$modifier CONTROL, l, resizeactive, 10 0"
+            "$modifier CONTROL, h, resizeactive, -10 0"
+            "$modifier CONTROL, k, resizeactive, 0 -10"
+            "$modifier CONTROL, j, resizeactive, 0 10"
 
-          "$modifier ALT, h, swapwindow, l"
-          "$modifier ALT, l, swapwindow, r"
-          "$modifier ALT, k, swapwindow, u"
-          "$modifier ALT, j, swapwindow, d"
+            "$modifier ALT, h, swapwindow, l"
+            "$modifier ALT, l, swapwindow, r"
+            "$modifier ALT, k, swapwindow, u"
+            "$modifier ALT, j, swapwindow, d"
 
-          # WORKSPACES
-          "$modifier, Z, workspace, previous"
+            # WORKSPACES
+            "$modifier, Z, workspace, previous"
+            # 1-5: workspaceBinds above
 
-          "$modifier, 1, workspace, 1"
-          "$modifier, 2, workspace, 2"
-          "$modifier, 3, workspace, 3"
-          "$modifier, 4, workspace, 4"
-          "$modifier, 5, workspace, 5"
+            # Scratchpads — native special workspaces (only one visible at a time)
+            "$modifier, grave, exec, ${hyprToggleScratchpad} term"
+            "$modifier, T, exec, ${hyprToggleScratchpad} filemanager"
+            "$modifier SHIFT, O, exec, ${hyprToggleScratchpad} pw"
+            "$modifier SHIFT, S, exec, ${hyprToggleScratchpad} slack"
+            "$modifier SHIFT, E, exec, ${hyprToggleScratchpad} ente"
+            "$modifier, N, exec, ${hyprMinimizeRestore}"
+            "$modifier SHIFT, N, exec, ${hyprToggleScratchpad} minimized"
+            "$modifier SHIFT, U, exec, ${hyprDismissScratchpad}"
 
-          "$modifier SHIFT, 1, movetoworkspace, 1"
-          "$modifier SHIFT, 2, movetoworkspace, 2"
-          "$modifier SHIFT, 3, movetoworkspace, 3"
-          "$modifier SHIFT, 4, movetoworkspace, 4"
-          "$modifier SHIFT, 5, movetoworkspace, 5"
+            "ALT,Tab,cyclenext"
 
-          "$modifier CONTROL, 1, movetoworkspacesilent, 1"
-          "$modifier CONTROL, 2, movetoworkspacesilent, 2"
-          "$modifier CONTROL, 3, movetoworkspacesilent, 3"
-          "$modifier CONTROL, 4, movetoworkspacesilent, 4"
-          "$modifier CONTROL, 5, movetoworkspacesilent, 5"
+            # Media/brightness + DMS toggles: dmsBinds (wayland/_dms-binds.nix)
 
-          # Scratchpads — native special workspaces (only one visible at a time)
-          "$modifier, grave, exec, ${hyprToggleScratchpad} term"
-          "$modifier, T, exec, ${hyprToggleScratchpad} filemanager"
-          "$modifier SHIFT, O, exec, ${hyprToggleScratchpad} pw"
-          "$modifier SHIFT, S, exec, ${hyprToggleScratchpad} slack"
-          "$modifier SHIFT, E, exec, ${hyprToggleScratchpad} ente"
-          "$modifier, N, exec, ${hyprMinimizeRestore}"
-          "$modifier SHIFT, N, exec, ${hyprToggleScratchpad} minimized"
-          "$modifier SHIFT, U, exec, ${hyprDismissScratchpad}"
-
-          "ALT,Tab,cyclenext"
-
-          # ── Media / brightness ──
-          ", F1, exec, dms ipc audio mute"
-          ", F2, exec, dms ipc audio decrement 5"
-          ", F3, exec, dms ipc audio increment 5"
-          ", F4, exec, dms ipc audio micmute"
-          ", F5, exec, dms ipc brightness decrement 10 backlight:amdgpu_bl1"
-          ", F6, exec, dms ipc brightness increment 10 backlight:amdgpu_bl1"
-
-          # ── DMS toggles ──
-          "$modifier SHIFT, P, exec, dms ipc powermenu toggle"
-          "$modifier SHIFT, D, exec, dms ipc notifications toggleDoNotDisturb"
-          "$modifier SHIFT, I, exec, dms ipc notepad toggle"
-          "$modifier SHIFT, V, exec, dms ipc clipboard toggle"
-          "$modifier SHIFT, B, exec, dms ipc notifications toggle"
-          "$modifier SHIFT, G, exec, dms ipc control-center toggle"
-
-          # ── Screenshot ──
-          "$modifier, P, exec, grimblast --notify copysave screen"
-          "$modifier CONTROL, P, exec, grimblast --notify copysave area"
-          "$modifier ALT, P, exec, ${screenshotAnnotate}"
-        ];
+            # ── Screenshot ──
+            "$modifier, P, exec, grimblast --notify copysave screen"
+            "$modifier CONTROL, P, exec, grimblast --notify copysave area"
+            "$modifier ALT, P, exec, ${screenshotAnnotate}"
+          ];
 
         # Mouse drag move/resize — parity with mango's SUPER+LMB/RMB mousebinds.
         wayland.windowManager.hyprland.settings.bindm = [
