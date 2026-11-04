@@ -26,24 +26,14 @@
   };
 
   den.aspects.thinkpad = {
-    nixos =
-      { pkgs, ... }:
-      {
-        imports = [
-          ./_hardware-configuration.nix
-          ./_disko-config.nix
-        ];
-        powerManagement.resumeCommands = ''
-          ${pkgs.kmod}/bin/modprobe -r rtsx_pci_sdmmc rtsx_pci
-          ${pkgs.kmod}/bin/modprobe rtsx_pci rtsx_pci_sdmmc
-        '';
-      };
+    nixos.imports = [
+      ./_hardware-configuration.nix
+      ./_disko-config.nix
+    ];
 
     includes = [
-      den.aspects.base-system
-      den.aspects.graphical-session
-      den.aspects.tailscale
-      den.aspects.desktop-services
+      den.aspects.desktop-host
+      den.aspects.rtsx-card-reader
       den.aspects.mullvad
       den.aspects.ios-devices
       den.aspects.laptop

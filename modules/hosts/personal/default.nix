@@ -25,18 +25,14 @@
   };
 
   den.aspects.personal = {
-    nixos = {
-      imports = [
-        ./_hardware-configuration.nix
-        ./_disko-config.nix
-      ];
-    };
+    nixos.imports = [
+      ./_hardware-configuration.nix
+      ./_disko-config.nix
+    ];
 
     includes = [
-      den.aspects.base-system
-      den.aspects.graphical-session
-      den.aspects.tailscale
-      den.aspects.desktop-services
+      den.aspects.desktop-host
+      den.aspects.rtsx-card-reader
       den.aspects.mullvad
       den.aspects.lact
       den.aspects.ios-devices
