@@ -1,3 +1,5 @@
+# Steam + gamemode. A user aspect, pulled in per host via host.extraAspects, so
+# `user.extraGroups` lands on the user who games; the nixos block goes to the host.
 { den, ... }:
 {
   den.aspects.gaming = {
@@ -14,14 +16,9 @@
       services.udev.extraRules = ''
         KERNEL=="uinput", TAG-="uaccess"
       '';
-      users.users.deus.extraGroups = [ "uinput" ];
     };
 
-    homeManager =
-      { pkgs, ... }:
-      {
-        home.packages = [ pkgs.mangohud ];
-      };
+    user.extraGroups = [ "uinput" ];
 
     includes = [
       (den._.unfree [

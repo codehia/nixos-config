@@ -1,24 +1,32 @@
 # Music arr stack — Lidarr (library/grab) + Prowlarr (indexers) +
 # slskd (Soulseek, for rare/niche) + Navidrome (stream the library).
 # All run as system services. A shared `media` group lets every service and
-# deus read-write one library tree so hardlinks work across the arr pipeline.
+# the user (deus, via host.extraAspects) read-write one library tree so hardlinks work across the arr pipeline.
 { den, ... }:
 let
   mediaDir = "/var/lib/media";
   musicDir = "${mediaDir}/music";
   dlDir = "${mediaDir}/downloads";
+
+  # The user runs qBittorrent (home-manager) and needs write to the shared dl dir.
+  qbitDir =
+    { user, ... }:
+    {
+      nixos.systemd.tmpfiles.rules = [ "d ${dlDir}/qbit    2775 ${user.userName} media - -" ];
+    };
 in
 {
   den.aspects.music-arr = {
+    includes = [ qbitDir ];
+    user.extraGroups = [ "media" ];
+
     nixos =
-      { pkgs, ... }:
+      { config, ... }:
       {
         users.groups.media = { };
         users.users.lidarr.extraGroups = [ "media" ];
         users.users.slskd.extraGroups = [ "media" ];
         users.users.navidrome.extraGroups = [ "media" ];
-        # deus runs qBittorrent (home-manager) — needs write to the shared dl dir.
-        users.users.deus.extraGroups = [ "media" ];
 
         # setgid dirs so new files inherit the media group.
         systemd.tmpfiles.rules = [
@@ -26,7 +34,6 @@ in
           "d ${musicDir}      2775 lidarr media - -"
           "d ${dlDir}         2775 lidarr media - -"
           "d ${dlDir}/slskd   2775 slskd  media - -"
-          "d ${dlDir}/qbit    2775 deus   media - -"
         ];
 
         services.prowlarr.enable = true; # web :9696, localhost only
@@ -40,14 +47,8 @@ in
           enable = true;
           openFirewall = true; # opens soulseek listen port only (50300)
           domain = null;
-          # TEMP hardcoded creds — world-readable in /nix/store. Replace with the
-          # sops slskd_env secret (see bottom) before real use / before committing.
-          environmentFile = pkgs.writeText "slskd-env" ''
-            SLSKD_SLSK_USERNAME=username
-            SLSKD_SLSK_PASSWORD=password
-            SLSKD_USERNAME=username
-            SLSKD_PASSWORD=password
-          '';
+          # Env file with SLSKD_SLSK_USERNAME/PASSWORD and SLSKD_USERNAME/PASSWORD.
+          environmentFile = config.sops.secrets.slskd_env.path;
           settings = {
             shared.directories = [ musicDir ];
             directories.downloads = "${dlDir}/slskd";
@@ -65,13 +66,11 @@ in
           };
         };
 
-        # LATER: swap the hardcoded environmentFile above for this sops secret.
-        # sops.secrets.slskd_env = {
-        #   sopsFile = ../../secrets/common.yaml;
-        # };
+        # Multi-line value in common.yaml; read by systemd (root) as EnvironmentFile.
+        sops.secrets.slskd_env.sopsFile = ../../secrets/common.yaml;
       };
 
-    # GUI / CLI music tools for deus (manual search + download).
+    # GUI / CLI music tools (manual search + download).
     homeManager =
       { pkgs, ... }:
       {
