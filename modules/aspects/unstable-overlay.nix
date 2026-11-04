@@ -6,16 +6,13 @@
 #
 # NOTE: modules/schema.nix defines the same overlay for den.schema.conf.
 # Keep the nixpkgs `config` below in sync with it.
-{ inputs, lib, ... }:
+{ inputs, ... }:
 let
   unstableOverlay = final: _: {
     unstable = import inputs.nixpkgs-unstable {
       inherit (final.stdenv.hostPlatform) system;
       config = {
         allowUnfree = true;
-        # beekeeper-studio bundles an EOL Electron. Allowed by name (not by
-        # pinned version) so it survives version bumps.
-        allowInsecurePredicate = pkg: lib.getName pkg == "beekeeper-studio";
       };
     };
   };

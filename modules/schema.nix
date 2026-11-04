@@ -9,9 +9,6 @@ let
       inherit (final.stdenv.hostPlatform) system;
       config = {
         allowUnfree = true;
-        # beekeeper-studio bundles an EOL Electron. Allowed by name (not by
-        # pinned version) so it survives version bumps.
-        allowInsecurePredicate = pkg: lib.getName pkg == "beekeeper-studio";
       };
     };
   };
