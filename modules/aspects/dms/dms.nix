@@ -217,6 +217,10 @@ let
           # ~/.local/state/dms/plugins/ — so read-only nix store is fine.
           xdg.configFile."dms/plugins/dankPomodoroTimer".force = true;
 
+          # DMS shows "What's New" until ~/.config/dms/.changelog-<major.minor> exists.
+          # Pre-create it for the installed version so the popup never appears.
+          xdg.configFile."dms/.changelog-${lib.versions.majorMinor dmsCfg.package.version}".text = "";
+
           programs.dank-material-shell = {
             enable = true;
             package = dmsCfg.package;
@@ -228,8 +232,6 @@ let
             enableCalendarEvents = false;
             settings = finalSettings;
             session = {
-              # session.json is a read-only HM symlink, so DMS can't record dismissing "What's New"
-              changelogSeenVersion = lib.versions.majorMinor dmsCfg.package.version;
               wallpaperPath = "${home}/Pictures/Wallpapers/active/wallpaper";
               wallpaperCyclingEnabled = true;
               wallpaperCyclingMode = "interval";
