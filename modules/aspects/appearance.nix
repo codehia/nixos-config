@@ -72,6 +72,8 @@
         stylix = {
           enable = true;
           autoEnable = true;
+          # HM-side overlays are ignored under home-manager.useGlobalPkgs (and warn).
+          overlays.enable = false;
           base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
           polarity = "dark";
 
