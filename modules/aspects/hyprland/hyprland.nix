@@ -59,7 +59,6 @@
           configType = "hyprlang";
           # UWSM owns the session — HM systemd integration must be disabled.
           systemd.enable = false;
-          systemd.variables = [ "--all" ];
           xwayland.enable = true;
           settings = {
             "$modifier" = "SUPER";

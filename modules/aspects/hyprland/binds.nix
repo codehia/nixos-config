@@ -41,8 +41,7 @@
             hyprctl dispatch togglespecialworkspace "$target"
           fi
         '';
-      in
-      let
+
         screenshotAnnotate = pkgs.writeShellScript "screenshot-annotate" ''
           mkdir -p "$HOME/Pictures/Screenshots"
           FILE=$(mktemp /tmp/screenshot-XXXXXX.png)
