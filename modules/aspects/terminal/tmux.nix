@@ -61,8 +61,6 @@
             set -g pane-border-status top
             set -g pane-border-format " #{pane_index} #{pane_current_command} "
 
-            set -g base-index 1           # start windows numbering at 1
-            setw -g pane-base-index 1     # make pane numbering consistent with windows
 
             setw -g automatic-rename on   # rename window to reflect current program
             set -g renumber-windows on    # renumber windows when a window is closed

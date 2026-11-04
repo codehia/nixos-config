@@ -1,11 +1,5 @@
 {
   den.aspects.rclone = {
-    nixos =
-      { pkgs, ... }:
-      {
-        environment.systemPackages = [ pkgs.rclone ];
-      };
-
     homeManager =
       {
         config,
@@ -16,6 +10,8 @@
         home = config.home.homeDirectory;
       in
       {
+        home.packages = [ pkgs.rclone ];
+
         sops.secrets.rclone_conf = {
           sopsFile = ../../secrets/rclone.yaml;
           path = "${home}/.config/rclone/rclone.conf";
