@@ -46,7 +46,6 @@
           satty
           wl-clipboard
           ydotool
-          hyprpolkitagent
           hyprland-qtutils
         ];
         wayland.windowManager.hyprland = {

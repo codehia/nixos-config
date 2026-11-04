@@ -35,20 +35,7 @@
     homeManager =
       { pkgs, ... }:
       {
-        # Bound to sway-session.target, not graphical-session.target — Hyprland brings its
-        # own polkit agent, and this must not start under other compositors.
-        systemd.user.services.lxqt-policykit-agent = {
-          Unit = {
-            Description = "LXQt PolicyKit Authentication Agent";
-            After = [ "sway-session.target" ];
-            PartOf = [ "sway-session.target" ];
-          };
-          Service = {
-            ExecStart = "${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent";
-            Restart = "on-failure";
-          };
-          Install.WantedBy = [ "sway-session.target" ];
-        };
+        # No polkit agent here: DMS registers its own on every compositor.
 
         services.swayidle = {
           enable = true;
