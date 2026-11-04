@@ -29,7 +29,6 @@
           initrd = {
             verbose = false;
             systemd.enable = true;
-            kernelModules = [ "amdgpu" ];
           };
           kernelParams = [
             "quiet"
