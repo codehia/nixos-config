@@ -1,6 +1,6 @@
 # Combined appearance aspect: stylix (base16 theming) + catppuccin/nix (per-app modules).
-# stylix handles: fonts, cursor, zen, base16 color schemes for most apps.
-# catppuccin/nix handles: fish, bat, fzf, lazygit, ghostty, kitty, kvantum.
+# stylix handles: fonts, cursor, zen, kitty, fish terminal palette, base16 schemes for most apps.
+# catppuccin/nix handles: fish syntax colors, bat, fzf, lazygit, ghostty, yazi, kvantum.
 {
   inputs,
   lib,
@@ -59,14 +59,14 @@
           nvim.enable = false; # configured directly in init.lua
           kvantum.enable = true; # Qt theming via Kvantum
           cursors.enable = false; # stylix.cursor handles this
-          # stylix handles these — catppuccin would double-theme them
-          ghostty.enable = false;
-          kitty.enable = false;
-          lazygit.enable = false;
+          # stylix.targets.{ghostty,lazygit} are off — catppuccin owns these
+          ghostty.enable = true;
+          lazygit.enable = true;
+          kitty.enable = false; # stylix themes kitty
           delta.enable = false; # managed via git.nix with mellow-barbet
           tmux.enable = false;
           hyprland.enable = false;
-          fish.enable = true; # no stylix fish target
+          fish.enable = true; # fish syntax colors (stylix only sets the terminal palette)
         };
 
         stylix = {
