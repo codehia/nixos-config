@@ -202,10 +202,10 @@ return {
         end
       end
 
-      vim.keymap.set('n', '<M-l>', function()
+      vim.keymap.set('n', '<M-L>', function()
         require('nvim-treesitter-textobjects.swap').swap_next('@parameter.inner')
       end)
-      vim.keymap.set('n', '<M-h>', function()
+      vim.keymap.set('n', '<M-H>', function()
         require('nvim-treesitter-textobjects.swap').swap_previous('@parameter.inner')
       end)
     end,
