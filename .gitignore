@@ -14,3 +14,5 @@ devenv.local*
 package.*
 package-*
 node_modules/*
+reports/
+research_notes/
