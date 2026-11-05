@@ -106,6 +106,10 @@ return {
         Snacks.zen()
       end, { desc = '[Z]en mode' })
 
+      vim.keymap.set('n', '<leader>zm', function()
+        Snacks.zen.zoom()
+      end, { desc = '[Z]oom: [m]aximize split' })
+
       vim.keymap.set('n', '<leader>gg', function()
         Snacks.lazygit()
       end, { desc = 'Lazygit' })
