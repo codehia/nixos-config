@@ -11,9 +11,9 @@ let
   # Every font choice lives here; fontconfig, stylix, GTK, DMS and the
   # terminals all read from this block. Helium keeps Chromium's own defaults.
   fonts = {
-    sans = "Inter";
-    serif = "Source Serif 4";
-    mono = "Source Code Pro";
+    sans = "SF Pro Text";
+    serif = "New York";
+    mono = "SF Mono";
     emoji = "Noto Color Emoji";
     terminal = {
       name = "JetBrainsMono Nerd Font";
@@ -27,17 +27,55 @@ in
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
+  flake-file.inputs.apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
+
   flake-file.inputs.stylix = {
     url = "github:nix-community/stylix/release-26.05";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  # System fonts + rendering. Grayscale AA + slight hinting: no colour fringes,
-  # and the same result in GTK4 (always grayscale), Chromium and Qt.
+  # System fonts + rendering. Stylix (NixOS module) owns the font choice: its
+  # fontconfig + font-packages targets set the generic families and install the
+  # fonts, and home-manager inherits them (homeManagerIntegration.followSystem).
+  # autoEnable = false: system-level theming of anything else stays off, so it
+  # never clashes with catppuccin (tty) or boot.nix (plymouth).
+  # Rendering: grayscale AA + slight hinting.
   den.aspects.fonts = {
     nixos =
-      { pkgs, ... }:
+      { pkgs, inputs', ... }:
+      let
+        apple = inputs'.apple-fonts.packages;
+      in
       {
+        imports = [ inputs.stylix.nixosModules.stylix ];
+
+        stylix = {
+          enable = true;
+          autoEnable = false;
+          overlays.enable = false;
+          base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+          targets.fontconfig.enable = true;
+          targets.font-packages.enable = true;
+          fonts = {
+            sansSerif = {
+              package = apple.sf-pro;
+              name = fonts.sans;
+            };
+            serif = {
+              package = apple.ny;
+              name = fonts.serif;
+            };
+            monospace = {
+              package = apple.sf-mono;
+              name = fonts.mono;
+            };
+            emoji = {
+              package = pkgs.noto-fonts-color-emoji;
+              name = fonts.emoji;
+            };
+          };
+        };
+
         fonts = {
           fontconfig = {
             enable = true;
@@ -50,28 +88,14 @@ in
               rgba = "none";
               lcdfilter = "none";
             };
-            # Generic families — what Qt apps, web fallbacks and anything
-            # without an explicit font ask for.
+            # Fallbacks after stylix's primary family (stylix inserts first).
             defaultFonts = {
-              sansSerif = [
-                fonts.sans
-                "Noto Sans CJK SC"
-              ];
-              serif = [
-                fonts.serif
-                "Noto Serif CJK SC"
-              ];
-              monospace = [
-                fonts.mono
-                "Symbols Nerd Font Mono"
-              ];
-              emoji = [ fonts.emoji ];
+              sansSerif = [ "Noto Sans CJK SC" ];
+              serif = [ "Noto Serif CJK SC" ];
+              monospace = [ "Symbols Nerd Font Mono" ];
             };
           };
           packages = with pkgs; [
-            inter
-            source-serif
-            source-code-pro
             corefonts # real Arial / Times New Roman for Chromium's web defaults
             noto-fonts
             noto-fonts-color-emoji
@@ -89,10 +113,7 @@ in
         };
       };
 
-    includes = [
-      den.aspects.apple-fonts
-      (den._.unfree [ "corefonts" ])
-    ];
+    includes = [ (den._.unfree [ "corefonts" ]) ];
   };
 
   den.aspects.appearance = {
@@ -121,10 +142,9 @@ in
     homeManager =
       { pkgs, ... }:
       {
-        imports = [
-          inputs.stylix.homeModules.stylix
-          inputs.catppuccin.homeModules.catppuccin
-        ];
+        # stylix's HM module is auto-imported by the NixOS module (fonts aspect),
+        # which also passes its fonts down.
+        imports = [ inputs.catppuccin.homeModules.catppuccin ];
 
         catppuccin = {
           flavor = "mocha";
@@ -154,25 +174,6 @@ in
             package = pkgs.phinger-cursors;
             name = "phinger-cursors-light";
             size = 32;
-          };
-
-          fonts = {
-            sansSerif = {
-              package = pkgs.inter; # Inter.ttc is the hinted static build
-              name = fonts.sans;
-            };
-            serif = {
-              package = pkgs.source-serif;
-              name = fonts.serif;
-            };
-            monospace = {
-              package = pkgs.source-code-pro;
-              name = fonts.mono;
-            };
-            emoji = {
-              package = pkgs.noto-fonts-color-emoji;
-              name = fonts.emoji;
-            };
           };
 
           targets = {
