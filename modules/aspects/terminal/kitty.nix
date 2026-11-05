@@ -3,6 +3,10 @@
     homeManager.programs.kitty = {
       enable = true;
       enableGitIntegration = true;
+      font = {
+        name = "Iosevka Nerd Font Mono";
+        size = 14;
+      };
       shellIntegration = {
         enableFishIntegration = true;
         mode = "no-rc no-cursor";
