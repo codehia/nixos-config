@@ -2,25 +2,10 @@
 # stylix handles: fonts, cursor, zen, kitty, fish terminal palette, base16 schemes for most apps.
 # catppuccin/nix handles: fish syntax colors, bat, fzf, lazygit, ghostty, yazi, kvantum.
 {
-  den,
   inputs,
   lib,
   ...
 }:
-let
-  # Every font choice lives here; fontconfig, stylix, GTK, DMS and the
-  # terminals all read from this block. Helium keeps Chromium's own defaults.
-  fonts = {
-    sans = "Inter";
-    serif = "Source Serif 4";
-    mono = "Source Code Pro";
-    emoji = "Noto Color Emoji";
-    terminal = {
-      name = "JetBrainsMono Nerd Font";
-      size = 14;
-    };
-  };
-in
 {
   flake-file.inputs.catppuccin = {
     url = "github:catppuccin/nix/release-26.05";
@@ -30,69 +15,6 @@ in
   flake-file.inputs.stylix = {
     url = "github:nix-community/stylix/release-26.05";
     inputs.nixpkgs.follows = "nixpkgs";
-  };
-
-  # System fonts + rendering. Grayscale AA + slight hinting: no colour fringes,
-  # and the same result in GTK4 (always grayscale), Chromium and Qt.
-  den.aspects.fonts = {
-    nixos =
-      { pkgs, ... }:
-      {
-        fonts = {
-          fontconfig = {
-            enable = true;
-            antialias = true;
-            hinting = {
-              enable = true;
-              style = "slight";
-            };
-            subpixel = {
-              rgba = "none";
-              lcdfilter = "none";
-            };
-            # Generic families — what Qt apps, web fallbacks and anything
-            # without an explicit font ask for.
-            defaultFonts = {
-              sansSerif = [
-                fonts.sans
-                "Noto Sans CJK SC"
-              ];
-              serif = [
-                fonts.serif
-                "Noto Serif CJK SC"
-              ];
-              monospace = [
-                fonts.mono
-                "Symbols Nerd Font Mono"
-              ];
-              emoji = [ fonts.emoji ];
-            };
-          };
-          packages = with pkgs; [
-            inter
-            source-serif
-            source-code-pro
-            corefonts # real Arial / Times New Roman for Chromium's web defaults
-            noto-fonts
-            noto-fonts-color-emoji
-            noto-fonts-monochrome-emoji
-            noto-fonts-cjk-sans
-            noto-fonts-cjk-serif
-            jetbrains-mono
-            nerd-fonts.jetbrains-mono
-            nerd-fonts.iosevka
-            font-awesome
-            material-icons
-            nerd-fonts.symbols-only
-            powerline-fonts
-          ];
-        };
-      };
-
-    includes = [
-      den.aspects.apple-fonts
-      (den._.unfree [ "corefonts" ])
-    ];
   };
 
   den.aspects.appearance = {
@@ -119,7 +41,10 @@ in
     };
 
     homeManager =
-      { pkgs, ... }:
+      { pkgs, inputs', ... }:
+      let
+        apple = inputs'.apple-fonts.packages;
+      in
       {
         imports = [
           inputs.stylix.homeModules.stylix
@@ -158,20 +83,20 @@ in
 
           fonts = {
             sansSerif = {
-              package = pkgs.inter; # Inter.ttc is the hinted static build
-              name = fonts.sans;
+              package = apple.sf-pro;
+              name = "SF Pro Display";
             };
             serif = {
-              package = pkgs.source-serif;
-              name = fonts.serif;
+              package = pkgs.noto-fonts;
+              name = "Noto Serif";
             };
             monospace = {
-              package = pkgs.source-code-pro;
-              name = fonts.mono;
+              package = apple.sf-mono;
+              name = "SF Mono";
             };
             emoji = {
               package = pkgs.noto-fonts-color-emoji;
-              name = fonts.emoji;
+              name = "Noto Color Emoji";
             };
           };
 
@@ -179,8 +104,8 @@ in
             dank-material-shell.enable = false;
             hyprland.enable = false;
             hyprlock.enable = false;
-            kitty.fonts.enable = false; # fonts.terminal, set below
-            ghostty.enable = false; # fonts.terminal, set below
+            kitty.fonts.enable = false; # Iosevka font set directly in kitty config
+            ghostty.enable = false; # JetBrainsMono set directly in ghostty config
             # catppuccin/nix handles these with purpose-built mocha colors
             bat.enable = false;
             fzf.enable = false;
@@ -204,29 +129,8 @@ in
           name = lib.mkForce "Tela-circle-dark";
         };
 
-        dconf.settings."org/gnome/desktop/interface" = {
-          # Default to dark; DMS toggle writes to this key at runtime.
-          color-scheme = "prefer-dark";
-          # GTK reads these via the settings portal (it overrides settings.ini).
-          # "manual" makes GTK4 use them instead of its own built-in choice.
-          font-rendering = "manual";
-          font-antialiasing = "grayscale";
-          font-hinting = "slight";
-        };
-        # Whole-pixel glyph advances; not exposed through the portal.
-        gtk.gtk4.extraConfig.gtk-hint-font-metrics = true;
-
-        programs.ghostty.settings = {
-          font-family = fonts.terminal.name;
-          font-size = fonts.terminal.size;
-        };
-        programs.kitty.font = fonts.terminal;
-
-        programs.dank-material-shell.settings = {
-          fontFamily = fonts.sans;
-          monoFontFamily = fonts.mono;
-          textRenderType = 1; # Native: hinted glyphs (default Qt = distance field)
-        };
+        # Default to dark; DMS toggle writes to this key at runtime.
+        dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
 
         # Qt: Kvantum platform theme; catppuccin.kvantum installs the Mocha theme files.
         qt = {
