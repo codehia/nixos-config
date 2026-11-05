@@ -117,7 +117,7 @@ return {
         end,
         subscroll = animate.gen_subscroll.equal({ max_output_steps = 120 }),
       },
-      resize = { timing = quad_out },
+      resize = { enable = false }, -- stalls at mid-height on rapid resizes (tmux zoom)
       open = { timing = quad_out },
       close = { timing = quad_out },
     })
