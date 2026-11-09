@@ -27,7 +27,6 @@ When sops creates or edits a file, it generates a one-time random data key, encr
 | `common.yaml` | thinkpad, personal, workstation | Shared system secrets (GitHub token, etc.) |
 | `deus.yaml` | thinkpad, personal, workstation | SSH user key for `deus` |
 | `soumya.yaml` | thinkpad, workstation | SSH user key + password for `soumya` |
-| `rclone.yaml` | rclone, personal, thinkpad | rclone configuration |
 | `../.sops.yaml` | Repo root | Age key recipients and creation rules |
 
 ## Editing secrets
