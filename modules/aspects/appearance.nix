@@ -84,7 +84,7 @@
           fonts = {
             sansSerif = {
               package = apple.sf-pro;
-              name = "SF Pro Display";
+              name = "SF Pro";
             };
             serif = {
               package = pkgs.noto-fonts;

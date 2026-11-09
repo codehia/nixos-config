@@ -16,10 +16,19 @@
               rgba = "rgb";
               lcdfilter = "default";
             };
+            defaultFonts.serif = [ "Noto Serif" ];
             localConf = ''
               <?xml version="1.0"?>
               <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
               <fontconfig>
+                <!-- Helium pref says "New York"; serve Noto Serif instead -->
+                <alias binding="same">
+                  <family>New York</family>
+                  <prefer>
+                    <family>Noto Serif</family>
+                  </prefer>
+                </alias>
+
                 <!-- Sans-serif: Use SF Pro (macOS default UI font) -->
                 <alias>
                   <family>sans-serif</family>
@@ -34,7 +43,7 @@
                 <alias>
                   <family>serif</family>
                   <prefer>
-                    <family>New York</family>
+                    <family>Noto Serif</family>
                     <family>Noto Serif CJK</family>
                     <family>Symbols Nerd Font</family>
                   </prefer>
