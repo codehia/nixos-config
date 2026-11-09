@@ -315,6 +315,10 @@ in
       url = "github:AvengeMedia/DankMaterialShell";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    dank-greeter = {
+      url = "github:duxlabs-dev/dux-greeter";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     dgop = {
       url = "github:AvengeMedia/dgop";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -330,9 +334,32 @@ in
 
   den.aspects.dms = {
     nixos =
-      { inputs', ... }:
+      { host, inputs', ... }:
       {
-        imports = [ inputs.dms.nixosModules.dank-material-shell ];
+        imports = [
+          inputs.dms.nixosModules.dank-material-shell
+          inputs.dank-greeter.nixosModules.default
+        ];
+        # Replaces tuigreet as greetd's default_session; greetd.nix keeps initial_session.
+        programs.dms-greeter = {
+          enable = true;
+          compositor = {
+            name = "mango";
+            # mango needs a config file: without -C it looks in ~/.config/mango (greeter HOME
+            # is /var/empty) then /etc/mango (absent on NixOS). Upstream's baseline is a comment.
+            customConfig = ''
+              # dms-greeter mango config
+            '';
+          };
+          configHome = "/home/${host.greetdUser}";
+          quickshell.package = inputs'.quickshell.packages.quickshell;
+        };
+        # Fixed greeter wallpaper: the user's session.json is read-only (HM), so cycling never
+        # persists and upstream's preStart copy would always pick active/wallpaper (first file).
+        # mkAfter: runs after upstream's copy, inside /var/lib/dms-greeter.
+        systemd.services.greetd.preStart = lib.mkAfter ''
+          cp -f ${inputs.wallpapers}/ultrawide/7645o6b2nno81.png wallpaper
+        '';
         programs.dank-material-shell = {
           enable = true;
           package = dmsPatched inputs'.dms.packages.dms-shell;

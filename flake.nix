@@ -13,6 +13,10 @@
       url = "github:sadjow/claude-code-nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    dank-greeter = {
+      url = "github:duxlabs-dev/dux-greeter";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     den.url = "github:denful/den/latest";
     dgop = {
       url = "github:AvengeMedia/dgop";
@@ -75,7 +79,7 @@
       flake = false;
     };
     tuigreet = {
-      url = "github:tuigreet/tuigreet";
+      url = "github:tuigreet/tuigreet/bd1078844cf2a98ccf82eb66dcdae3170dbe2e17";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     wallpapers = {

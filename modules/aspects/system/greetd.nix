@@ -12,7 +12,12 @@ let
     in
     {
       nixos =
-        { inputs', config, ... }:
+        {
+          inputs',
+          config,
+          lib,
+          ...
+        }:
         let
           tuigreet = "${inputs'.tuigreet.packages.default}/bin/tuigreet";
           # Aggregated session entries from all WMs (sway, hyprland, mango, …).
@@ -32,7 +37,8 @@ let
               default_session = {
                 # No --theme: tuigreet's defaults render on the VT 16-slot palette, which
                 # catppuccin.tty (appearance.nix) remaps to Mocha.
-                command = "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --sessions ${sessionsDir}";
+                # Fallback only: dms-greeter (dms.nix) sets this with mkDefault and wins.
+                command = lib.mkOptionDefault "${tuigreet} --greeting 'Welcome to NixOs!' --asterisks --remember --remember-user-session --time --sessions ${sessionsDir}";
                 user = "greeter";
               };
             };
@@ -42,7 +48,8 @@ let
 in
 {
   flake-file.inputs.tuigreet = {
-    url = "github:tuigreet/tuigreet";
+    # Pinned: later commits break Nix's fromTOML (TOML 1.1 Cargo.toml).
+    url = "github:tuigreet/tuigreet/bd1078844cf2a98ccf82eb66dcdae3170dbe2e17";
     inputs.nixpkgs.follows = "nixpkgs";
   };
   den.aspects.greetd = {
