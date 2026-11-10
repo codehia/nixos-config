@@ -195,7 +195,7 @@ let
           imports = [ inputs.dms.homeModules.dank-material-shell ];
 
           home.file.".config/dms/themes/catppuccin/theme.json".source = ./catppuccin-theme.json;
-          home.file.".face".source = "${self}/assets/profile.jpg";
+          home.file."Pictures/profile.jpg".source = "${self}/assets/profile.jpg";
 
           # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
           home.activation.syncWallpapers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
