@@ -1,11 +1,21 @@
 # Combined appearance aspect: stylix (base16 theming) + catppuccin/nix (per-app modules).
 # stylix handles: fonts, cursor, zen, kitty, fish terminal palette, base16 schemes for most apps.
-# catppuccin/nix handles: fish syntax colors, bat, fzf, lazygit, ghostty, yazi, kvantum.
+# catppuccin/nix handles: fish syntax colors, bat, fzf, ghostty, yazi, kvantum.
 {
   inputs,
   lib,
   ...
 }:
+let
+  # catppuccin/nix compiles whiskers (Rust) from source for every port; swap in the
+  # cache.nixos.org build from unstable (same version, 2.9.0).
+  # ponytail: drop once catppuccin/nix uses nixpkgs' catppuccin-whiskers itself
+  catppuccinSources =
+    pkgs:
+    (import inputs.catppuccin { inherit pkgs; }).packages.overrideScope (
+      _: _: { whiskers = pkgs.unstable.catppuccin-whiskers; }
+    );
+in
 {
   flake-file.inputs.catppuccin = {
     url = "github:catppuccin/nix/release-26.05";
@@ -18,8 +28,9 @@
   };
 
   den.aspects.appearance = {
-    nixos = {
+    nixos = { pkgs, ... }: {
       imports = [ inputs.catppuccin.nixosModules.catppuccin ];
+      catppuccin.sources = catppuccinSources pkgs;
       # Mocha VT palette (console.colors) — the Linux console approximates all
       # colors to its 16-slot palette, so this is what makes tuigreet's named
       # theme colors render as Catppuccin hues.
@@ -54,12 +65,14 @@
         catppuccin = {
           flavor = "mocha";
           enable = true;
+          sources = catppuccinSources pkgs;
           nvim.enable = false; # configured directly in init.lua
           kvantum.enable = true; # Qt theming via Kvantum
           cursors.enable = false; # stylix.cursor handles this
-          # stylix.targets.{ghostty,lazygit} are off — catppuccin owns these
+          # stylix.targets.ghostty is off — catppuccin owns it
           ghostty.enable = true;
-          lazygit.enable = true;
+          # theme file uses old gui.authorColors; lazygit 0.66 tries to migrate it in /nix/store and exits
+          lazygit.enable = false;
           kitty.enable = false; # stylix themes kitty
           delta.enable = false; # managed via git.nix with mellow-barbet
           tmux.enable = false;
@@ -109,10 +122,10 @@
             # catppuccin/nix handles these with purpose-built mocha colors
             bat.enable = false;
             fzf.enable = false;
-            lazygit.enable = false;
             yazi.enable = false;
             # Qt handled by catppuccin.kvantum instead
             qt.enable = false;
+            gtk.flatpakSupport.enable = false; # no flatpak apps; avoids ~/.themes
             zen-browser.profileNames = [ "Default Profile" ];
           };
         };
@@ -123,6 +136,9 @@
           package = lib.mkForce pkgs.adw-gtk3;
           name = lib.mkForce "adw-gtk3";
         };
+
+        # cursor already lives in ~/.local/share/icons (on XCURSOR_PATH); skip ~/.icons
+        home.pointerCursor.dotIcons.enable = false;
 
         gtk.iconTheme = {
           package = lib.mkForce pkgs.tela-circle-icon-theme;
