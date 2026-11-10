@@ -42,7 +42,6 @@ in
       (den._.unfree [
         "brave"
         "google-chrome"
-        "firefox-esr"
       ])
       extraBrowsersConfig
       defaultBrowserConfig

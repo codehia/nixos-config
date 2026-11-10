@@ -15,7 +15,6 @@
     ];
     defaultBrowser = "helium";
     extraBrowsers = [
-      "firefox-esr"
       "google-chrome"
     ];
     users.deus = {
