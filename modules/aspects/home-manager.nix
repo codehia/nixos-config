@@ -28,7 +28,10 @@
             publicShare = "${config.home.homeDirectory}";
           };
         };
+        gtk.gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
+        xresources.path = "${config.xdg.configHome}/X11/xresources";
         home = {
+          preferXdgDirectories = true;
           sessionVariables = {
             CARGO_HOME = "$HOME/.local/share/cargo";
             RUSTUP_HOME = "$HOME/.local/share/rustup";
@@ -38,7 +41,11 @@
             LESSHISTFILE = "$HOME/.local/state/less/history";
             NODE_REPL_HISTORY = "$HOME/.local/state/node_repl_history";
             NPM_CONFIG_USERCONFIG = "$HOME/.config/npm/npmrc";
-            COOKIECUTTER_CONFIG = "$HOME/.config/cookiecutter/config.yaml";
+            CLAUDE_CONFIG_DIR = "${config.xdg.configHome}/claude";
+            DOCKER_CONFIG = "${config.xdg.configHome}/docker";
+            PARALLEL_HOME = "${config.xdg.configHome}/parallel";
+            PYTHON_HISTORY = "${config.xdg.stateHome}/python_history";
+            HISTFILE = "${config.xdg.stateHome}/bash/history";
           };
           # npmrc supports ''${VAR} env substitution only — no shell :-defaults;
           # unexpanded values become literal relative dirs in whatever cwd npm runs

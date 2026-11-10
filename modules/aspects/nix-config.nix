@@ -54,6 +54,7 @@ in
               "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
             ];
             auto-optimise-store = true;
+            use-xdg-base-directories = true;
             # root is always trusted by nix daemon.
             # Per-user entries are added via perUser in defaults.nix.
             max-jobs = "auto";
