@@ -15,8 +15,6 @@
           (with pkgs; [
             just
             devbox
-            cruft
-            cookiecutter
             nodejs # claude-code plugin hooks (caveman) shell out to `node`
             python3
             python3Packages.ipython
