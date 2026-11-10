@@ -7,11 +7,10 @@
         disableStartupPopups = true;
         confirmOnQuit = false;
         notARepository = "skip";
-        git.pagers = [
+        git.diffRenderers = [
           {
             colorArg = "always";
-            pager = "delta --paging=never --features='mellow-barbet' --syntax-theme='Catppuccin Mocha' --plus-style='syntax #1e3626' --minus-style='syntax #36201e' --plus-emph-style='syntax #2d5238' --minus-emph-style='syntax #5c3230'";
-            useConfig = false;
+            command = "delta --paging=never --features='mellow-barbet' --syntax-theme='Catppuccin Mocha' --plus-style='syntax #1e3626' --minus-style='syntax #36201e' --plus-emph-style='syntax #2d5238' --minus-emph-style='syntax #5c3230'";
           }
         ];
         gui = {
