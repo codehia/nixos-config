@@ -2,19 +2,17 @@
 # den.default sets baseline NixOS and home-manager options across all hosts.
 { den, ... }:
 let
-  trustedUsers =
-    { user, ... }:
-    {
-      nixos.nix.settings.trusted-users = [ user.userName ];
-    };
+  trustedUsers = { user, ... }: { nixos.nix.settings.trusted-users = [ user.userName ]; };
 in
 {
   den.default = {
-    nixos.system.stateVersion = "26.05";
-    nixos.time.timeZone = "Asia/Kolkata";
-    nixos.i18n = {
-      defaultLocale = "en_US.UTF-8";
-      extraLocales = [ "all" ];
+    nixos = {
+      system.stateVersion = "26.05";
+      time.timeZone = "Asia/Kolkata";
+      i18n = {
+        defaultLocale = "en_US.UTF-8";
+        extraLocales = [ "all" ];
+      };
     };
     homeManager.home.stateVersion = "26.05";
     includes = [
