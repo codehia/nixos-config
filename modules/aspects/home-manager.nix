@@ -24,8 +24,6 @@
           userDirs = {
             enable = true;
             createDirectories = true;
-            music = "${config.home.homeDirectory}/Media/Music";
-            publicShare = "${config.home.homeDirectory}";
           };
         };
         gtk.gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
