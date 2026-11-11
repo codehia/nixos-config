@@ -1,13 +1,17 @@
+{ lib, ... }:
 let
-  # GC policy: host.nhCleanEnabled picks nh clean or the built-in nix.gc timer.
+  # GC policy: settings.nix-config.nhClean picks nh clean or the built-in nix.gc timer.
   # Both are set from the one flag so they can never run together.
   gcPolicy =
     { host }:
+    let
+      inherit (host.settings.nix-config) nhClean;
+    in
     {
       nixos = {
-        programs.nh.clean.enable = host.nhCleanEnabled;
+        programs.nh.clean.enable = nhClean;
         nix.gc = {
-          automatic = !host.nhCleanEnabled;
+          automatic = !nhClean;
           dates = "weekly";
           options = "--delete-older-than 7d";
         };
@@ -16,6 +20,12 @@ let
 in
 {
   den.aspects.nix-config = {
+    settings.nhClean = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "GC via nh clean (true) or the built-in nix.gc timer (false). Exactly one runs.";
+    };
+
     includes = [ gcPolicy ];
 
     nixos =
@@ -56,7 +66,7 @@ in
             auto-optimise-store = true;
             use-xdg-base-directories = true;
             # root is always trusted by nix daemon.
-            # Per-user entries are added via perUser in defaults.nix.
+            # Per-user entries are added via trustedUsers in defaults.nix.
             max-jobs = "auto";
             http-connections = 50;
             max-substitution-jobs = 128;

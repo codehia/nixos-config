@@ -1,7 +1,7 @@
 # MangoWC compositor — lightweight Wayland compositor based on dwl.
 # System half (binary + session entry via programs.mango) lives in den.aspects.wm-sessions;
 # the HM half (generated ~/.config/mango/config.conf) reaches every user via
-# den.aspects.wm-configs (den.default).
+# den.aspects.wm-configs (den.schema.user.includes).
 #
 # NOTE: unlike the other WM aspects, all settings live in this single file — the HM
 # module's structured `settings` option is a oneOf type that permits only ONE

@@ -19,11 +19,13 @@ in
       den.batteries.define-user
       den.batteries.hostname
       den.batteries.inputs'
-      # WM home-manager configs for every user — keybinds/settings for each session.
-      # The system half (compositor + session entry) is den.aspects.wm-sessions on the
-      # host side; each WM file contributes to both collectors.
-      den.aspects.wm-configs
       trustedUsers
     ];
   };
+
+  # WM home-manager configs for every user — keybinds/settings for each session.
+  # homeManager only, so it goes on the user kind (den.default is walked at host scope too).
+  # The system half (compositor + session entry) is den.aspects.wm-sessions on the
+  # host side; each WM file contributes to both collectors.
+  den.schema.user.includes = [ den.aspects.wm-configs ];
 }

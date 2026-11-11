@@ -1,9 +1,9 @@
-# Steam + gamemode. A user aspect, pulled in per host via host.extraAspects, so
-# `user.extraGroups` lands on the user who games; the nixos block goes to the host.
+# Steam + gamemode. A user aspect, included per host via den.aspects."<user>@<host>", so
+# `user.extraGroups` lands on the user who games; provides.to-hosts carries the system part.
 { den, ... }:
 {
   den.aspects.gaming = {
-    nixos = {
+    provides.to-hosts.nixos = {
       programs.steam.enable = true;
       programs.steam.remotePlay.openFirewall = true;
       programs.gamemode.enable = true;
@@ -24,7 +24,7 @@
     user.extraGroups = [ "uinput" ];
 
     includes = [
-      (den._.unfree [
+      (den.batteries.unfree [
         "steam"
         "steam-original"
         "steam-unwrapped"

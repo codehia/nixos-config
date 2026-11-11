@@ -3,19 +3,17 @@
 { den, ... }:
 {
   den.hosts.x86_64-linux.workstation = {
-    home-manager.enable = true;
-    nhCleanEnabled = true;
-    greetdUser = "soumya";
-    # Auto-login straight into Hyprland under UWSM (matches the greeter session entry).
-    greetdSessionCmd = "/run/current-system/sw/bin/uwsm start -- Hyprland";
-    # Aspects added here are picked up by deus's extraAspectsSelector and included only on this host.
-    # Useful when deus needs an aspect on some hosts but not all (e.g. work tools on a work laptop).
-    extraAspects = [ ];
-    users.deus = {
-      personalApps = true;
+    settings = {
+      nix-config.nhClean = true;
+      greetd = {
+        user = "soumya";
+        # Auto-login straight into Hyprland under UWSM (matches the greeter session entry).
+        session = "/run/current-system/sw/bin/uwsm start -- Hyprland";
+      };
+      browser.extra = [ "google-chrome" ];
     };
+    users.deus = { };
     users.soumya = { };
-    extraBrowsers = [ "google-chrome" ];
   };
 
   den.aspects.workstation = {

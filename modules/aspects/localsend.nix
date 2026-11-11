@@ -1,7 +1,7 @@
 {
   den.aspects.localsend = {
     # LocalSend discovery + transfer port — system level so peers can reach it.
-    nixos = {
+    provides.to-hosts.nixos = {
       networking.firewall = {
         allowedTCPPorts = [ 53317 ];
         allowedUDPPorts = [ 53317 ];

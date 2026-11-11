@@ -2,7 +2,7 @@
 {
   den.aspects.apps = {
     includes = [
-      (den._.unfree [
+      (den.batteries.unfree [
         "bitwarden-desktop"
         "bitwarden-cli"
         "obsidian"

@@ -1,64 +1,30 @@
-# Schema — typed metadata for den entities (hosts, users, homes).
+# Schema — den entity kinds (hosts, users) and what applies to every entity of a kind.
 #
-# den.schema.host:  options every host declaration (den.hosts.<system>.<name>) accepts.
-# den.schema.user:  options every user declaration (host.users.<name>) accepts.
-# Aspects read these as host.<opt> / user.<opt>. Hosts stay freeform, so attrs not
-# declared here (e.g. greetdSessionBin/greetdSessionCmd) are read with `or`.
-{ lib, ... }:
+# Per-host tunables live on the aspect that uses them (den's settings pattern):
+# an aspect declares `settings.<name> = lib.mkOption { … }`, a host sets
+# `settings.<aspect>.<name>`, the aspect reads `host.settings.<aspect>.<name>`.
+{ lib, den, ... }:
 {
-  den.schema.host =
-    { lib, ... }:
-    {
-      options = {
-        isLaptop = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = "Laptop host: battery widgets, DMS battery plugin, charge toggle.";
-        };
-        extraAspects = lib.mkOption {
-          type = lib.types.listOf lib.types.str;
-          default = [ ];
-          description = "Aspect names deus gets on this host only (users/deus.nix).";
-        };
-        defaultBrowser = lib.mkOption {
-          type = lib.types.enum [
-            "zen"
-            "helium"
-          ];
-          default = "zen";
-          description = "Default browser (mimeApps, $BROWSER, WM launch bind); see browsers/_<name>.nix.";
-        };
-        extraBrowsers = lib.mkOption {
-          type = lib.types.listOf lib.types.str;
-          default = [ ];
-          description = "Extra nixpkgs browser attrs installed for users on this host.";
-        };
-        gpuKey = lib.mkOption {
-          type = lib.types.nullOr lib.types.str;
-          default = null;
-          description = "LACT GPU key (sudo lact cli list) for the fan curve in lact.nix.";
-        };
-        nhCleanEnabled = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = "GC via nh clean (true) or the built-in nix.gc timer (false). Exactly one runs.";
-        };
-        greetdUser = lib.mkOption {
-          type = lib.types.str;
-          description = "User greetd auto-logs into on boot.";
-        };
-      };
+  # `settings` on an aspect is structural (option declarations), not class content.
+  den.reservedKeys = [ "settings" ];
+
+  # den #694 end state: a user's own nixos content stays with the user. User → host
+  # content goes through `provides.to-hosts` (delivered by mutual-provider).
+  den.migrations.user-host-content.acknowledged = true;
+
+  den.schema.host = {
+    includes = [ den.batteries.mutual-provider ];
+
+    options.settings = lib.mkOption {
+      type = import ./_settings-type.nix { inherit den lib; };
+      default = { };
+      description = "Per-aspect typed settings (host.settings.<aspect path>.<name>).";
     };
+  };
 
   den.schema.user = {
     # Default all users to homeManager class unless explicitly overridden.
-    # CRITICAL: without this, den.ctx.hm-host never activates.
+    # CRITICAL: without it no user has the homeManager class, so home-manager.enable defaults to false.
     config.classes = lib.mkDefault [ "homeManager" ];
-
-    options.personalApps = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Install personal apps (chat, media, calibre, creative).";
-    };
   };
 }

@@ -2,7 +2,7 @@
 {
   den.aspects.zoom = {
     includes = [
-      (den._.unfree [
+      (den.batteries.unfree [
         "zoom"
         "zoom-us"
       ])

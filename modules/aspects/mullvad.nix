@@ -12,7 +12,7 @@
       };
 
     includes = [
-      (den._.unfree [
+      (den.batteries.unfree [
         "mullvad"
         "mullvad-vpn"
       ])

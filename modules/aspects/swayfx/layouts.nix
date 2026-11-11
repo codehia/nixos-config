@@ -5,7 +5,6 @@
 # Mod+Return promotes focused window to master (mode-aware).
 # Mod+Tab / Mod+Shift+Tab cycles focus through the stack (stack-main only).
 # Mod+bracketright rotates the stack (stack-main only).
-{ inputs, ... }:
 {
   flake-file.inputs.persway.url = "github:johnae/persway";
 
@@ -13,11 +12,11 @@
     homeManager =
       {
         pkgs,
+        inputs',
         ...
       }:
       let
-        inherit (pkgs.stdenv.hostPlatform) system;
-        persway = inputs.persway.packages.${system}.default;
+        persway = inputs'.persway.packages.default;
 
         # ── Center-master layout ──
         # Subcommands: apply, promote, watch, stop-watch

@@ -13,6 +13,10 @@
         services.udev.packages = [ pkgs.brightnessctl ];
       };
 
+    # Users on a laptop get the laptop-only DMS bits (battery plugin, charge toggle,
+    # battery widget — dms-home reads it via host.hasAspect).
+    provides.to-users.includes = [ den.aspects.dms-home.laptop ];
+
     includes = [
       den.aspects.tlp
       den.aspects.upower

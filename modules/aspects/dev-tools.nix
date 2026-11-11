@@ -2,7 +2,7 @@
 {
   den.aspects.dev-tools = {
     includes = [
-      (den._.unfree [ "httpie-desktop" ])
+      (den.batteries.unfree [ "httpie-desktop" ])
     ];
 
     nixos.virtualisation.docker.enable = true;

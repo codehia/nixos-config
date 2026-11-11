@@ -2,7 +2,7 @@
 # Provides fan control, power cap, and clock monitoring for AMD discrete GPUs.
 # NOT useful for laptop APUs (fan is EC-controlled, not GPU-controlled).
 #
-# gpuKey is a typed host option (schema.nix), set in the host declaration.
+# gpuKey is this aspect's setting: hosts set settings.lact.gpuKey.
 # Usage: den.aspects.lact
 #
 # gpuKey format: "<vendor>:<device>-<subvendor>:<subdevice>-<pci_addr>"
@@ -20,11 +20,12 @@
 #       startup, so a read-only Nix store symlink causes an immediate crash. Config is
 #       written via ExecStartPre (pkgs.writeText → cp) to a writable /etc/lact/config.yaml.
 #       The LACT GUI cannot save changes (config is overwritten on each service start).
+{ lib, ... }:
 let
   gpuConfig =
     { host }:
     let
-      inherit (host) gpuKey;
+      inherit (host.settings.lact) gpuKey;
     in
     {
       nixos =
@@ -72,6 +73,12 @@ let
 in
 {
   den.aspects.lact = {
+    settings.gpuKey = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "LACT GPU key (sudo lact cli list) for the fan curve.";
+    };
+
     nixos = {
       # Overdrive required for fan control to work on RDNA1+
       hardware.amdgpu.overdrive.enable = true;

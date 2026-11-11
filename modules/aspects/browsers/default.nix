@@ -1,4 +1,4 @@
-{ den, ... }:
+{ den, lib, ... }:
 let
   extraBrowsersConfig =
     { host, ... }:
@@ -6,18 +6,18 @@ let
       homeManager =
         { pkgs, ... }:
         {
-          home.packages = map (name: pkgs.${name}) host.extraBrowsers;
+          home.packages = map (name: pkgs.${name}) host.settings.browser.extra;
         };
     };
   zen = import ./_zen.nix;
   helium = import ./_helium.nix;
 
-  # host.defaultBrowser (schema.nix) picks the mimeApps, $BROWSER and the
+  # settings.browser.default picks the mimeApps, $BROWSER and the
   # `default-browser` launcher the WM binds call.
   defaultBrowserConfig =
     { host, ... }:
     let
-      browser = { inherit zen helium; }.${host.defaultBrowser};
+      browser = { inherit zen helium; }.${host.settings.browser.default};
     in
     {
       homeManager =
@@ -38,8 +38,24 @@ in
   };
 
   den.aspects.browser = {
+    settings = {
+      default = lib.mkOption {
+        type = lib.types.enum [
+          "zen"
+          "helium"
+        ];
+        default = "zen";
+        description = "Default browser (mimeApps, $BROWSER, WM launch bind); see _<name>.nix.";
+      };
+      extra = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = "Extra nixpkgs browser attrs installed for users on this host.";
+      };
+    };
+
     includes = [
-      (den._.unfree [
+      (den.batteries.unfree [
         "brave"
         "google-chrome"
       ])

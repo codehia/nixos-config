@@ -6,7 +6,7 @@
       home.packages = [ pkgs.kdePackages.gwenview ];
     };
 
-  # personalApps users only
+  # deus only (users/deus.nix includes personal-apps)
   den.aspects.personal-apps.homeManager =
     { pkgs, ... }:
     {

@@ -3,25 +3,23 @@
 { den, ... }:
 {
   den.hosts.x86_64-linux.thinkpad = {
-    home-manager.enable = true;
-    nhCleanEnabled = true;
-    isLaptop = true;
-    greetdUser = "deus";
-    greetdSessionBin = "mango";
-    # Aspects added here are picked up by deus's extraAspectsSelector and included only on this host.
-    # Useful when deus needs an aspect on some hosts but not all (e.g. work tools on a work laptop).
-    extraAspects = [
-      "gaming"
-    ];
-    defaultBrowser = "helium";
-    extraBrowsers = [
-      "google-chrome"
-    ];
-    users.deus = {
-      personalApps = true;
+    settings = {
+      nix-config.nhClean = true;
+      greetd = {
+        user = "deus";
+        session = "mango";
+      };
+      browser = {
+        default = "helium";
+        extra = [ "google-chrome" ];
+      };
     };
+    users.deus = { };
     users.soumya = { };
   };
+
+  # deus on this host only (den host-qualified aspect).
+  den.aspects."deus@thinkpad".includes = [ den.aspects.gaming ];
 
   den.aspects.thinkpad = {
     nixos.imports = [

@@ -1,7 +1,7 @@
 { den, ... }:
 {
   den.aspects.cli-utils = {
-    includes = [ (den._.unfree [ "unrar" ]) ];
+    includes = [ (den.batteries.unfree [ "unrar" ]) ];
     homeManager =
       { pkgs, ... }:
       {

@@ -13,7 +13,7 @@
         programs.nix-index-database.comma.enable = true;
         programs.nh = {
           enable = true;
-          # clean.enable is set by nix-config.nix (host.nhCleanEnabled)
+          # clean.enable is set by nix-config.nix (settings.nix-config.nhClean)
           clean.extraArgs = "--keep-since 7d --keep 5";
         };
         environment.systemPackages = with pkgs; [

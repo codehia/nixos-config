@@ -10,6 +10,10 @@
       den.aspects.disko
       den.aspects.nix-tools
       den.aspects.zram
+      # nixos halves of aspects users also include (homeManager halves land per user)
+      den.aspects.secrets
+      den.aspects.ssh
+      den.aspects.packages
     ];
   };
 }

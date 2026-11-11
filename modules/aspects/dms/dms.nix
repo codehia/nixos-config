@@ -1,8 +1,9 @@
 # DankMaterialShell.
 #   den.aspects.dms      — NixOS module: system services + the (patched) package. Host includes.
-#   den.aspects.dms-home — per-user HM config, parametric on host.isLaptop. User includes.
+#   den.aspects.dms-home — per-user HM config; laptop bits when the host has den.aspects.laptop. User includes.
 # HM reuses the NixOS package via osConfig, so there is one patched dms-shell build.
 {
+  den,
   inputs,
   lib,
   self,
@@ -35,7 +36,10 @@ let
   dmsPerUser =
     { host, ... }:
     let
-      inherit (host) isLaptop;
+      # True when the host's laptop aspect delivered dms-home.laptop to this user
+      # (den's in-scope hasAspect). Read lazily, inside module values only —
+      # hasAspect must never decide includes.
+      isLaptop = host.hasAspect den.aspects.dms-home.laptop;
       patchBarConfig =
         bar:
         lib.recursiveUpdate bar {
@@ -108,21 +112,6 @@ let
         }:
         let
           home = config.home.homeDirectory;
-
-          batteryToggleScript = lib.optionalString isLaptop (
-            toString (
-              pkgs.writeShellScript "battery-charge-user-toggle" ''
-                current=$(${pkgs.coreutils}/bin/cat /sys/class/power_supply/BAT0/charge_control_end_threshold 2>/dev/null || echo 100)
-                if [ "$current" -le 80 ]; then
-                  sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 95 100
-                  ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Full charge (100%)"
-                else
-                  sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 75 80
-                  ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Health mode (80%)"
-                fi
-              ''
-            )
-          );
 
           # Detects max connected-display width via kernel DRM sysfs (no Wayland or DMS required),
           # populates ~/Pictures/Wallpapers/active/ with symlinks from the right resolution folder.
@@ -258,19 +247,6 @@ let
                   hash = "sha256-/155wFIotV9xiZzX9XRGs3ANjBcLJwS4kNDDNO6WkF0=";
                 }
                 + "/DankPomodoroTimer";
-            }
-            // lib.optionalAttrs isLaptop {
-              dankBatteryAlerts = {
-                src =
-                  pkgs.fetchFromGitHub {
-                    owner = "AvengeMedia";
-                    repo = "dms-plugins";
-                    rev = "a759ddfccb021ef7e6824685e7a1c3728170977e";
-                    hash = "sha256-s6zQvPoTaJYMA8A/vUEgQhTE/VhQJZwcGw1ET6bOYKg=";
-                  }
-                  + "/DankBatteryAlerts";
-                settings.warningThreshold = 15;
-              };
             };
             managePluginSettings = true;
             systemd = {
@@ -278,14 +254,6 @@ let
               restartIfChanged = true;
             };
           };
-
-          wayland.windowManager.sway.config.keybindings = lib.mkOptionDefault (
-            lib.optionalAttrs isLaptop { "Mod4+b" = "exec ${batteryToggleScript}"; }
-          );
-
-          wayland.windowManager.hyprland.settings.bind = lib.optionals isLaptop [
-            "$modifier, B, exec, ${batteryToggleScript}"
-          ];
 
           systemd.user.services.dms-wallpaper-select = wallpaperSelectService;
 
@@ -333,7 +301,7 @@ in
 
   den.aspects.dms = {
     nixos =
-      { host, inputs', ... }:
+      { config, inputs', ... }:
       {
         imports = [
           inputs.dms.nixosModules.dank-material-shell
@@ -350,7 +318,7 @@ in
               # dms-greeter mango config
             '';
           };
-          configHome = "/home/${host.greetdUser}";
+          configHome = "/home/${config.services.greetd.settings.initial_session.user}";
         };
         # Fixed greeter wallpaper: the user's session.json is read-only (HM), so cycling never
         # persists and upstream's preStart copy would always pick active/wallpaper (first file).
@@ -369,5 +337,45 @@ in
 
   den.aspects.dms-home = {
     includes = [ dmsPerUser ];
+
+    # Laptop-only DMS bits. Delivered to every user by den.aspects.laptop
+    # (provides.to-users), so the laptop aspect stays the one source of truth.
+    laptop.homeManager =
+      { pkgs, lib, ... }:
+      let
+        batteryToggleScript = toString (
+          pkgs.writeShellScript "battery-charge-user-toggle" ''
+            current=$(${pkgs.coreutils}/bin/cat /sys/class/power_supply/BAT0/charge_control_end_threshold 2>/dev/null || echo 100)
+            if [ "$current" -le 80 ]; then
+              sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 95 100
+              ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Full charge (100%)"
+            else
+              sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 75 80
+              ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Health mode (80%)"
+            fi
+          ''
+        );
+      in
+      {
+        programs.dank-material-shell.plugins.dankBatteryAlerts = {
+          src =
+            pkgs.fetchFromGitHub {
+              owner = "AvengeMedia";
+              repo = "dms-plugins";
+              rev = "a759ddfccb021ef7e6824685e7a1c3728170977e";
+              hash = "sha256-s6zQvPoTaJYMA8A/vUEgQhTE/VhQJZwcGw1ET6bOYKg=";
+            }
+            + "/DankBatteryAlerts";
+          settings.warningThreshold = 15;
+        };
+
+        wayland.windowManager.sway.config.keybindings = lib.mkOptionDefault {
+          "Mod4+b" = "exec ${batteryToggleScript}";
+        };
+
+        wayland.windowManager.hyprland.settings.bind = [
+          "$modifier, B, exec, ${batteryToggleScript}"
+        ];
+      };
   };
 }

@@ -1,14 +1,19 @@
 # Greeter aspect: tuigreet-backed greetd session manager.
-# greetdUser and greetdSessionBin are freeform host attributes (set in the host declarations).
-# initial_session auto-logs greetdUser into /run/current-system/sw/bin/<greetdSessionBin>
-# (override with host.greetdSessionCmd); after logout, tuigreet lists every session that
-# the WM modules register via services.displayManager.sessionPackages.
+# Hosts set settings.greetd.{user,session}. initial_session auto-logs `user` into
+# `session` (a binary name in /run/current-system/sw/bin, or an absolute command);
+# after logout, tuigreet lists every session that the WM modules register via
+# services.displayManager.sessionPackages.
+{ lib, ... }:
 let
   greetdConfig =
     { host }:
     let
-      user = host.greetdUser;
-      session = host.greetdSessionCmd or "/run/current-system/sw/bin/${host.greetdSessionBin}";
+      inherit (host.settings.greetd) user;
+      session =
+        if lib.hasPrefix "/" host.settings.greetd.session then
+          host.settings.greetd.session
+        else
+          "/run/current-system/sw/bin/${host.settings.greetd.session}";
     in
     {
       nixos =
@@ -53,6 +58,17 @@ in
     inputs.nixpkgs.follows = "nixpkgs";
   };
   den.aspects.greetd = {
+    settings = {
+      user = lib.mkOption {
+        type = lib.types.str;
+        description = "User greetd auto-logs into on boot.";
+      };
+      session = lib.mkOption {
+        type = lib.types.str;
+        description = "Auto-login session: a binary in /run/current-system/sw/bin, or an absolute command.";
+      };
+    };
+
     includes = [ greetdConfig ];
   };
 }

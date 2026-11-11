@@ -1,7 +1,5 @@
 {
   den.aspects.terminal = {
-    nixos.programs.fish.enable = true;
-
     homeManager =
       { pkgs, ... }:
       {

@@ -8,6 +8,7 @@
       den.aspects.graphical-session
       den.aspects.tailscale
       den.aspects.desktop-services
+      den.aspects.dev-tools # docker; users include it for the homeManager half
     ];
   };
 }

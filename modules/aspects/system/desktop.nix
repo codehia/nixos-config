@@ -12,6 +12,7 @@
       den.aspects.gnome-keyring
       den.aspects.core-services
       den.aspects.dconf
+      den.aspects.appearance # nixos half; users include it for the homeManager half
     ];
   };
 }

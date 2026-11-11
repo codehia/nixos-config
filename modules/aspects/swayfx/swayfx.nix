@@ -5,7 +5,7 @@
 # The compositor itself is system-level: the nixos block lives in den.aspects.wm-sessions
 # (a collector shared by all WM aspects, included by graphical-session) so the session
 # registers with services.displayManager.sessionPackages and appears in the greeter.
-# The HM config half reaches every user via the den.aspects.wm-configs collector (den.default).
+# The HM config half reaches every user via the den.aspects.wm-configs collector (den.schema.user.includes).
 { den, ... }:
 {
   den.aspects.wm-configs.includes = [ den.aspects.swayfx ];

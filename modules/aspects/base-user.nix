@@ -21,9 +21,8 @@
       # Browser
       den.aspects.browser
 
-      # Secrets / SSH
+      # Secrets (sops-nix HM module; the host includes the nixos half and ssh)
       den.aspects.secrets
-      den.aspects.ssh
 
       # Packages and tools
       den.aspects.packages

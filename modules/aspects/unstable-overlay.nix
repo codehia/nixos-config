@@ -7,9 +7,9 @@ let
   unstableOverlay = final: _: {
     unstable = import inputs.nixpkgs-unstable {
       inherit (final.stdenv.hostPlatform) system;
-      config = {
-        allowUnfree = true;
-      };
+      # The host's nixpkgs config, so den.batteries.unfree allowlists apply to
+      # pkgs.unstable too (den nixpkgs guide).
+      inherit (final) config;
     };
   };
 in

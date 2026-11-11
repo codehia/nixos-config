@@ -2,7 +2,7 @@
 {
   den.aspects.personal-apps = {
     includes = [
-      (den._.unfree [
+      (den.batteries.unfree [
         "signal-desktop"
         "telegram-desktop"
         "discord"

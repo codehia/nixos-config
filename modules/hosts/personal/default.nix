@@ -3,25 +3,26 @@
 { den, ... }:
 {
   den.hosts.x86_64-linux.personal = {
-    home-manager.enable = true;
-    nhCleanEnabled = true;
-    gpuKey = "1002:7340-1043:04E6-0000:2d:00.0";
-    greetdUser = "deus";
-    greetdSessionBin = "mango";
-    # Aspects added here are picked up by deus's extraAspectsSelector and included only on this host.
-    # Useful when deus needs an aspect on some hosts but not all (e.g. work tools on a work laptop).
-    extraAspects = [
-      "localsend"
-      "gaming"
-    ];
-    defaultBrowser = "helium";
-    extraBrowsers = [
-      "google-chrome"
-    ];
-    users.deus = {
-      personalApps = true;
+    settings = {
+      nix-config.nhClean = true;
+      lact.gpuKey = "1002:7340-1043:04E6-0000:2d:00.0";
+      greetd = {
+        user = "deus";
+        session = "mango";
+      };
+      browser = {
+        default = "helium";
+        extra = [ "google-chrome" ];
+      };
     };
+    users.deus = { };
   };
+
+  # deus on this host only (den host-qualified aspect).
+  den.aspects."deus@personal".includes = [
+    den.aspects.localsend
+    den.aspects.gaming
+  ];
 
   den.aspects.personal = {
     nixos.imports = [

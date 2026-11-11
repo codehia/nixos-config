@@ -7,15 +7,12 @@
     };
   };
   den.aspects.dev-tools = {
-    includes = [
-      (den._.unfree [ "claude-code" ])
+    includes = [ (den.batteries.unfree [ "claude-code" ]) ];
+
+    homeManager =
+      { inputs', ... }:
       {
-        homeManager =
-          { inputs', ... }:
-          {
-            home.packages = [ inputs'.claude-code.packages.default ];
-          };
-      }
-    ];
+        home.packages = [ inputs'.claude-code.packages.default ];
+      };
   };
 }

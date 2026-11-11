@@ -3,7 +3,7 @@
   den.aspects.work = {
     includes = [
       den.aspects.zoom
-      (den._.unfree [ "slack" ])
+      (den.batteries.unfree [ "slack" ])
     ];
     homeManager =
       { pkgs, ... }:
