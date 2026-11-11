@@ -7,7 +7,7 @@
         # The reader stops detecting cards after suspend; reload the driver on resume.
         powerManagement.resumeCommands = ''
           ${pkgs.kmod}/bin/modprobe -r rtsx_pci_sdmmc rtsx_pci
-          ${pkgs.kmod}/bin/modprobe rtsx_pci rtsx_pci_sdmmc
+          ${pkgs.kmod}/bin/modprobe -a rtsx_pci rtsx_pci_sdmmc
         '';
         # rtsx_pci calls pm_runtime_allow() at probe, so the reader runtime-
         # suspends and misses card-insert events. Must match ACTION=="bind" —
