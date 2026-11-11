@@ -18,10 +18,6 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     den.url = "github:denful/den/latest";
-    dgop = {
-      url = "github:AvengeMedia/dgop";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -62,10 +58,6 @@
       flake = false;
     };
     persway.url = "github:johnae/persway";
-    quickshell = {
-      url = "git+https://git.outfoxxed.me/quickshell/quickshell";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -77,10 +69,6 @@
     sway-scratch = {
       url = "github:aokellermann/sway-scratch";
       flake = false;
-    };
-    tuigreet = {
-      url = "github:tuigreet/tuigreet/bd1078844cf2a98ccf82eb66dcdae3170dbe2e17";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     wallpapers = {
       url = "git+https://codeberg.org/codehia/wallpapers";
