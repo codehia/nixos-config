@@ -39,7 +39,6 @@
             "rd.systemd.show_status=auto"
             "amd_pstate=active"
           ];
-          kernelModules = [ "uinput" ];
           consoleLogLevel = 0;
         };
       };
