@@ -5,26 +5,30 @@
 # `settings.<aspect>.<name>`, the aspect reads `host.settings.<aspect>.<name>`.
 { lib, den, ... }:
 {
-  # `settings` on an aspect is structural (option declarations), not class content.
-  den.reservedKeys = [ "settings" ];
+  den = {
+    # `settings` on an aspect is structural (option declarations), not class content.
+    reservedKeys = [ "settings" ];
 
-  # den #694 end state: a user's own nixos content stays with the user. User → host
-  # content goes through `provides.to-hosts` (delivered by mutual-provider).
-  den.migrations.user-host-content.acknowledged = true;
+    # den #694 end state: a user's own nixos content stays with the user. User → host
+    # content goes through `provides.to-hosts` (delivered by mutual-provider).
+    migrations.user-host-content.acknowledged = true;
 
-  den.schema.host = {
-    includes = [ den.batteries.mutual-provider ];
+    schema = {
+      host = {
+        includes = [ den.batteries.mutual-provider ];
 
-    options.settings = lib.mkOption {
-      type = import ./_settings-type.nix { inherit den lib; };
-      default = { };
-      description = "Per-aspect typed settings (host.settings.<aspect path>.<name>).";
+        options.settings = lib.mkOption {
+          type = import ./_settings-type.nix { inherit den lib; };
+          default = { };
+          description = "Per-aspect typed settings (host.settings.<aspect path>.<name>).";
+        };
+      };
+
+      user = {
+        # Default all users to homeManager class unless explicitly overridden.
+        # CRITICAL: without it no user has the homeManager class, so home-manager.enable defaults to false.
+        config.classes = lib.mkDefault [ "homeManager" ];
+      };
     };
-  };
-
-  den.schema.user = {
-    # Default all users to homeManager class unless explicitly overridden.
-    # CRITICAL: without it no user has the homeManager class, so home-manager.enable defaults to false.
-    config.classes = lib.mkDefault [ "homeManager" ];
   };
 }

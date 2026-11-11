@@ -286,96 +286,87 @@ in
       url = "github:duxlabs-dev/dux-greeter";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    dgop = {
-      url = "github:AvengeMedia/dgop";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-    # Override quickshell — DMS stable pins 2025-12-25 which predates:
-    # - layer-shell placeholder screen crash fix (2026-02-22)
-    # - QTBUG-145022 null proxy crash fix (2026-03-16)
-    quickshell = {
-      url = "git+https://git.outfoxxed.me/quickshell/quickshell";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
   };
 
-  den.aspects.dms = {
-    nixos =
-      { config, inputs', ... }:
-      {
-        imports = [
-          inputs.dms.nixosModules.dank-material-shell
-          inputs.dank-greeter.nixosModules.default
-        ];
-        # Replaces tuigreet as greetd's default_session; greetd.nix keeps initial_session.
-        programs.dms-greeter = {
-          enable = true;
-          compositor = {
-            name = "mango";
-            # mango needs a config file: without -C it looks in ~/.config/mango (greeter HOME
-            # is /var/empty) then /etc/mango (absent on NixOS). Upstream's baseline is a comment.
-            customConfig = ''
-              # dms-greeter mango config
-            '';
+  den.aspects = {
+    dms = {
+      nixos =
+        { config, inputs', ... }:
+        {
+          imports = [
+            inputs.dms.nixosModules.dank-material-shell
+            inputs.dank-greeter.nixosModules.default
+          ];
+          # Replaces tuigreet as greetd's default_session; greetd.nix keeps initial_session.
+          programs.dms-greeter = {
+            enable = true;
+            compositor = {
+              name = "mango";
+              # mango needs a config file: without -C it looks in ~/.config/mango (greeter HOME
+              # is /var/empty) then /etc/mango (absent on NixOS). Upstream's baseline is a comment.
+              customConfig = ''
+                # dms-greeter mango config
+              '';
+            };
+            configHome = "/home/${config.services.greetd.settings.initial_session.user}";
           };
-          configHome = "/home/${config.services.greetd.settings.initial_session.user}";
+          # Fixed greeter wallpaper: the user's session.json is read-only (HM), so cycling never
+          # persists and upstream's preStart copy would always pick active/wallpaper (first file).
+          # mkAfter: runs after upstream's copy, inside /var/lib/dms-greeter.
+          systemd.services.greetd.preStart = lib.mkAfter ''
+            cp -f ${inputs.wallpapers}/ultrawide/7645o6b2nno81.png wallpaper
+          '';
+          programs.dank-material-shell = {
+            enable = true;
+            package = dmsPatched inputs'.dms.packages.dms-shell;
+          };
+          # DMS enables power-profiles-daemon by default, which conflicts with TLP.
+          services.power-profiles-daemon.enable = false;
         };
-        # Fixed greeter wallpaper: the user's session.json is read-only (HM), so cycling never
-        # persists and upstream's preStart copy would always pick active/wallpaper (first file).
-        # mkAfter: runs after upstream's copy, inside /var/lib/dms-greeter.
-        systemd.services.greetd.preStart = lib.mkAfter ''
-          cp -f ${inputs.wallpapers}/ultrawide/7645o6b2nno81.png wallpaper
-        '';
-        programs.dank-material-shell = {
-          enable = true;
-          package = dmsPatched inputs'.dms.packages.dms-shell;
+    };
+
+    dms-home = {
+      includes = [ dmsPerUser ];
+
+      # Laptop-only DMS bits. Delivered to every user by den.aspects.laptop
+      # (provides.to-users), so the laptop aspect stays the one source of truth.
+      laptop.homeManager =
+        { pkgs, lib, ... }:
+        let
+          batteryToggleScript = toString (
+            pkgs.writeShellScript "battery-charge-user-toggle" ''
+              current=$(${pkgs.coreutils}/bin/cat /sys/class/power_supply/BAT0/charge_control_end_threshold 2>/dev/null || echo 100)
+              if [ "$current" -le 80 ]; then
+                sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 95 100
+                ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Full charge (100%)"
+              else
+                sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 75 80
+                ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Health mode (80%)"
+              fi
+            ''
+          );
+        in
+        {
+          programs.dank-material-shell.plugins.dankBatteryAlerts = {
+            src =
+              pkgs.fetchFromGitHub {
+                owner = "AvengeMedia";
+                repo = "dms-plugins";
+                rev = "a759ddfccb021ef7e6824685e7a1c3728170977e";
+                hash = "sha256-s6zQvPoTaJYMA8A/vUEgQhTE/VhQJZwcGw1ET6bOYKg=";
+              }
+              + "/DankBatteryAlerts";
+            settings.warningThreshold = 15;
+          };
+
+          wayland.windowManager.sway.config.keybindings = lib.mkOptionDefault {
+            "Mod4+b" = "exec ${batteryToggleScript}";
+          };
+
+          wayland.windowManager.hyprland.settings.bind = [
+            "$modifier, B, exec, ${batteryToggleScript}"
+          ];
         };
-        # DMS enables power-profiles-daemon by default, which conflicts with TLP.
-        services.power-profiles-daemon.enable = false;
-      };
-  };
-
-  den.aspects.dms-home = {
-    includes = [ dmsPerUser ];
-
-    # Laptop-only DMS bits. Delivered to every user by den.aspects.laptop
-    # (provides.to-users), so the laptop aspect stays the one source of truth.
-    laptop.homeManager =
-      { pkgs, lib, ... }:
-      let
-        batteryToggleScript = toString (
-          pkgs.writeShellScript "battery-charge-user-toggle" ''
-            current=$(${pkgs.coreutils}/bin/cat /sys/class/power_supply/BAT0/charge_control_end_threshold 2>/dev/null || echo 100)
-            if [ "$current" -le 80 ]; then
-              sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 95 100
-              ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Full charge (100%)"
-            else
-              sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 75 80
-              ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Health mode (80%)"
-            fi
-          ''
-        );
-      in
-      {
-        programs.dank-material-shell.plugins.dankBatteryAlerts = {
-          src =
-            pkgs.fetchFromGitHub {
-              owner = "AvengeMedia";
-              repo = "dms-plugins";
-              rev = "a759ddfccb021ef7e6824685e7a1c3728170977e";
-              hash = "sha256-s6zQvPoTaJYMA8A/vUEgQhTE/VhQJZwcGw1ET6bOYKg=";
-            }
-            + "/DankBatteryAlerts";
-          settings.warningThreshold = 15;
-        };
-
-        wayland.windowManager.sway.config.keybindings = lib.mkOptionDefault {
-          "Mod4+b" = "exec ${batteryToggleScript}";
-        };
-
-        wayland.windowManager.hyprland.settings.bind = [
-          "$modifier, B, exec, ${batteryToggleScript}"
-        ];
-      };
+    };
   };
 }

@@ -8,115 +8,117 @@
 # The HM config half reaches every user via the den.aspects.wm-configs collector (den.schema.user.includes).
 { den, ... }:
 {
-  den.aspects.wm-configs.includes = [ den.aspects.swayfx ];
+  den.aspects = {
+    wm-configs.includes = [ den.aspects.swayfx ];
 
-  den.aspects.wm-sessions = {
-    nixos =
-      { pkgs, ... }:
-      {
-        programs.sway = {
-          enable = true;
-          package = pkgs.swayfx;
-          # default pulls foot, wmenu, swaylock, swayidle, grim, brightnessctl, pulseaudio — none used
-          extraPackages = [ ];
-        };
-
-        xdg.portal = {
-          enable = true;
-          extraPortals = [
-            pkgs.xdg-desktop-portal-wlr
-            pkgs.xdg-desktop-portal-gtk
-          ];
-        };
-      };
-  };
-
-  den.aspects.swayfx = {
-    homeManager =
-      { pkgs, ... }:
-      {
-        # No polkit agent here: DMS registers its own on every compositor.
-
-        services.swayidle = {
-          enable = true;
-          # Bind to the sway session only — with all WMs' HM configs active per user,
-          # graphical-session.target would start this under every compositor.
-          systemdTargets = [ "sway-session.target" ];
-          events = {
-            before-sleep = "${pkgs.playerctl}/bin/playerctl -a pause";
-            lock = "${pkgs.playerctl}/bin/playerctl -a pause";
-          };
-        };
-
-        home = {
-          packages = with pkgs; [
-            playerctl
-            wl-clipboard
-            sway-contrib.grimshot
-            satty
-            swayr
-          ];
-        };
-
-        wayland.windowManager.sway = {
-          enable = true;
-          # Binary comes from the system (programs.sway in wm-sessions) — null avoids
-          # installing a second copy in the user profile.
-          package = null;
-          checkConfig = false;
-          xwayland = true;
-          wrapperFeatures.gtk = true;
-          systemd = {
+    wm-sessions = {
+      nixos =
+        { pkgs, ... }:
+        {
+          programs.sway = {
             enable = true;
-            xdgAutostart = true;
-            variables = [ "--all" ];
+            package = pkgs.swayfx;
+            # default pulls foot, wmenu, swaylock, swayidle, grim, brightnessctl, pulseaudio — none used
+            extraPackages = [ ];
           };
 
-          config = {
-            modifier = "Mod4";
-            floating.modifier = "Mod4";
-            terminal = "ghostty";
-            defaultWorkspace = "workspace number 1";
-
-            startup = [
-              { command = "enteauth"; }
-              # swayrd tracks window focus history — required by the swayr
-              # focus-last/urgent binds (Mod+x / Mod+u) in binds.nix.
-              { command = "swayrd"; }
+          xdg.portal = {
+            enable = true;
+            extraPortals = [
+              pkgs.xdg-desktop-portal-wlr
+              pkgs.xdg-desktop-portal-gtk
             ];
+          };
+        };
+    };
 
-            output."*" = {
-              scale = "1";
+    swayfx = {
+      homeManager =
+        { pkgs, ... }:
+        {
+          # No polkit agent here: DMS registers its own on every compositor.
+
+          services.swayidle = {
+            enable = true;
+            # Bind to the sway session only — with all WMs' HM configs active per user,
+            # graphical-session.target would start this under every compositor.
+            systemdTargets = [ "sway-session.target" ];
+            events = {
+              before-sleep = "${pkgs.playerctl}/bin/playerctl -a pause";
+              lock = "${pkgs.playerctl}/bin/playerctl -a pause";
+            };
+          };
+
+          home = {
+            packages = with pkgs; [
+              playerctl
+              wl-clipboard
+              sway-contrib.grimshot
+              satty
+              swayr
+            ];
+          };
+
+          wayland.windowManager.sway = {
+            enable = true;
+            # Binary comes from the system (programs.sway in wm-sessions) — null avoids
+            # installing a second copy in the user profile.
+            package = null;
+            checkConfig = false;
+            xwayland = true;
+            wrapperFeatures.gtk = true;
+            systemd = {
+              enable = true;
+              xdgAutostart = true;
+              variables = [ "--all" ];
             };
 
-            output."HDMI-A-1" = {
-              mode = "3440x1440@75.050Hz";
-            };
+            config = {
+              modifier = "Mod4";
+              floating.modifier = "Mod4";
+              terminal = "ghostty";
+              defaultWorkspace = "workspace number 1";
 
-            gaps = {
-              inner = 7;
-              outer = 0;
-            };
+              startup = [
+                { command = "enteauth"; }
+                # swayrd tracks window focus history — required by the swayr
+                # focus-last/urgent binds (Mod+x / Mod+u) in binds.nix.
+                { command = "swayrd"; }
+              ];
 
-            bars = [ ];
+              output."*" = {
+                scale = "1";
+              };
 
-            window = {
-              titlebar = false;
-              border = 4;
-              hideEdgeBorders = "none";
-            };
+              output."HDMI-A-1" = {
+                mode = "3440x1440@75.050Hz";
+              };
 
-            floating = {
-              titlebar = false;
-              border = 4;
-            };
+              gaps = {
+                inner = 7;
+                outer = 0;
+              };
 
-            focus = {
-              followMouse = "no";
-              wrapping = "yes";
+              bars = [ ];
+
+              window = {
+                titlebar = false;
+                border = 4;
+                hideEdgeBorders = "none";
+              };
+
+              floating = {
+                titlebar = false;
+                border = 4;
+              };
+
+              focus = {
+                followMouse = "no";
+                wrapping = "yes";
+              };
             };
           };
         };
-      };
+    };
   };
 }

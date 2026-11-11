@@ -21,371 +21,373 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  den.aspects.wm-configs.includes = [ den.aspects.mangowc ];
+  den.aspects = {
+    wm-configs.includes = [ den.aspects.mangowc ];
 
-  den.aspects.wm-sessions = {
-    nixos = {
-      imports = [ inputs.mango.nixosModules.mango ];
-      programs.mango.enable = true;
+    wm-sessions = {
+      nixos = {
+        imports = [ inputs.mango.nixosModules.mango ];
+        programs.mango.enable = true;
+      };
     };
-  };
 
-  den.aspects.mangowc = {
-    homeManager =
-      {
-        lib,
-        pkgs,
-        inputs',
-        ...
-      }:
-      let
-        mangoMods = {
-          none = "NONE";
-          super = "SUPER";
-          "super+shift" = "SUPER+SHIFT";
-        };
-        dmsBinds = map (
-          b: "${mangoMods.${b.mods}},${if b.key == "space" then "SPACE" else b.key},spawn,${b.cmd}"
-        ) (import ../_dms-binds.nix);
+    mangowc = {
+      homeManager =
+        {
+          lib,
+          pkgs,
+          inputs',
+          ...
+        }:
+        let
+          mangoMods = {
+            none = "NONE";
+            super = "SUPER";
+            "super+shift" = "SUPER+SHIFT";
+          };
+          dmsBinds = map (
+            b: "${mangoMods.${b.mods}},${if b.key == "space" then "SPACE" else b.key},spawn,${b.cmd}"
+          ) (import ../_dms-binds.nix);
 
-        workspaceBinds = lib.concatMap (
-          n:
-          let
-            s = toString n;
-          in
-          [
-            "SUPER,${s},view,${s}"
-            "SUPER+SHIFT,${s},tag,${s}"
-            "SUPER+CTRL,${s},tagsilent,${s}"
-          ]
-        ) (lib.range 1 5);
+          workspaceBinds = lib.concatMap (
+            n:
+            let
+              s = toString n;
+            in
+            [
+              "SUPER,${s},view,${s}"
+              "SUPER+SHIFT,${s},tag,${s}"
+              "SUPER+CTRL,${s},tagsilent,${s}"
+            ]
+          ) (lib.range 1 5);
 
-        mangoPkg = inputs'.mango.packages.mango;
+          mangoPkg = inputs'.mango.packages.mango;
 
-        # "Last workspace" toggle — mango has no prev-tag bind function (view,0
-        # means "show ALL tags", not previous). With view_current_to_back=1,
-        # dispatching view on the current tag jumps to the compositor's own
-        # prevtag; mmsg supplies the current tag (single monitor assumed).
-        # active_tags is [0] in overview mode, so the guard skips it there.
-        viewPrevTag = pkgs.writeShellScript "mango-view-prev-tag" ''
-          cur=$(${mangoPkg}/bin/mmsg get all-monitors \
-            | ${pkgs.jq}/bin/jq -r '.monitors[0].active_tags[0] // 0')
-          if [ "''${cur:-0}" -ge 1 ]; then
-            exec ${mangoPkg}/bin/mmsg dispatch "view,$cur"
-          fi
-        '';
-
-        # Window stash — tag 6 ("S") replaces mango's minimize/scratchpad pool,
-        # which only shows one window at a time and restores floating-centered.
-        # On a normal tag: send the focused window to the stash silently and
-        # record its origin tag. On the stash tag: bounce back to the previous
-        # tag (view_current_to_back) and bring the focused window along.
-        # Origin records live in XDG_RUNTIME_DIR — client ids and the file both
-        # reset with the session, so they stay in sync.
-        stashToggle = pkgs.writeShellScript "mango-stash-toggle" ''
-          mmsg=${mangoPkg}/bin/mmsg
-          jq=${pkgs.jq}/bin/jq
-          state="''${XDG_RUNTIME_DIR:-/tmp}/mango-stash-origins"
-
-          mon=$($mmsg get all-monitors)
-          tags=$(printf '%s' "$mon" | $jq -c '[.monitors[] | select(.active) | .active_tags[]]')
-          cid=$(printf '%s' "$mon" | $jq -r '.monitors[] | select(.active) | .active_client.id // empty')
-          [ -n "$cid" ] || exit 0
-
-          if [ "$tags" = "[6]" ]; then
-            # viewing the stash tag bounces to prevtag (view_current_to_back)
-            $mmsg dispatch "view,6"
-            cur=$($mmsg get all-monitors | $jq -r '.monitors[] | select(.active) | .active_tags[0] // 0')
-            if [ "$cur" -lt 1 ] || [ "$cur" -gt 5 ]; then
-              cur=1
-              $mmsg dispatch "view,1"
+          # "Last workspace" toggle — mango has no prev-tag bind function (view,0
+          # means "show ALL tags", not previous). With view_current_to_back=1,
+          # dispatching view on the current tag jumps to the compositor's own
+          # prevtag; mmsg supplies the current tag (single monitor assumed).
+          # active_tags is [0] in overview mode, so the guard skips it there.
+          viewPrevTag = pkgs.writeShellScript "mango-view-prev-tag" ''
+            cur=$(${mangoPkg}/bin/mmsg get all-monitors \
+              | ${pkgs.jq}/bin/jq -r '.monitors[0].active_tags[0] // 0')
+            if [ "''${cur:-0}" -ge 1 ]; then
+              exec ${mangoPkg}/bin/mmsg dispatch "view,$cur"
             fi
-            $mmsg dispatch "client,$cid,tagsilent,$cur"
-            $mmsg dispatch "client,$cid,focusid"
-            [ -f "$state" ] && sed -i "/^$cid /d" "$state"
-          else
-            client=$($mmsg get all-clients | $jq -c ".clients[] | select(.id == $cid)")
-            [ -n "$client" ] || exit 0
-            # named scratchpads carry their own toggle state — never stash them
-            [ "$(printf '%s' "$client" | $jq '.is_namedscratchpad')" = "true" ] && exit 0
-            origin=$(printf '%s' "$client" | $jq -r '.tags[0] // 0')
-            if [ "$origin" -ge 1 ] && [ "$origin" -le 5 ]; then
-              touch "$state"
-              { grep -v "^$cid " "$state"; echo "$cid $origin"; } > "$state.new"
-              mv "$state.new" "$state"
-            fi
-            $mmsg dispatch "client,$cid,tagsilent,6"
-          fi
-        '';
-
-        # Restore the focused stashed window to the tag it was stashed from.
-        # Falls back to stashToggle's restore-to-last when no origin record.
-        restoreToOrigin = pkgs.writeShellScript "mango-restore-origin" ''
-          mmsg=${mangoPkg}/bin/mmsg
-          jq=${pkgs.jq}/bin/jq
-          state="''${XDG_RUNTIME_DIR:-/tmp}/mango-stash-origins"
-
-          cid=$($mmsg get all-monitors | $jq -r '.monitors[] | select(.active) | .active_client.id // empty')
-          [ -n "$cid" ] || exit 0
-
-          # only acts on stashed windows
-          on_stash=$($mmsg get all-clients | $jq ".clients[] | select(.id == $cid) | .tags | contains([6])")
-          [ "$on_stash" = "true" ] || exit 0
-
-          origin=""
-          [ -f "$state" ] && origin=$(grep "^$cid " "$state" | cut -d' ' -f2)
-          if [ -n "$origin" ] && [ "$origin" -ge 1 ] && [ "$origin" -le 5 ]; then
-            # tag moves the window, follows the view, and focuses it
-            $mmsg dispatch "client,$cid,tag,$origin"
-            sed -i "/^$cid /d" "$state"
-          else
-            exec ${stashToggle}
-          fi
-        '';
-
-        # Screenshots use grim/slurp per mango's own docs — grimblast (hyprctl) and
-        # grimshot (swaymsg) only work under their respective compositors.
-        screenshotFull = pkgs.writeShellScript "mango-screenshot-full" ''
-          mkdir -p "$HOME/Pictures/Screenshots"
-          ${pkgs.grim}/bin/grim - \
-            | tee "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png" \
-            | ${pkgs.wl-clipboard}/bin/wl-copy
-        '';
-
-        screenshotArea = pkgs.writeShellScript "mango-screenshot-area" ''
-          mkdir -p "$HOME/Pictures/Screenshots"
-          ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp)" - \
-            | tee "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png" \
-            | ${pkgs.wl-clipboard}/bin/wl-copy
-        '';
-
-        screenshotAnnotate = pkgs.writeShellScript "mango-screenshot-annotate" ''
-          mkdir -p "$HOME/Pictures/Screenshots"
-          FILE=$(mktemp /tmp/screenshot-XXXXXX.png)
-          ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp)" "$FILE" \
-            && ${pkgs.satty}/bin/satty --filename "$FILE" \
-              --output-filename "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
-          rm -f "$FILE"
-        '';
-      in
-      {
-        imports = [ inputs.mango.hmModules.mango ];
-
-        home.packages = with pkgs; [
-          grim
-          slurp
-          satty
-          wl-clipboard
-        ];
-
-        wayland.windowManager.mango = {
-          enable = true;
-          package = mangoPkg;
-
-          # Import all env vars into systemd so services (DMS, etc.)
-          # get PATH, XDG_DATA_DIRS, and other session variables.
-          systemd.variables = [ "--all" ];
-
-          # Must be non-empty: the HM module only writes autostart.sh (and its
-          # exec_once line) when this is set, and the systemd activation —
-          # dbus env import + `systemctl --user start mango-session.target`,
-          # which BindsTo graphical-session.target — lives inside that script.
-          # Without it DMS and every graphical-session service never start.
-          autostart_sh = ''
-            # systemd/D-Bus activation is prepended by the HM module
           '';
 
-          settings = {
-            ### Appearance — gaps, borders, colors, blur, shadows, animations
-            ### (matching the Hyprland look)
-            gap_inner_horizontal = 7;
-            gap_inner_vertical = 7;
-            gap_outer_horizontal = 7;
-            gap_outer_vertical = 7;
+          # Window stash — tag 6 ("S") replaces mango's minimize/scratchpad pool,
+          # which only shows one window at a time and restores floating-centered.
+          # On a normal tag: send the focused window to the stash silently and
+          # record its origin tag. On the stash tag: bounce back to the previous
+          # tag (view_current_to_back) and bring the focused window along.
+          # Origin records live in XDG_RUNTIME_DIR — client ids and the file both
+          # reset with the session, so they stay in sync.
+          stashToggle = pkgs.writeShellScript "mango-stash-toggle" ''
+            mmsg=${mangoPkg}/bin/mmsg
+            jq=${pkgs.jq}/bin/jq
+            state="''${XDG_RUNTIME_DIR:-/tmp}/mango-stash-origins"
 
-            border_px = 4;
-            border_radius = 7;
+            mon=$($mmsg get all-monitors)
+            tags=$(printf '%s' "$mon" | $jq -c '[.monitors[] | select(.active) | .active_tags[]]')
+            cid=$(printf '%s' "$mon" | $jq -r '.monitors[] | select(.active) | .active_client.id // empty')
+            [ -n "$cid" ] || exit 0
 
-            focus_color = "0x33ccffee";
-            border_color = "0x595959aa";
-            urgent_color = "0xff5555ff";
+            if [ "$tags" = "[6]" ]; then
+              # viewing the stash tag bounces to prevtag (view_current_to_back)
+              $mmsg dispatch "view,6"
+              cur=$($mmsg get all-monitors | $jq -r '.monitors[] | select(.active) | .active_tags[0] // 0')
+              if [ "$cur" -lt 1 ] || [ "$cur" -gt 5 ]; then
+                cur=1
+                $mmsg dispatch "view,1"
+              fi
+              $mmsg dispatch "client,$cid,tagsilent,$cur"
+              $mmsg dispatch "client,$cid,focusid"
+              [ -f "$state" ] && sed -i "/^$cid /d" "$state"
+            else
+              client=$($mmsg get all-clients | $jq -c ".clients[] | select(.id == $cid)")
+              [ -n "$client" ] || exit 0
+              # named scratchpads carry their own toggle state — never stash them
+              [ "$(printf '%s' "$client" | $jq '.is_namedscratchpad')" = "true" ] && exit 0
+              origin=$(printf '%s' "$client" | $jq -r '.tags[0] // 0')
+              if [ "$origin" -ge 1 ] && [ "$origin" -le 5 ]; then
+                touch "$state"
+                { grep -v "^$cid " "$state"; echo "$cid $origin"; } > "$state.new"
+                mv "$state.new" "$state"
+              fi
+              $mmsg dispatch "client,$cid,tagsilent,6"
+            fi
+          '';
 
-            blur = 1;
-            blur_optimized = 1;
-            blur_params_radius = 5;
-            shadows = 1;
-            focused_opacity = 1.0;
-            unfocused_opacity = 1.0;
+          # Restore the focused stashed window to the tag it was stashed from.
+          # Falls back to stashToggle's restore-to-last when no origin record.
+          restoreToOrigin = pkgs.writeShellScript "mango-restore-origin" ''
+            mmsg=${mangoPkg}/bin/mmsg
+            jq=${pkgs.jq}/bin/jq
+            state="''${XDG_RUNTIME_DIR:-/tmp}/mango-stash-origins"
 
-            # Durations/curves mirror Hyprland's defaults (the smoothness target):
-            # easeOutQuint 0.23,1,0.32,1; windowsIn ≈ 410ms, windows ≈ 480ms,
-            # windowsOut ≈ 150ms, popin starts at 87% size. The previous
-            # 150-200ms durations were too few frames and read as choppy.
-            animations = 1;
-            animation_type_open = "zoom";
-            animation_type_close = "fade";
-            animation_duration_open = 400;
-            animation_duration_close = 150;
-            animation_duration_move = 400;
-            animation_duration_tag = 300;
-            zoom_initial_ratio = 0.87;
+            cid=$($mmsg get all-monitors | $jq -r '.monitors[] | select(.active) | .active_client.id // empty')
+            [ -n "$cid" ] || exit 0
 
-            animation_curve_open = "0.23,1.0,0.32,1";
-            animation_curve_move = "0.23,1.0,0.32,1";
-            animation_curve_tag = "0.23,1.0,0.32,1";
-            animation_curve_close = "0.08,0.92,0,1";
-            animation_curve_focus = "0.23,1.0,0.32,1";
-            animation_curve_opacity_fade_in = "0.23,1.0,0.32,1";
-            animation_curve_opacity_fade_out = "0.5,0.5,0.5,0.5";
+            # only acts on stashed windows
+            on_stash=$($mmsg get all-clients | $jq ".clients[] | select(.id == $cid) | .tags | contains([6])")
+            [ "$on_stash" = "true" ] || exit 0
 
-            ### Layout, input, cursor, monitor
-            # 5 workspace tags + tag 6 as the window stash (see stashToggle).
-            tag_num = 6;
-            default_master_factor = 0.55;
-            default_master_count = 1;
-            # center_tile: master spans the full width while it has no stack
-            # windows (otherwise a lone window sits centered at mfact width)
-            center_master_overspread = 1;
+            origin=""
+            [ -f "$state" ] && origin=$(grep "^$cid " "$state" | cut -d' ' -f2)
+            if [ -n "$origin" ] && [ "$origin" -ge 1 ] && [ "$origin" -le 5 ]; then
+              # tag moves the window, follows the view, and focuses it
+              $mmsg dispatch "client,$cid,tag,$origin"
+              sed -i "/^$cid /d" "$state"
+            else
+              exec ${stashToggle}
+            fi
+          '';
 
-            repeat_delay = 300;
-            repeat_rate = 25;
-            numlock_on = 0;
-            sloppy_focus = 0;
-            warp_cursor = 0;
+          # Screenshots use grim/slurp per mango's own docs — grimblast (hyprctl) and
+          # grimshot (swaymsg) only work under their respective compositors.
+          screenshotFull = pkgs.writeShellScript "mango-screenshot-full" ''
+            mkdir -p "$HOME/Pictures/Screenshots"
+            ${pkgs.grim}/bin/grim - \
+              | tee "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png" \
+              | ${pkgs.wl-clipboard}/bin/wl-copy
+          '';
 
-            # Mango's default (1) lets any xdg-activation request yank the view
-            # back to the requesting client's tag — fullscreen VLC does this on
-            # workspace switch, so leaving its tag looked impossible. 0 matches
-            # Hyprland's focus_on_activate=false: the client is marked urgent
-            # (border color) instead of stealing the view.
-            focus_on_activate = 0;
+          screenshotArea = pkgs.writeShellScript "mango-screenshot-area" ''
+            mkdir -p "$HOME/Pictures/Screenshots"
+            ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp)" - \
+              | tee "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png" \
+              | ${pkgs.wl-clipboard}/bin/wl-copy
+          '';
 
-            # Viewing the already-current tag jumps back to the previous one
-            # (Hyprland's workspace_back_and_forth). Required by the SUPER,z
-            # last-workspace script; side effect: SUPER,1-5 on the current
-            # tag also goes back instead of being a no-op.
-            view_current_to_back = 1;
+          screenshotAnnotate = pkgs.writeShellScript "mango-screenshot-annotate" ''
+            mkdir -p "$HOME/Pictures/Screenshots"
+            FILE=$(mktemp /tmp/screenshot-XXXXXX.png)
+            ${pkgs.grim}/bin/grim -g "$(${pkgs.slurp}/bin/slurp)" "$FILE" \
+              && ${pkgs.satty}/bin/satty --filename "$FILE" \
+                --output-filename "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
+            rm -f "$FILE"
+          '';
+        in
+        {
+          imports = [ inputs.mango.hmModules.mango ];
 
-            # Keep XWayland running even with no X11 apps open (reduces startup lag).
-            # (the old `xwayland` toggle was removed upstream — XWayland is always built in)
-            xwayland_persistence = 1;
+          home.packages = with pkgs; [
+            grim
+            slurp
+            satty
+            wl-clipboard
+          ];
 
-            env = [ "XCURSOR_SIZE,32" ];
+          wayland.windowManager.mango = {
+            enable = true;
+            package = mangoPkg;
 
-            # First matching rule wins — keep the specific rule above the wildcard.
-            monitor_rule = [
-              # LG 34" ultrawide: run at its max mode (3440x1440@75.05);
-              # model match survives connector/KVM changes
-              "model:LG HDR WQHD,width:3440,height:1440,refresh:75.05,x:0,y:0,scale:1"
-              "name:.*,width:0,height:0,refresh:0,x:0,y:0,scale:1"
-            ];
+            # Import all env vars into systemd so services (DMS, etc.)
+            # get PATH, XDG_DATA_DIRS, and other session variables.
+            systemd.variables = [ "--all" ];
 
-            # Centered-master layout (mango's closest to centertall) on the
-            # ultrawide only; other monitors keep the default tile layout.
-            tag_rule = [
-              "id:1,layout_name:center_tile,monitor_model:LG HDR WQHD"
-              "id:2,layout_name:center_tile,monitor_model:LG HDR WQHD"
-              "id:3,layout_name:center_tile,monitor_model:LG HDR WQHD"
-              "id:4,layout_name:center_tile,monitor_model:LG HDR WQHD"
-              "id:5,layout_name:center_tile,monitor_model:LG HDR WQHD"
-            ];
+            # Must be non-empty: the HM module only writes autostart.sh (and its
+            # exec_once line) when this is set, and the systemd activation —
+            # dbus env import + `systemctl --user start mango-session.target`,
+            # which BindsTo graphical-session.target — lives inside that script.
+            # Without it DMS and every graphical-session service never start.
+            autostart_sh = ''
+              # systemd/D-Bus activation is prepended by the HM module
+            '';
 
-            # Layouts SUPER,o cycles through (switch_layout); without this it
-            # would cycle all 14 built-in layouts
-            circle_layout = "tile,center_tile,monocle";
+            settings = {
+              ### Appearance — gaps, borders, colors, blur, shadows, animations
+              ### (matching the Hyprland look)
+              gap_inner_horizontal = 7;
+              gap_inner_vertical = 7;
+              gap_outer_horizontal = 7;
+              gap_outer_vertical = 7;
 
-            ### Named scratchpads — apps ONLY exist as scratchpads; the binds below
-            ### lazy-spawn them on first use (like Hyprland's on-created-empty).
-            scratchpad_width_ratio = 0.7;
-            scratchpad_height_ratio = 0.7;
+              border_px = 4;
+              border_radius = 7;
 
-            window_rule = [
-              # kitty-term floats at map, so scratchpad_*_ratio never applies;
-              # size it explicitly or it opens at kitty's own requested size.
-              "is_named_scratchpad:1,app_id:kitty-term,width:0.7,height:0.7"
-              "is_named_scratchpad:1,app_id:org.gnome.Nautilus"
-              "is_named_scratchpad:1,app_id:bitwarden"
-              "is_named_scratchpad:1,app_id:Slack"
-              "is_named_scratchpad:1,app_id:io.ente.auth"
-            ];
+              focus_color = "0x33ccffee";
+              border_color = "0x595959aa";
+              urgent_color = "0xff5555ff";
 
-            ### Keybindings — canonical Hyprland scheme wherever mango has an equivalent
-            bind =
-              dmsBinds
-              ++ workspaceBinds
-              ++ [
-                # Application launchers (launcher: dmsBinds)
-                "SUPER+SHIFT,Return,spawn,ghostty"
-                "SUPER,w,spawn,default-browser"
+              blur = 1;
+              blur_optimized = 1;
+              blur_params_radius = 5;
+              shadows = 1;
+              focused_opacity = 1.0;
+              unfocused_opacity = 1.0;
 
-                # Window management
-                "SUPER,c,killclient"
-                "SUPER,f,togglefullscreen"
-                "SUPER+SHIFT,f,togglefloating"
-                "SUPER,x,focuslast"
-                "SUPER,o,switch_layout"
+              # Durations/curves mirror Hyprland's defaults (the smoothness target):
+              # easeOutQuint 0.23,1,0.32,1; windowsIn ≈ 410ms, windows ≈ 480ms,
+              # windowsOut ≈ 150ms, popin starts at 87% size. The previous
+              # 150-200ms durations were too few frames and read as choppy.
+              animations = 1;
+              animation_type_open = "zoom";
+              animation_type_close = "fade";
+              animation_duration_open = 400;
+              animation_duration_close = 150;
+              animation_duration_move = 400;
+              animation_duration_tag = 300;
+              zoom_initial_ratio = 0.87;
 
-                # Master layout — zoom = swap with master (mango has no focus-master)
-                "SUPER,Return,zoom"
-                "SUPER+ALT,i,incnmaster,+1"
-                "SUPER+ALT,d,incnmaster,-1"
+              animation_curve_open = "0.23,1.0,0.32,1";
+              animation_curve_move = "0.23,1.0,0.32,1";
+              animation_curve_tag = "0.23,1.0,0.32,1";
+              animation_curve_close = "0.08,0.92,0,1";
+              animation_curve_focus = "0.23,1.0,0.32,1";
+              animation_curve_opacity_fade_in = "0.23,1.0,0.32,1";
+              animation_curve_opacity_fade_out = "0.5,0.5,0.5,0.5";
 
-                # Vim-style focus navigation
-                "SUPER,h,focusdir,left"
-                "SUPER,l,focusdir,right"
-                "SUPER,k,focusdir,up"
-                "SUPER,j,focusdir,down"
+              ### Layout, input, cursor, monitor
+              # 5 workspace tags + tag 6 as the window stash (see stashToggle).
+              tag_num = 6;
+              default_master_factor = 0.55;
+              default_master_count = 1;
+              # center_tile: master spans the full width while it has no stack
+              # windows (otherwise a lone window sits centered at mfact width)
+              center_master_overspread = 1;
 
-                # Vim-style window moving (swap with neighbor)
-                "SUPER+SHIFT,h,exchange_client,left"
-                "SUPER+SHIFT,l,exchange_client,right"
-                "SUPER+SHIFT,k,exchange_client,up"
-                "SUPER+SHIFT,j,exchange_client,down"
+              repeat_delay = 300;
+              repeat_rate = 25;
+              numlock_on = 0;
+              sloppy_focus = 0;
+              warp_cursor = 0;
 
-                # Resize master factor
-                "SUPER+CTRL,l,setmfact,+0.02"
-                "SUPER+CTRL,h,setmfact,-0.02"
+              # Mango's default (1) lets any xdg-activation request yank the view
+              # back to the requesting client's tag — fullscreen VLC does this on
+              # workspace switch, so leaving its tag looked impossible. 0 matches
+              # Hyprland's focus_on_activate=false: the client is marked urgent
+              # (border color) instead of stealing the view.
+              focus_on_activate = 0;
 
-                # Tag navigation (tags are dwm-style workspaces)
-                # z = last workspace via mmsg script (view,0 would show ALL tags)
-                "SUPER,z,spawn,${viewPrevTag}"
-                # 1-5 view / tag / tagsilent: workspaceBinds above
+              # Viewing the already-current tag jumps back to the previous one
+              # (Hyprland's workspace_back_and_forth). Required by the SUPER,z
+              # last-workspace script; side effect: SUPER,1-5 on the current
+              # tag also goes back instead of being a no-op.
+              view_current_to_back = 1;
 
-                # Named scratchpads — canonical Hyprland keys
-                "SUPER,grave,toggle_named_scratchpad,kitty-term,none,kitty --class kitty-term"
-                "SUPER,t,toggle_named_scratchpad,org.gnome.Nautilus,none,nautilus"
-                "SUPER+SHIFT,o,toggle_named_scratchpad,bitwarden,none,bitwarden"
-                "SUPER+SHIFT,s,toggle_named_scratchpad,Slack,none,slack"
-                "SUPER+SHIFT,e,toggle_named_scratchpad,io.ente.auth,none,enteauth"
+              # Keep XWayland running even with no X11 apps open (reduces startup lag).
+              # (the old `xwayland` toggle was removed upstream — XWayland is always built in)
+              xwayland_persistence = 1;
 
-                # Window stash (tag 6, "S") — see stashToggle above.
-                # n stashes / restores to last focused workspace (context-aware);
-                # SHIFT+n toggles the stash view; SHIFT+u restores to origin tag.
-                "SUPER,n,spawn,${stashToggle}"
-                "SUPER+SHIFT,n,view,6"
-                "SUPER+SHIFT,u,spawn,${restoreToOrigin}"
+              env = [ "XCURSOR_SIZE,32" ];
 
-                # Alt-Tab cycling
-                "ALT,Tab,focusstack,next"
-
-                # Media/brightness + DMS toggles: dmsBinds (wayland/_dms-binds.nix)
-
-                # Screenshots
-                "SUPER,p,spawn,${screenshotFull}"
-                "SUPER+CTRL,p,spawn,${screenshotArea}"
-                "SUPER+ALT,p,spawn,${screenshotAnnotate}"
-
-                # Session
-                "SUPER+SHIFT,c,reload_config"
-                "SUPER+SHIFT,q,quit"
+              # First matching rule wins — keep the specific rule above the wildcard.
+              monitor_rule = [
+                # LG 34" ultrawide: run at its max mode (3440x1440@75.05);
+                # model match survives connector/KVM changes
+                "model:LG HDR WQHD,width:3440,height:1440,refresh:75.05,x:0,y:0,scale:1"
+                "name:.*,width:0,height:0,refresh:0,x:0,y:0,scale:1"
               ];
 
-            mousebind = [
-              "SUPER,btn_left,moveresize,move"
-              "SUPER,btn_right,moveresize,resize"
-            ];
+              # Centered-master layout (mango's closest to centertall) on the
+              # ultrawide only; other monitors keep the default tile layout.
+              tag_rule = [
+                "id:1,layout_name:center_tile,monitor_model:LG HDR WQHD"
+                "id:2,layout_name:center_tile,monitor_model:LG HDR WQHD"
+                "id:3,layout_name:center_tile,monitor_model:LG HDR WQHD"
+                "id:4,layout_name:center_tile,monitor_model:LG HDR WQHD"
+                "id:5,layout_name:center_tile,monitor_model:LG HDR WQHD"
+              ];
+
+              # Layouts SUPER,o cycles through (switch_layout); without this it
+              # would cycle all 14 built-in layouts
+              circle_layout = "tile,center_tile,monocle";
+
+              ### Named scratchpads — apps ONLY exist as scratchpads; the binds below
+              ### lazy-spawn them on first use (like Hyprland's on-created-empty).
+              scratchpad_width_ratio = 0.7;
+              scratchpad_height_ratio = 0.7;
+
+              window_rule = [
+                # kitty-term floats at map, so scratchpad_*_ratio never applies;
+                # size it explicitly or it opens at kitty's own requested size.
+                "is_named_scratchpad:1,app_id:kitty-term,width:0.7,height:0.7"
+                "is_named_scratchpad:1,app_id:org.gnome.Nautilus"
+                "is_named_scratchpad:1,app_id:bitwarden"
+                "is_named_scratchpad:1,app_id:Slack"
+                "is_named_scratchpad:1,app_id:io.ente.auth"
+              ];
+
+              ### Keybindings — canonical Hyprland scheme wherever mango has an equivalent
+              bind =
+                dmsBinds
+                ++ workspaceBinds
+                ++ [
+                  # Application launchers (launcher: dmsBinds)
+                  "SUPER+SHIFT,Return,spawn,ghostty"
+                  "SUPER,w,spawn,default-browser"
+
+                  # Window management
+                  "SUPER,c,killclient"
+                  "SUPER,f,togglefullscreen"
+                  "SUPER+SHIFT,f,togglefloating"
+                  "SUPER,x,focuslast"
+                  "SUPER,o,switch_layout"
+
+                  # Master layout — zoom = swap with master (mango has no focus-master)
+                  "SUPER,Return,zoom"
+                  "SUPER+ALT,i,incnmaster,+1"
+                  "SUPER+ALT,d,incnmaster,-1"
+
+                  # Vim-style focus navigation
+                  "SUPER,h,focusdir,left"
+                  "SUPER,l,focusdir,right"
+                  "SUPER,k,focusdir,up"
+                  "SUPER,j,focusdir,down"
+
+                  # Vim-style window moving (swap with neighbor)
+                  "SUPER+SHIFT,h,exchange_client,left"
+                  "SUPER+SHIFT,l,exchange_client,right"
+                  "SUPER+SHIFT,k,exchange_client,up"
+                  "SUPER+SHIFT,j,exchange_client,down"
+
+                  # Resize master factor
+                  "SUPER+CTRL,l,setmfact,+0.02"
+                  "SUPER+CTRL,h,setmfact,-0.02"
+
+                  # Tag navigation (tags are dwm-style workspaces)
+                  # z = last workspace via mmsg script (view,0 would show ALL tags)
+                  "SUPER,z,spawn,${viewPrevTag}"
+                  # 1-5 view / tag / tagsilent: workspaceBinds above
+
+                  # Named scratchpads — canonical Hyprland keys
+                  "SUPER,grave,toggle_named_scratchpad,kitty-term,none,kitty --class kitty-term"
+                  "SUPER,t,toggle_named_scratchpad,org.gnome.Nautilus,none,nautilus"
+                  "SUPER+SHIFT,o,toggle_named_scratchpad,bitwarden,none,bitwarden"
+                  "SUPER+SHIFT,s,toggle_named_scratchpad,Slack,none,slack"
+                  "SUPER+SHIFT,e,toggle_named_scratchpad,io.ente.auth,none,enteauth"
+
+                  # Window stash (tag 6, "S") — see stashToggle above.
+                  # n stashes / restores to last focused workspace (context-aware);
+                  # SHIFT+n toggles the stash view; SHIFT+u restores to origin tag.
+                  "SUPER,n,spawn,${stashToggle}"
+                  "SUPER+SHIFT,n,view,6"
+                  "SUPER+SHIFT,u,spawn,${restoreToOrigin}"
+
+                  # Alt-Tab cycling
+                  "ALT,Tab,focusstack,next"
+
+                  # Media/brightness + DMS toggles: dmsBinds (wayland/_dms-binds.nix)
+
+                  # Screenshots
+                  "SUPER,p,spawn,${screenshotFull}"
+                  "SUPER+CTRL,p,spawn,${screenshotArea}"
+                  "SUPER+ALT,p,spawn,${screenshotAnnotate}"
+
+                  # Session
+                  "SUPER+SHIFT,c,reload_config"
+                  "SUPER+SHIFT,q,quit"
+                ];
+
+              mousebind = [
+                "SUPER,btn_left,moveresize,move"
+                "SUPER,btn_right,moveresize,resize"
+              ];
+            };
           };
         };
-      };
+    };
   };
 }
