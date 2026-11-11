@@ -1,22 +1,25 @@
 # Home-manager integration — declares the flake input and sets default home-manager config.
 #
-# Home-manager is now enabled per-host via den.hosts.<system>.<hostname>.home-manager.enable = true.
-# User accounts are created automatically by den when users are declared in den.hosts.
+# Home-manager turns on for a host when a user has "homeManager" in classes (schema.nix
+# defaults every user to it). Accounts come from den.batteries.define-user.
+{ den, ... }:
 {
   flake-file.inputs.home-manager = {
     url = "github:nix-community/home-manager/release-26.05";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  den.default = {
-    nixos.home-manager = {
+  den = {
+    # Host-side HM settings, on every host that enables home-manager.
+    aspects.hm-host.nixos.home-manager = {
       backupFileExtension = "hm-backup";
       # Homes reuse the host's pkgs (overlays + unfree predicate) instead of
       # evaluating nixpkgs again per user.
       useGlobalPkgs = true;
     };
+    schema.hm-host.includes = [ den.aspects.hm-host ];
 
-    homeManager =
+    default.homeManager =
       { config, ... }:
       {
         xdg = {
