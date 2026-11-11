@@ -224,7 +224,6 @@ let
           programs.dank-material-shell = {
             enable = true;
             package = dmsCfg.package;
-            quickshell.package = dmsCfg.quickshell.package;
             enableSystemMonitoring = true;
             enableVPN = true;
             enableDynamicTheming = false;
@@ -352,7 +351,6 @@ in
             '';
           };
           configHome = "/home/${host.greetdUser}";
-          quickshell.package = inputs'.quickshell.packages.quickshell;
         };
         # Fixed greeter wallpaper: the user's session.json is read-only (HM), so cycling never
         # persists and upstream's preStart copy would always pick active/wallpaper (first file).
@@ -363,7 +361,6 @@ in
         programs.dank-material-shell = {
           enable = true;
           package = dmsPatched inputs'.dms.packages.dms-shell;
-          quickshell.package = inputs'.quickshell.packages.quickshell;
         };
         # DMS enables power-profiles-daemon by default, which conflicts with TLP.
         services.power-profiles-daemon.enable = false;
