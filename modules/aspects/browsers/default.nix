@@ -55,10 +55,7 @@ in
     };
 
     includes = [
-      (den.batteries.unfree [
-        "brave"
-        "google-chrome"
-      ])
+      (den.batteries.unfree [ "google-chrome" ])
       extraBrowsersConfig
       defaultBrowserConfig
     ];

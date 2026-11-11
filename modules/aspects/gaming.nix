@@ -26,7 +26,6 @@
     includes = [
       (den.batteries.unfree [
         "steam"
-        "steam-original"
         "steam-unwrapped"
       ])
     ];

@@ -5,7 +5,6 @@
       (den.batteries.unfree [
         "signal-desktop"
         "telegram-desktop"
-        "discord"
       ])
     ];
     homeManager =
