@@ -24,6 +24,10 @@
           userDirs = {
             enable = true;
             createDirectories = true;
+            projects = "${config.home.homeDirectory}/workspace";
+            desktop = null;
+            templates = null;
+            publicShare = null;
           };
         };
         gtk.gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
