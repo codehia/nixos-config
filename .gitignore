@@ -9,8 +9,6 @@ devenv.local*
 # direnv
 .direnv
 
-# pre-commit
-.pre-commit-config.yaml
 package.*
 package-*
 node_modules/*
