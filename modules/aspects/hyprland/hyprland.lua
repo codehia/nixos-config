@@ -47,8 +47,8 @@ hl.config({
     slave_count_for_center_master = 1,
     center_master_fallback = 'right',
   },
+  layers = { layers_hog_keyboard_focus = true },
   misc = {
-    layers_hog_keyboard_focus = true,
     initial_workspace_tracking = 1,
     mouse_move_enables_dpms = true,
     key_press_enables_dpms = false,
