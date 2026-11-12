@@ -9,7 +9,8 @@
         lact.gpuKey = "1002:7340-1043:04E6-0000:2d:00.0";
         greetd = {
           user = "deus";
-          session = "mango";
+          # Starts the greeter's "Hyprland" entry (hyprland.nix); uwsm re-reads its args.
+          session = "uwsm start hyprland-uwsm.desktop";
         };
         browser = {
           default = "helium";

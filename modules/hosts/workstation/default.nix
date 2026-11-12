@@ -8,8 +8,8 @@
         nix-config.nhClean = true;
         greetd = {
           user = "soumya";
-          # Auto-login straight into Hyprland under UWSM (matches the greeter session entry).
-          session = "/run/current-system/sw/bin/uwsm start -- Hyprland";
+          # Starts the greeter's "Hyprland" entry (hyprland.nix); uwsm re-reads its args.
+          session = "uwsm start hyprland-uwsm.desktop";
         };
         browser.extra = [ "google-chrome" ];
       };

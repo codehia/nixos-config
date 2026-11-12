@@ -1,5 +1,5 @@
 # Hyprland compositor — base config, packages, and settings.
-# Uses the collector pattern: other files (binds.nix, hypridle.nix) also define
+# Uses the collector pattern: hypridle.nix also defines
 # den.aspects.hyprland and their attrs are merged together by den.
 #
 # The compositor itself is system-level: the nixos block lives in den.aspects.wm-sessions
@@ -7,29 +7,65 @@
 # registers with services.displayManager.sessionPackages and appears in the greeter.
 { den, ... }:
 {
-  flake-file.inputs.hyprland = {
-    url = "github:hyprwm/hyprland";
-  };
-
   den.aspects = {
     wm-configs.includes = [ den.aspects.hyprland ];
 
     wm-sessions = {
       nixos =
-        { inputs', ... }:
         {
+          config,
+          lib,
+          pkgs,
+          ...
+        }:
+        let
+          inherit (config.programs) hyprland uwsm;
+          # Greeter entries: the package ships hyprland.desktop (bare start-hyprland, no
+          # UWSM -> no graphical-session.target, DMS never starts) and
+          # hyprland-uwsm.desktop ("Hyprland (uwsm-managed)"). Hide the bare one and
+          # name the UWSM one "Hyprland". uwsm refuses Hidden entries, so the UWSM entry
+          # starts start-hyprland by path instead of via hyprland.desktop.
+          # mkBefore: first package wins in the session dir (lndir keeps existing links),
+          # and that dir precedes /run/current-system/sw/share in XDG_DATA_DIRS.
+          hyprlandSessions =
+            pkgs.runCommand "hyprland-sessions" { passthru.providedSessions = [ "hyprland-uwsm" ]; }
+              ''
+                d=$out/share/wayland-sessions
+                mkdir -p $d
+                { cat ${hyprland.package}/share/wayland-sessions/hyprland.desktop; echo Hidden=true; } > $d/hyprland.desktop
+                cat > $d/hyprland-uwsm.desktop <<EOF
+                [Desktop Entry]
+                Name=Hyprland
+                Comment=An intelligent dynamic tiling Wayland compositor
+                Exec=${uwsm.package}/bin/uwsm start -F -e -D Hyprland -N Hyprland -- ${hyprland.package}/bin/start-hyprland
+                TryExec=${uwsm.package}/bin/uwsm
+                DesktopNames=Hyprland
+                Type=Application
+                EOF
+              '';
+        in
+        {
+          services.displayManager.sessionPackages = lib.mkBefore [ hyprlandSessions ];
           programs.hyprland = {
             enable = true;
             withUWSM = true;
-            package = inputs'.hyprland.packages.hyprland;
-            portalPackage = inputs'.hyprland.packages.xdg-desktop-portal-hyprland;
+            # nixpkgs-unstable release: cache.nixos.org, no separate hyprland nixpkgs copy
+            package = pkgs.unstable.hyprland;
+            portalPackage = pkgs.unstable.xdg-desktop-portal-hyprland;
           };
+          # unstable hyprland's hyprland-uwsm.desktop points at unstable uwsm; match it (one uwsm)
+          programs.uwsm.package = pkgs.unstable.uwsm;
         };
     };
 
     hyprland = {
       homeManager =
-        { pkgs, config, ... }:
+        {
+          config,
+          osConfig,
+          pkgs,
+          ...
+        }:
         {
           # Export HM session variables into the UWSM environment so systemd
           # services (DMS, etc.) inherit PATH and other HM-set vars.
@@ -37,166 +73,35 @@
           # environment, so sourcing alone is a no-op and nothing (NIXOS_OZONE_WL
           # included) reaches the systemd activation environment — DMS-launched
           # Electron apps then silently fall back to XWayland.
-          xdg.configFile."uwsm/env".text = ''
-            unset __HM_SESS_VARS_SOURCED
-            . ${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh
-          '';
+          xdg.configFile = {
+            "uwsm/env".text = ''
+              unset __HM_SESS_VARS_SOURCED
+              . ${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh
+            '';
+            # Hyprland 0.57 reads only hyprland.lua (Lua config); hand-written, see hyprland.lua.
+            "hypr/hyprland.lua".source = ./hyprland.lua;
+            # Overview plugin; stable path so the static Lua can hl.plugin.load() it.
+            # pkgs.unstable: built against the same pkgs.unstable.hyprland the session runs.
+            # src bumped: nixpkgs' 12d1c68 doesn't compile on 0.57; upstream fixed it in
+            # 04d2365 (2026-11-09). Drop the override once nixpkgs packages it (local build).
+            "hypr/plugins/hyprtasking.so".source = "${
+              pkgs.unstable.hyprlandPlugins.hyprtasking.overrideAttrs {
+                version = "0-unstable-2026-11-09";
+                src = pkgs.fetchFromGitHub {
+                  owner = "raybbian";
+                  repo = "hyprtasking";
+                  rev = "04d2365d37f032af537b8d5c55efbfe15f01adc7";
+                  hash = "sha256-KzxmA0lqTvZKq/AHdSu2juugkfXwLC6ywR4BeAfiIIg=";
+                };
+              }
+            }/lib/libhyprtasking.so";
+          };
           home.packages = with pkgs; [
-            grimblast
+            # nixpkgs grimblast depends on nixpkgs hyprland (a 2nd Hyprland); use the session's.
+            (grimblast.override { hyprland = osConfig.programs.hyprland.package; })
             satty
             wl-clipboard
-            hyprland-qtutils
           ];
-          wayland.windowManager.hyprland = {
-            enable = true;
-            # Use the NixOS module's package (set to the flake version via programs.hyprland.package).
-            # Avoids version mismatch between the session binary and the HM config.
-            package = null;
-            portalPackage = null;
-            # stateVersion >= 26.05 defaults to the new Lua config engine — stay on
-            # hyprlang (hyprland.conf) until switching is a deliberate decision.
-            configType = "hyprlang";
-            # UWSM owns the session — HM systemd integration must be disabled.
-            systemd.enable = false;
-            xwayland.enable = true;
-            settings = {
-              "$modifier" = "SUPER";
-
-              input = {
-                # single hyprlang String — a list would render as repeated lines
-                # and the last one overwrites the rest
-                kb_options = "grp:alt_caps_toggle,caps:super";
-                numlock_by_default = false;
-                repeat_delay = 300;
-                follow_mouse = 0;
-                float_switch_override_focus = 0;
-                sensitivity = 0;
-                touchpad = {
-                  natural_scroll = false;
-                  disable_while_typing = true;
-                  scroll_factor = 0.8;
-                };
-              };
-
-              general = {
-                layout = "master";
-                gaps_in = 5;
-                gaps_out = 7;
-                border_size = 4;
-                resize_on_border = true;
-                "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
-                "col.inactive_border" = "rgba(595959aa)";
-              };
-
-              misc = {
-                layers_hog_keyboard_focus = true;
-                initial_workspace_tracking = 1;
-                mouse_move_enables_dpms = true;
-                key_press_enables_dpms = false;
-                disable_hyprland_logo = true;
-                disable_splash_rendering = true;
-                enable_swallow = true;
-                vrr = 2;
-                enable_anr_dialog = true;
-                anr_missed_pings = 15;
-              };
-
-              decoration = {
-                rounding = 7;
-                rounding_power = 4.0;
-                blur = {
-                  enabled = true;
-                  size = 5;
-                  passes = 3;
-                  ignore_opacity = false;
-                  new_optimizations = true;
-                };
-                shadow = {
-                  enabled = true;
-                  range = 4;
-                  render_power = 3;
-                  color = "rgba(1a1a1aee)";
-                };
-              };
-
-              ecosystem = {
-                no_donation_nag = true;
-                no_update_news = true;
-              };
-
-              cursor = {
-                sync_gsettings_theme = true;
-                no_hardware_cursors = 2;
-                enable_hyprcursor = true;
-                warp_on_change_workspace = 0;
-                no_warps = true;
-              };
-
-              render = {
-                direct_scanout = 0;
-              };
-
-              master = {
-                orientation = "center";
-                new_status = "master";
-                mfact = 0.62;
-                slave_count_for_center_master = 2;
-              };
-
-              monitor = [ ", 3440x1440@75.05Hz, auto, 1" ];
-
-              workspace = [
-                "1, persistent:true,"
-                "2, persistent:true,"
-                "3, persistent:true,"
-                "4, persistent:true,"
-                "5, persistent:true,"
-                "special:minimized, gapsout:100"
-                # Scratchpads — lazy: app starts only on first toggle (on-created-empty)
-                "special:term, on-created-empty:kitty --class kitty-term"
-                "special:filemanager, on-created-empty:nautilus"
-                "special:pw, on-created-empty:bitwarden"
-                "special:slack, on-created-empty:slack"
-                "special:ente, on-created-empty:enteauth"
-              ];
-
-              # windowrule: send each scratchpad app to its special workspace silently on open,
-              # and enforce float + size + center.
-              # "workspace ... silent" is a static effect (fires once at window open).
-              windowrule = [
-                "workspace special:term silent, match:class kitty-term"
-                "float on, match:class kitty-term"
-                "size 70% 70%, match:class kitty-term"
-                "center on, match:class kitty-term"
-
-                "workspace special:filemanager silent, match:class org.gnome.Nautilus"
-                "float on, match:class org.gnome.Nautilus"
-                "size 70% 70%, match:class org.gnome.Nautilus"
-                "center on, match:class org.gnome.Nautilus"
-
-                "workspace special:pw silent, match:class bitwarden"
-                "float on, match:class bitwarden"
-                "size 30% 50%, match:class bitwarden"
-                "center on, match:class bitwarden"
-
-                "workspace special:slack silent, match:class Slack"
-                "float on, match:class Slack"
-                "size 70% 70%, match:class Slack"
-                "center on, match:class Slack"
-
-                "workspace special:ente silent, match:class io.ente.auth"
-                "float on, match:class io.ente.auth"
-                "size 10% 80%, match:class io.ente.auth"
-                "center on, match:class io.ente.auth"
-
-                # Apps launched from the filemanager scratchpad inherit its special
-                # workspace (visible-special map + initial_workspace_tracking token).
-                # r+0 resolves to the current REGULAR workspace and applies silently
-                # while a special is up, so the scratchpad stays visible on top.
-                "workspace r+0, match:class vlc"
-              ];
-            };
-          };
         };
     };
   };
