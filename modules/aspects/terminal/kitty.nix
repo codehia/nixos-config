@@ -18,6 +18,7 @@
         cursor_blink_interval -1
         cursor_stop_blinking_after 15.0
         window_padding_width 4
+        remember_window_size no
       '';
     };
   };
