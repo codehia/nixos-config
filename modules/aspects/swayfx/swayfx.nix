@@ -34,7 +34,7 @@
 
     swayfx = {
       homeManager =
-        { pkgs, ... }:
+        { pkgs, osConfig, ... }:
         {
           # No polkit agent here: DMS registers its own on every compositor.
 
@@ -53,7 +53,8 @@
             packages = with pkgs; [
               playerctl
               wl-clipboard
-              sway-contrib.grimshot
+              # nixpkgs grimshot depends on plain sway; use the session's swayfx
+              (sway-contrib.grimshot.override { sway-unwrapped = osConfig.programs.sway.package; })
               satty
               swayr
             ];

@@ -6,13 +6,17 @@
 # Mod+Tab / Mod+Shift+Tab cycles focus through the stack (stack-main only).
 # Mod+bracketright rotates the stack (stack-main only).
 {
-  flake-file.inputs.persway.url = "github:johnae/persway";
+  flake-file.inputs.persway = {
+    url = "github:johnae/persway";
+    inputs.nixpkgs.follows = "nixpkgs-unstable";
+  };
 
   den.aspects.swayfx = {
     homeManager =
       {
         pkgs,
         inputs',
+        osConfig,
         ...
       }:
       let
@@ -26,7 +30,7 @@
           name = "center-master";
           runtimeInputs = [
             pkgs.jq
-            pkgs.sway
+            osConfig.programs.sway.package # the exact (wrapped) swayfx the session runs
           ];
           text = ''
             MASTER_MARK="_cm_master"

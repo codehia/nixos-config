@@ -15,12 +15,19 @@
 {
   den.aspects.swayfx = {
     homeManager =
-      { lib, pkgs, ... }:
+      {
+        lib,
+        pkgs,
+        osConfig,
+        ...
+      }:
       let
         screenshotAnnotate = pkgs.writeShellScript "screenshot-annotate" ''
           mkdir -p "$HOME/Pictures/Screenshots"
           FILE=$(mktemp /tmp/screenshot-XXXXXX.png)
-          ${pkgs.sway-contrib.grimshot}/bin/grimshot save area "$FILE" && satty --filename "$FILE" --output-filename "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
+          ${
+            pkgs.sway-contrib.grimshot.override { sway-unwrapped = osConfig.programs.sway.package; }
+          }/bin/grimshot save area "$FILE" && satty --filename "$FILE" --output-filename "$HOME/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png"
           rm -f "$FILE"
         '';
       in

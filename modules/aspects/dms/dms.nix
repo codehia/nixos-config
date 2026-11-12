@@ -1,7 +1,7 @@
 # DankMaterialShell.
-#   den.aspects.dms      — NixOS module: system services + the (patched) package. Host includes.
+#   den.aspects.dms      — NixOS module: system services + nixpkgs-unstable dux-shell. Host includes.
 #   den.aspects.dms-home — per-user HM config; laptop bits when the host has den.aspects.laptop. User includes.
-# HM reuses the NixOS package via osConfig, so there is one patched dms-shell build.
+# HM reuses the NixOS package via osConfig, and the HM dms service loads the patched QML (dmsShellDir).
 {
   den,
   inputs,
@@ -23,15 +23,28 @@ let
   # so the stash is tag.tag === 5; state === 1 means active.
   # --replace-fail makes a DMS update that restructures this line fail
   # the build instead of silently regressing.
-  dmsPatched =
-    pkg:
-    pkg.overrideAttrs (old: {
-      postInstall = old.postInstall + ''
-        substituteInPlace $out/share/quickshell/dms/Common/WorkspaceModel.js \
-          --replace-fail 'return tags.map(tag => mangoRecord(tag.tag, tag, screenName));' \
-                         'return tags.filter(tag => tag.tag !== 5 || tag.state === 1).map(tag => mangoRecord(tag.tag, tag, screenName));'
-      '';
-    });
+  # The nixpkgs package embeds its QML in the binary, so patching it would
+  # recompile DMS. Instead: patched copy of the package's own QML, loaded via
+  # DMS_SHELL_DIR (upstream's customization hook). PAM edits mirror nixpkgs' preBuild.
+  dmsShellDir =
+    pkgs: pkg:
+    pkgs.runCommand "dms-shell-dir-${pkg.version}" { } ''
+      cp -rL ${pkg.src}/quickshell $out # -L: DCommon is a relative symlink into the source tree
+      chmod -R u+w $out
+      substituteInPlace $out/Common/WorkspaceModel.js \
+        --replace-fail 'return tags.map(tag => mangoRecord(tag.tag, tag, screenName));' \
+                       'return tags.filter(tag => tag.tag !== 5 || tag.state === 1).map(tag => mangoRecord(tag.tag, tag, screenName));'
+      substituteInPlace $out/assets/pam/fprint \
+        --replace-fail pam_fprintd.so ${pkgs.fprintd}/lib/security/pam_fprintd.so \
+        --replace-fail pam_deny.so ${pkgs.pam}/lib/security/pam_deny.so \
+        --replace-fail pam_permit.so ${pkgs.pam}/lib/security/pam_permit.so
+      substituteInPlace $out/assets/pam/u2f \
+        --replace-fail pam_u2f.so ${pkgs.pam_u2f}/lib/security/pam_u2f.so \
+        --replace-fail pam_deny.so ${pkgs.pam}/lib/security/pam_deny.so \
+        --replace-fail pam_permit.so ${pkgs.pam}/lib/security/pam_permit.so
+      substituteInPlace $out/assets/pam/other \
+        --replace-fail pam_deny.so ${pkgs.pam}/lib/security/pam_deny.so
+    '';
 
   dmsPerUser =
     { host, ... }:
@@ -171,7 +184,7 @@ let
             Install.WantedBy = [ "graphical-session.target" ];
           };
 
-          # Same patched package + quickshell the NixOS module installs (see dmsPatched).
+          # Same package the NixOS module installs (nixpkgs-unstable dux-shell).
           dmsCfg = osConfig.programs.dank-material-shell;
 
           finalSettings = lib.recursiveUpdate settings {
@@ -263,7 +276,10 @@ let
             # qt5ct/qt6ct config requests kvantum as the Qt style, but kvantum fails
             # to load due to a qtsvg version mismatch, causing quickshell to deadlock.
             # Bypass qt5ct entirely for DMS — it uses its own QML theme anyway.
-            Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
+            Service.Environment = [
+              "QT_QPA_PLATFORMTHEME=gtk3"
+              "DMS_SHELL_DIR=${dmsShellDir pkgs.unstable dmsCfg.package}" # unstable: same fprintd/pam as dux-shell
+            ];
             # UWSM owns the session (hyprland.systemd.enable = false), so hyprland-session.target
             # is never created. Override to graphical-session.target which UWSM activates instead.
             Install.WantedBy = lib.mkForce [ "graphical-session.target" ];
@@ -281,8 +297,9 @@ in
       flake = false;
     };
     dms = {
-      url = "github:AvengeMedia/DankMaterialShell";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      # Modules only (the package comes from nixpkgs-unstable). `stable` = latest release, not master/beta.
+      url = "github:duxlabs-dev/dux-shell/stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     dank-greeter = {
       url = "github:duxlabs-dev/dux-greeter";
@@ -293,7 +310,7 @@ in
   den.aspects = {
     dms = {
       nixos =
-        { config, inputs', ... }:
+        { config, pkgs, ... }:
         {
           imports = [
             inputs.dms.nixosModules.dank-material-shell
@@ -320,7 +337,7 @@ in
           '';
           programs.dank-material-shell = {
             enable = true;
-            package = dmsPatched inputs'.dms.packages.dms-shell;
+            package = pkgs.unstable.dux-shell; # Hydra-cached; patch applied via DMS_SHELL_DIR
           };
           # DMS enables power-profiles-daemon by default, which conflicts with TLP.
           services.power-profiles-daemon.enable = false;
@@ -335,20 +352,21 @@ in
       laptop.homeManager =
         { pkgs, lib, ... }:
         let
-          batteryToggleScript = toString (
-            pkgs.writeShellScript "battery-charge-user-toggle" ''
-              current=$(${pkgs.coreutils}/bin/cat /sys/class/power_supply/BAT0/charge_control_end_threshold 2>/dev/null || echo 100)
-              if [ "$current" -le 80 ]; then
-                sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 95 100
-                ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Full charge (100%)"
-              else
-                sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 75 80
-                ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Health mode (80%)"
-              fi
-            ''
-          );
+          # On PATH so hyprland.lua (static file) can bind it by name.
+          batteryToggle = pkgs.writeShellScriptBin "battery-charge-toggle" ''
+            current=$(${pkgs.coreutils}/bin/cat /sys/class/power_supply/BAT0/charge_control_end_threshold 2>/dev/null || echo 100)
+            if [ "$current" -le 80 ]; then
+              sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 95 100
+              ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Full charge (100%)"
+            else
+              sudo ${pkgs.tlp}/bin/tlp setcharge BAT0 75 80
+              ${pkgs.libnotify}/bin/notify-send -u normal "Battery" "Health mode (80%)"
+            fi
+          '';
         in
         {
+          home.packages = [ batteryToggle ];
+
           programs.dank-material-shell.plugins.dankBatteryAlerts = {
             src =
               pkgs.fetchFromGitHub {
@@ -362,12 +380,8 @@ in
           };
 
           wayland.windowManager.sway.config.keybindings = lib.mkOptionDefault {
-            "Mod4+b" = "exec ${batteryToggleScript}";
+            "Mod4+b" = "exec ${lib.getExe batteryToggle}";
           };
-
-          wayland.windowManager.hyprland.settings.bind = [
-            "$modifier, B, exec, ${batteryToggleScript}"
-          ];
         };
     };
   };

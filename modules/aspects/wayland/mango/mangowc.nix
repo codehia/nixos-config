@@ -25,10 +25,15 @@
     wm-configs.includes = [ den.aspects.mangowc ];
 
     wm-sessions = {
-      nixos = {
-        imports = [ inputs.mango.nixosModules.mango ];
-        programs.mango.enable = true;
-      };
+      nixos =
+        { pkgs, ... }:
+        {
+          imports = [ inputs.mango.nixosModules.mango ];
+          programs.mango = {
+            enable = true;
+            package = pkgs.unstable.mango; # Hydra-cached release instead of building the flake's HEAD
+          };
+        };
     };
 
     mangowc = {
@@ -36,7 +41,7 @@
         {
           lib,
           pkgs,
-          inputs',
+          osConfig,
           ...
         }:
         let
@@ -61,7 +66,8 @@
             ]
           ) (lib.range 1 5);
 
-          mangoPkg = inputs'.mango.packages.mango;
+          # One mango: the system package (programs.mango.package, nixpkgs-unstable).
+          mangoPkg = osConfig.programs.mango.package;
 
           # "Last workspace" toggle — mango has no prev-tag bind function (view,0
           # means "show ALL tags", not previous). With view_current_to_back=1,
