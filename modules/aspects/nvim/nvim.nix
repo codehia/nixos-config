@@ -88,8 +88,14 @@ let
 in
 {
   flake-file.inputs = {
-    wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
-    lzextras.url = "github:BirdeeHub/lzextras";
+    wrappers = {
+      url = "github:BirdeeHub/nix-wrapper-modules";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+    lzextras = {
+      url = "github:BirdeeHub/lzextras";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     nvim-rulebook = {
       url = "github:chrisgrieser/nvim-rulebook";
       flake = false;
