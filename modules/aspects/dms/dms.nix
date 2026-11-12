@@ -183,23 +183,25 @@ let
         {
           imports = [ inputs.dms.homeModules.dank-material-shell ];
 
-          home.file.".config/dms/themes/catppuccin/theme.json".source = ./catppuccin-theme.json;
-          home.file."Pictures/profile.jpg".source = "${self}/assets/profile.jpg";
+          home = {
+            file.".config/dms/themes/catppuccin/theme.json".source = ./catppuccin-theme.json;
+            file."Pictures/profile.jpg".source = "${self}/assets/profile.jpg";
 
-          # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
-          home.activation.syncWallpapers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            wallpaperSrc="${inputs.wallpapers}"
-            wallpaperDst="$HOME/Pictures/Wallpapers"
+            # Sync wallpapers from config repo to ~/Pictures/Wallpapers.
+            activation.syncWallpapers = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+              wallpaperSrc="${inputs.wallpapers}"
+              wallpaperDst="$HOME/Pictures/Wallpapers"
 
-            if [ -d "$wallpaperSrc" ] && [ -n "$(ls -A "$wallpaperSrc" 2>/dev/null)" ]; then
-              $DRY_RUN_CMD mkdir -p "$wallpaperDst"
-              $DRY_RUN_CMD chmod u+w "$wallpaperDst"
-              $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete --no-perms --chmod=D755,F644 --exclude='active' "$wallpaperSrc/" "$wallpaperDst/"
+              if [ -d "$wallpaperSrc" ] && [ -n "$(ls -A "$wallpaperSrc" 2>/dev/null)" ]; then
+                $DRY_RUN_CMD mkdir -p "$wallpaperDst"
+                $DRY_RUN_CMD chmod u+w "$wallpaperDst"
+                $DRY_RUN_CMD ${pkgs.rsync}/bin/rsync -a --checksum --delete --no-perms --chmod=D755,F644 --exclude='active' "$wallpaperSrc/" "$wallpaperDst/"
 
-              # Pre-populate active/ so DMS has a wallpaper even before the service runs.
-              PATH="${wallpaperSelectPath}:$PATH" $DRY_RUN_CMD ${wallpaperSelectScript} || true
-            fi
-          '';
+                # Pre-populate active/ so DMS has a wallpaper even before the service runs.
+                PATH="${wallpaperSelectPath}:$PATH" $DRY_RUN_CMD ${wallpaperSelectScript} || true
+              fi
+            '';
+          };
 
           # force=true replaces the stale real directory (from a pre-nix manual DMS install)
           # with the nix-managed symlink. DMS only reads plugin dirs — state goes to
@@ -212,7 +214,7 @@ let
 
           programs.dank-material-shell = {
             enable = true;
-            package = dmsCfg.package;
+            inherit (dmsCfg) package;
             enableSystemMonitoring = true;
             enableVPN = true;
             enableDynamicTheming = false;

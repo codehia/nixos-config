@@ -87,11 +87,13 @@ let
     };
 in
 {
-  flake-file.inputs.wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
-  flake-file.inputs.lzextras.url = "github:BirdeeHub/lzextras";
-  flake-file.inputs.nvim-rulebook = {
-    url = "github:chrisgrieser/nvim-rulebook";
-    flake = false;
+  flake-file.inputs = {
+    wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
+    lzextras.url = "github:BirdeeHub/lzextras";
+    nvim-rulebook = {
+      url = "github:chrisgrieser/nvim-rulebook";
+      flake = false;
+    };
   };
 
   den.aspects.nvim.homeManager = nvimHome;

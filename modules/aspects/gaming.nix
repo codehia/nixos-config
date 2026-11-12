@@ -4,9 +4,13 @@
 {
   den.aspects.gaming = {
     provides.to-hosts.nixos = {
-      programs.steam.enable = true;
-      programs.steam.remotePlay.openFirewall = true;
-      programs.gamemode.enable = true;
+      programs = {
+        steam = {
+          enable = true;
+          remotePlay.openFirewall = true;
+        };
+        gamemode.enable = true;
+      };
       hardware.graphics.enable32Bit = true;
 
       # Creates the `uinput` group and makes /dev/uinput 0660 root:uinput.
