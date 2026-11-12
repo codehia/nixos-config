@@ -271,17 +271,6 @@ hl.bind('SUPER + CTRL + L', hl.dsp.layout('mfact +0.02'))
 hl.bind('SUPER + CTRL + H', hl.dsp.layout('mfact -0.02'))
 hl.bind('SUPER + O', cycle_layout)
 
--- Overview (hyprtasking, linked by hyprland.nix). Defaults otherwise.
-hl.plugin.load(os.getenv('HOME') .. '/.config/hypr/plugins/hyprtasking.so')
-hl.bind('SUPER + SHIFT + A', function()
-  hl.plugin.hyprtasking.toggle('cursor')
-end)
-hl.bind('Escape', function()
-  if hl.plugin.hyprtasking.is_active() then
-    hl.plugin.hyprtasking.toggle('all')
-  end
-end, { non_consuming = true })
-
 -- Windows
 hl.bind('SUPER + C', hl.dsp.window.close())
 hl.bind('SUPER + F', hl.dsp.window.fullscreen())

@@ -80,21 +80,6 @@
             '';
             # Hyprland 0.57 reads only hyprland.lua (Lua config); hand-written, see hyprland.lua.
             "hypr/hyprland.lua".source = ./hyprland.lua;
-            # Overview plugin; stable path so the static Lua can hl.plugin.load() it.
-            # pkgs.unstable: built against the same pkgs.unstable.hyprland the session runs.
-            # src bumped: nixpkgs' 12d1c68 doesn't compile on 0.57; upstream fixed it in
-            # 04d2365 (2026-11-09). Drop the override once nixpkgs packages it (local build).
-            "hypr/plugins/hyprtasking.so".source = "${
-              pkgs.unstable.hyprlandPlugins.hyprtasking.overrideAttrs {
-                version = "0-unstable-2026-11-09";
-                src = pkgs.fetchFromGitHub {
-                  owner = "raybbian";
-                  repo = "hyprtasking";
-                  rev = "04d2365d37f032af537b8d5c55efbfe15f01adc7";
-                  hash = "sha256-KzxmA0lqTvZKq/AHdSu2juugkfXwLC6ywR4BeAfiIIg=";
-                };
-              }
-            }/lib/libhyprtasking.so";
           };
           home.packages = with pkgs; [
             # nixpkgs grimblast depends on nixpkgs hyprland (a 2nd Hyprland); use the session's.
