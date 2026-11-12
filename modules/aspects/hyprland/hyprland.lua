@@ -27,7 +27,7 @@ hl.config({
     numlock_by_default = false,
     repeat_delay = 300,
     repeat_rate = 25,
-    follow_mouse = 0,
+    follow_mouse = 2,
     float_switch_override_focus = 0,
     sensitivity = 0,
     touchpad = {
