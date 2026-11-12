@@ -8,7 +8,7 @@
         nix-config.nhClean = true;
         greetd = {
           user = "deus";
-          session = "mango";
+          session = "uwsm start hyprland-uwsm.desktop";
         };
         browser = {
           default = "helium";
