@@ -170,7 +170,9 @@ end
 
 -- Apps launched from the filemanager scratchpad would inherit its special workspace;
 -- r+0 = the current regular workspace, applied silently so the scratchpad stays up.
-hl.window_rule({ match = { class = 'vlc' }, workspace = 'r+0' })
+-- render_unfocused: hidden windows get no frame callbacks, so VLC's Wayland vout
+-- stalls off-workspace and the video freezes ~1s on return while it catches up.
+hl.window_rule({ match = { class = 'vlc' }, workspace = 'r+0', render_unfocused = true })
 
 ------------------------------------------------------------------------------
 -- Window stash (mango tag 6, here special:minimized).
