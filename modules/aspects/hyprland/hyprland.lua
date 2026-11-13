@@ -84,7 +84,7 @@ hl.curve('easeOutCubic', { type = 'bezier', points = { { 0.33, 1 }, { 0.68, 1 } 
 hl.animation({ leaf = 'workspaces', enabled = true, speed = 3, bezier = 'easeOutCubic' })
 hl.animation({ leaf = 'windows', enabled = true, speed = 3, bezier = 'easeOutCubic' }) -- open/close/move, same reason
 
-hl.monitor({ output = 'desc:' .. LG, mode = '3440x1440@75.05', position = '0x0', scale = 1 })
+hl.monitor({ output = 'desc:' .. LG, mode = '3440x1440@75.05', position = '0x0', scale = 1, supports_wide_color = -1 })
 hl.monitor({ output = '', mode = 'preferred', position = 'auto', scale = 1 })
 
 ------------------------------------------------------------------------------
