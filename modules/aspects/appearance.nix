@@ -148,6 +148,8 @@ in
         # Default to dark; DMS toggle writes to this key at runtime.
         dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
 
+        xdg.systemDirs.data = [ "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}" ];
+
         # Qt: Kvantum platform theme; catppuccin.kvantum installs the Mocha theme files.
         qt = {
           enable = true;
