@@ -168,6 +168,25 @@ local function toggle_special(name)
   hl.dispatch(hl.dsp.workspace.toggle_special(name))
 end
 
+-- New windows map on the focused workspace, so anything spawned from a scratchpad app
+-- (Nautilus opening a PDF, Slack opening a link) lands on its special workspace. Move
+-- whatever isn't the pad's own app (or a portal dialog) to the regular workspace
+-- underneath; follow = false keeps the scratchpad up. The stash isn't in SCRATCHPADS.
+hl.on('window.open', function(w)
+  local ws = w and w.workspace
+  if not ws or not ws.special or not w.class then
+    return
+  end
+  local sp = SCRATCHPADS[(ws.name:gsub('^special:', ''))]
+  if not sp or w.class == sp.class or w.class:find('^xdg%-desktop%-portal') then
+    return
+  end
+  local base = hl.get_active_workspace()
+  if base then
+    hl.dispatch(hl.dsp.window.move({ window = w, workspace = tostring(base.id), follow = false }))
+  end
+end)
+
 -- Apps launched from the filemanager scratchpad would inherit its special workspace;
 -- r+0 = the current regular workspace, applied silently so the scratchpad stays up.
 -- render_unfocused: hidden windows get no frame callbacks, so VLC's Wayland vout
