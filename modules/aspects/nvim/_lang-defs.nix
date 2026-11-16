@@ -139,19 +139,19 @@
     linters = {
       javascript = [
         "biomejs"
-        "eslint"
+        "eslint_d"
       ];
       typescript = [
         "biomejs"
-        "eslint"
+        "eslint_d"
       ];
       javascriptreact = [
         "biomejs"
-        "eslint"
+        "eslint_d"
       ];
       typescriptreact = [
         "biomejs"
-        "eslint"
+        "eslint_d"
       ];
     };
   };
@@ -161,6 +161,7 @@
       gopls
       delve
       golangci-lint
+      gofumpt
       go
     ];
     formatters = {
@@ -212,6 +213,7 @@
       texlab
       latexrun
       biber
+      bibtex-tidy
     ];
     formatters = {
       fast = {

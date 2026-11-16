@@ -283,7 +283,7 @@ return {
       -- via `if not picked`) — revisit if the list becomes a burden.
       local config_gates = {
         biomejs = { 'biome.json', 'biome.jsonc' },
-        eslint = {
+        eslint_d = {
           '.eslintrc',
           '.eslintrc.js',
           '.eslintrc.cjs',

@@ -16,6 +16,9 @@ local M = {}
 -- Filetypes that timed out on fast format — switched to after-save async
 local slow_format_filetypes = {}
 
+-- Filetypes whose fast formatters all run in sequence (others stop at the first available)
+local run_all = { python = true }
+
 --- Get fast formatters for a filetype from Nix info
 ---@param ft string
 ---@return string[]|nil
@@ -58,7 +61,7 @@ function M.format_fast(bufnr)
       formatters = fast,
       timeout_ms = 500,
       lsp_format = 'fallback',
-      stop_after_first = true,
+      stop_after_first = not run_all[ft],
     }, function(err)
       if err and err:match('timeout$') then
         slow_format_filetypes[ft] = true
