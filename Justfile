@@ -35,10 +35,10 @@ write-flake:
 up:
 	nh os switch -u
 
-# Update a single flake input and rebuild: just upp i=home-manager
+# Update a single flake input and rebuild: just upp home-manager
 # To update without rebuilding: nix flake update <input>
-upp:
-	nh os switch -U $(i)
+upp i:
+	nh os switch -U {{i}}
 
 # Show generation history
 history:
