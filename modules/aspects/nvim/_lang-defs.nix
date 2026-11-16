@@ -217,14 +217,11 @@
     ];
     formatters = {
       fast = {
-        tex = [ "latexindent" ];
         bib = [ "bibtex-tidy" ];
       };
       slow = { };
     };
-    linters = {
-      tex = [ "chktex" ];
-    };
+    linters = { };
   };
 
   c = {

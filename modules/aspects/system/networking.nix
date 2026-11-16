@@ -1,9 +1,7 @@
-# Shared networking baseline: NetworkManager + Tailscale firewall rules.
-# Tailscale service itself is declared per-host (workstation uses custom port/package).
+# Shared networking baseline: NetworkManager (the firewall is on by NixOS default).
 # hostname is set by the den.batteries.hostname battery (defaults.nix).
 {
   den.aspects.networking = {
     nixos.networking.networkmanager.enable = true;
-    nixos.networking.firewall.enable = true;
   };
 }
