@@ -11,7 +11,6 @@
         };
         gamemode.enable = true;
       };
-      hardware.graphics.enable32Bit = true;
 
       # Creates the `uinput` group and makes /dev/uinput 0660 root:uinput.
       hardware.uinput.enable = true;

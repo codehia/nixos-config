@@ -35,7 +35,6 @@
             "splash"
             "boot.shell_on_fail"
             "udev.log_level=3"
-            "udev.log_priority=3"
             "rd.systemd.show_status=auto"
             "amd_pstate=active"
           ];

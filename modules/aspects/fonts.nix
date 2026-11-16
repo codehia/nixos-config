@@ -6,16 +6,7 @@
       {
         fonts = {
           fontconfig = {
-            enable = true;
-            antialias = true;
-            hinting = {
-              enable = true;
-              style = "slight";
-            };
-            subpixel = {
-              rgba = "rgb";
-              lcdfilter = "default";
-            };
+            subpixel.rgba = "rgb";
             defaultFonts.serif = [ "Noto Serif" ];
             localConf = ''
               <?xml version="1.0"?>
@@ -39,7 +30,7 @@
                   </prefer>
                 </alias>
 
-                <!-- Serif: Use New York (macOS serif font) -->
+                <!-- Serif: Noto Serif -->
                 <alias>
                   <family>serif</family>
                   <prefer>
