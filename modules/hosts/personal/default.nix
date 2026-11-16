@@ -6,7 +6,6 @@
     hosts.x86_64-linux.personal = {
       settings = {
         nix-config.nhClean = true;
-        lact.gpuKey = "1002:7340-1043:04E6-0000:2d:00.0";
         greetd = {
           user = "deus";
           # Starts the greeter's "Hyprland" entry (hyprland.nix); uwsm re-reads its args.
@@ -37,7 +36,7 @@
           den.aspects.desktop-host
           den.aspects.rtsx-card-reader
           den.aspects.mullvad
-          den.aspects.lact
+          den.aspects.coolercontrol
           den.aspects.ios-devices
           den.aspects.kanata
         ];
