@@ -55,6 +55,8 @@
           };
           # unstable hyprland's hyprland-uwsm.desktop points at unstable uwsm; match it (one uwsm)
           programs.uwsm.package = pkgs.unstable.uwsm;
+          # uwsm prints its startup steps on the VT at every login; 1 hides them, warnings stay (man uwsm)
+          environment.sessionVariables.UWSM_SILENT_START = "1";
         };
     };
 
