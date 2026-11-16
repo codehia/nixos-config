@@ -5,6 +5,7 @@
 .devenv*
 .devenv.flake.nix
 devenv.local*
+.pre-commit-config.yaml
 
 # direnv
 .direnv
