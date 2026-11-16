@@ -38,6 +38,7 @@
         home = {
           preferXdgDirectories = true;
           sessionVariables = {
+            EDITOR = "nvim"; # yazi, sudoedit, gh, lazygit read it (NixOS default: nano)
             CARGO_HOME = "$HOME/.local/share/cargo";
             RUSTUP_HOME = "$HOME/.local/share/rustup";
             BUN_INSTALL = "$HOME/.local/share/bun";
