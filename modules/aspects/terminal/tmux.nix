@@ -59,7 +59,8 @@
             set -g pane-border-style "bg=default,fg=colour245"
             set -g pane-border-lines "double"
             set -g pane-border-status top
-            set -g pane-border-format " #{pane_index} #{pane_current_command} "
+            set -g pane-border-format "#{?pane_active,#[reverse] #{pane_index} #{pane_current_command} #[noreverse], #{pane_index} #{pane_current_command} }"
+            set -g pane-border-indicators both
 
 
             setw -g automatic-rename on   # rename window to reflect current program
