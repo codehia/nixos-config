@@ -168,33 +168,27 @@ local function toggle_special(name)
   hl.dispatch(hl.dsp.workspace.toggle_special(name))
 end
 
--- A window opening while a scratchpad is up (Nautilus opening a PDF, an app started from
--- the terminal pad) hides the pad and takes focus. New windows map on the focused
--- workspace, so one that landed on the pad's special workspace is first moved to the
--- regular workspace underneath. The pad's own windows and portal dialogs are left
--- alone. The stash isn't in SCRATCHPADS.
--- ponytail: any new window hides the pad, not only ones the pad launched (the event
--- carries no parent); filter by pid ancestry if unrelated windows start closing it.
+-- New windows map on the focused workspace, so anything spawned from a scratchpad app
+-- (Nautilus opening a PDF, Slack opening a link) lands on its special workspace. Move
+-- whatever isn't the pad's own app (or a portal dialog) to the regular workspace
+-- underneath; follow = false keeps the scratchpad up. The stash isn't in SCRATCHPADS.
 hl.on('window.open', function(w)
-  local cur = hl.get_active_special_workspace()
-  if not cur or not w or not w.class then
+  local ws = w and w.workspace
+  if not ws or not ws.special or not w.class then
     return
   end
-  local name = (cur.name:gsub('^special:', ''))
-  local sp = SCRATCHPADS[name]
+  local sp = SCRATCHPADS[(ws.name:gsub('^special:', ''))]
   if not sp or w.class == sp.class or w.class:find('^xdg%-desktop%-portal') then
     return
   end
   local base = hl.get_active_workspace()
-  if w.workspace and w.workspace.special and base then
+  if base then
     hl.dispatch(hl.dsp.window.move({ window = w, workspace = tostring(base.id), follow = false }))
   end
-  hl.dispatch(hl.dsp.workspace.toggle_special(name))
-  hl.dispatch(hl.dsp.focus({ window = w }))
 end)
 
 -- Apps launched from the filemanager scratchpad would inherit its special workspace;
--- r+0 = the current regular workspace (the handler above then hides the scratchpad).
+-- r+0 = the current regular workspace, applied silently so the scratchpad stays up.
 -- render_unfocused: hidden windows get no frame callbacks, so VLC's Wayland vout
 -- stalls off-workspace and the video freezes ~1s on return while it catches up.
 hl.window_rule({ match = { class = 'vlc' }, workspace = 'r+0', render_unfocused = true })
