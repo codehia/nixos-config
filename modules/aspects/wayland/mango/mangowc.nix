@@ -191,7 +191,10 @@
 
             # Import all env vars into systemd so services (DMS, etc.)
             # get PATH, XDG_DATA_DIRS, and other session variables.
-            systemd.variables = [ "--all" ];
+            systemd = {
+              variables = [ "--all" ];
+              xdgAutostart = true; # run XDG autostart entries (tailscale tray), as sway and uwsm do
+            };
 
             # Must be non-empty: the HM module only writes autostart.sh (and its
             # exec_once line) when this is set, and the systemd activation —
