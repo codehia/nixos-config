@@ -1,0 +1,23 @@
+{
+    "id": "dayAgenda",
+    "name": "Today",
+    "description": "Today's calendar events, for the dash next to the calendar card",
+    "version": "1.0.0",
+    "author": "deus",
+    "type": "dashCard",
+    "capabilities": ["dash-card"],
+    "component": "./DayAgendaCard.qml",
+    "icon": "today",
+    "dash": {
+        "card": {
+            "title": "Today",
+            "w": 3,
+            "h": 5,
+            "minW": 2,
+            "minH": 2,
+            "maxW": 6,
+            "maxH": 8
+        }
+    },
+    "requires_dms": ">=2.0.0"
+}
