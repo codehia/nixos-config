@@ -232,7 +232,7 @@ let
             enableVPN = true;
             enableDynamicTheming = false;
             enableAudioWavelength = false;
-            enableCalendarEvents = false;
+            enableCalendarEvents = false; # no khal; DMS uses dcal (dms nixos block)
             settings = finalSettings;
             session = {
               wallpaperPath = "${home}/Pictures/Wallpapers/active/wallpaper";
@@ -315,6 +315,7 @@ in
           imports = [
             inputs.dms.nixosModules.dank-material-shell
             inputs.dank-greeter.nixosModules.default
+            "${inputs.nixpkgs-unstable}/nixos/modules/programs/dux-calendar.nix" # 26.11 module, not in 26.05
           ];
           # Replaces tuigreet as greetd's default_session; greetd.nix keeps initial_session.
           programs.dms-greeter = {
@@ -339,6 +340,13 @@ in
             enable = true;
             package = pkgs.unstable.dux-shell; # Hydra-cached; patch applied via DMS_SHELL_DIR
           };
+          # Calendar backend for DMS (replaces khal). Unit ships in the package.
+          programs.dux-calendar = {
+            enable = true;
+            package = pkgs.unstable.dux-calendar;
+            systemd.enable = true;
+          };
+          systemd.user.services.dcal.environment.DANKCAL_NO_TRAY = "1"; # no tray icon; reopen with `dcal show`
           # DMS enables power-profiles-daemon by default, which conflicts with TLP.
           services.power-profiles-daemon.enable = false;
         };
