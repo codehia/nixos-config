@@ -110,6 +110,88 @@ let
         # it to play/pause/track changes only; upstream fix needed in MediaPlaybackOSD.qml.
         osdMediaPlaybackEnabled = false;
 
+        # Dash media card: Bento style squeezes the title font (wdth 25, DashMetrics.qml);
+        # Material uses the normal font.
+        dashOptions.media.playerStyle = "material";
+
+        # Dash overview (6-column grid), as set by hand in the DMS GUI (2026-11-19).
+        dashCards = [
+          {
+            id = "clock";
+            w = 3;
+            h = 1;
+            col = 0;
+            row = 0;
+          }
+          {
+            id = "weather";
+            w = 3;
+            h = 1;
+            col = 0;
+            row = 1;
+          }
+          {
+            id = "plugin_dayAgenda";
+            w = 3;
+            h = 3;
+            col = 3;
+            row = 3;
+          }
+          {
+            id = "calendar";
+            w = 3;
+            h = 3;
+            col = 0;
+            row = 2;
+          }
+          {
+            id = "media";
+            w = 3;
+            h = 1;
+            col = 0;
+            row = 5;
+          }
+          {
+            id = "notifications";
+            w = 3;
+            h = 3;
+            col = 3;
+            row = 0;
+          }
+        ];
+
+        # Dash tabs: only Overview and Digital wellbeing.
+        dashTabs = [
+          {
+            id = "overview";
+            enabled = true;
+          }
+          {
+            id = "media";
+            enabled = false;
+          }
+          {
+            id = "wallpaper";
+            enabled = false;
+          }
+          {
+            id = "weather";
+            enabled = false;
+          }
+          {
+            id = "wellbeing";
+            enabled = true;
+          }
+          {
+            id = "notifications";
+            enabled = false;
+          }
+          {
+            id = "settings";
+            enabled = false;
+          }
+        ];
+
         # Lock session before suspend/hibernate.
         lockBeforeSuspend = true;
       };
@@ -254,6 +336,7 @@ let
               nightModeEndMinute = 0;
             };
             plugins = {
+              dayAgenda.src = ./day-agenda; # local dash card: today's events
               dankPomodoroTimer.src =
                 pkgs.fetchFromGitHub {
                   owner = "AvengeMedia";
