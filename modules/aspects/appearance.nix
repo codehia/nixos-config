@@ -156,6 +156,12 @@ in
           platformTheme.name = "kvantum";
           style.name = "kvantum";
         };
+
+        # Kvantum Manager ships with the Kvantum style package; the theme is set by nix, so hide it.
+        xdg.desktopEntries.kvantummanager = {
+          name = "Kvantum Manager";
+          noDisplay = true;
+        };
       };
   };
 }

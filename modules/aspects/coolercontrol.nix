@@ -17,6 +17,10 @@
           "graphical-session.target"
           "dms.service" # DMS sets the dark color-scheme the GUI follows
         ];
+        # Session QT_QPA_PLATFORMTHEME=kvantum names no platform-theme plugin, so the
+        # GUI never sees the dark color-scheme; gtk3 follows the GTK theme + color-scheme.
+        # Fallback if it misbehaves: "xdgdesktopportal" (also tested dark).
+        environment.QT_QPA_PLATFORMTHEME = "gtk3";
         serviceConfig.ExecStart = "${pkgs.coolercontrol.coolercontrol-gui}/bin/coolercontrol";
       };
 
