@@ -11,7 +11,7 @@
 
     homeManager = { pkgs, ... }: {
       home.packages = with pkgs; [
-        libreoffice-still
+        libreoffice
         kdePackages.okular
         bitwarden-desktop
         bitwarden-cli
