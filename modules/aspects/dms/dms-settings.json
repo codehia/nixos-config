@@ -122,6 +122,10 @@
         },
         {
           "enabled": true,
+          "id": "battery"
+        },
+        {
+          "enabled": true,
           "id": "controlCenterButton",
           "showBatteryIcon": false,
           "showBrightnessIcon": true,
