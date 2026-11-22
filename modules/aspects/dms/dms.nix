@@ -400,36 +400,41 @@ in
             inputs.dank-greeter.nixosModules.default
             "${inputs.nixpkgs-unstable}/nixos/modules/programs/dux-calendar.nix" # 26.11 module, not in 26.05
           ];
-          # Replaces tuigreet as greetd's default_session; greetd.nix keeps initial_session.
-          programs.dms-greeter = {
-            enable = true;
-            compositor = {
-              name = "mango";
-              # mango needs a config file: without -C it looks in ~/.config/mango (greeter HOME
-              # is /var/empty) then /etc/mango (absent on NixOS). Upstream's baseline is a comment.
-              customConfig = ''
-                # dms-greeter mango config
-              '';
+          programs = {
+
+            # Replaces tuigreet as greetd's default_session; greetd.nix keeps initial_session.
+            dms-greeter = {
+              enable = true;
+              compositor = {
+                name = "mango";
+                # mango needs a config file: without -C it looks in ~/.config/mango (greeter HOME
+                # is /var/empty) then /etc/mango (absent on NixOS). Upstream's baseline is a comment.
+                customConfig = ''
+                  # dms-greeter mango config
+                '';
+              };
+              configHome = "/home/${config.services.greetd.settings.initial_session.user}";
             };
-            configHome = "/home/${config.services.greetd.settings.initial_session.user}";
+            # Fixed greeter wallpaper: the user's session.json is read-only (HM), so cycling never
+            # persists and upstream's preStart copy would always pick active/wallpaper (first file).
+            # mkAfter: runs after upstream's copy, inside /var/lib/dms-greeter.
+            dank-material-shell = {
+              enable = true;
+              package = pkgs.unstable.dux-shell; # Hydra-cached; patch applied via DMS_SHELL_DIR
+            };
+            # Calendar backend for DMS (replaces khal). Unit ships in the package.
+            dux-calendar = {
+              enable = true;
+              package = pkgs.unstable.dux-calendar;
+              systemd.enable = true;
+            };
           };
-          # Fixed greeter wallpaper: the user's session.json is read-only (HM), so cycling never
-          # persists and upstream's preStart copy would always pick active/wallpaper (first file).
-          # mkAfter: runs after upstream's copy, inside /var/lib/dms-greeter.
-          systemd.services.greetd.preStart = lib.mkAfter ''
-            cp -f ${inputs.wallpapers}/ultrawide/7645o6b2nno81.png wallpaper
-          '';
-          programs.dank-material-shell = {
-            enable = true;
-            package = pkgs.unstable.dux-shell; # Hydra-cached; patch applied via DMS_SHELL_DIR
+          systemd = {
+            services.greetd.preStart = lib.mkAfter ''
+              cp -f ${inputs.wallpapers}/ultrawide/7645o6b2nno81.png wallpaper
+            '';
+            user.services.dcal.environment.DANKCAL_NO_TRAY = "1"; # no tray icon; reopen with `dcal show`
           };
-          # Calendar backend for DMS (replaces khal). Unit ships in the package.
-          programs.dux-calendar = {
-            enable = true;
-            package = pkgs.unstable.dux-calendar;
-            systemd.enable = true;
-          };
-          systemd.user.services.dcal.environment.DANKCAL_NO_TRAY = "1"; # no tray icon; reopen with `dcal show`
           # DMS enables power-profiles-daemon by default, which conflicts with TLP.
           services.power-profiles-daemon.enable = false;
         };
