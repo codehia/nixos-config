@@ -57,6 +57,18 @@
           programs.uwsm.package = pkgs.unstable.uwsm;
           # uwsm prints its startup steps on the VT at every login; 1 hides them, warnings stay (man uwsm)
           environment.sessionVariables.UWSM_SILENT_START = "1";
+          # Backport of nixpkgs #532275 (not in 26.05): a switch that restarts these ends the uwsm session.
+          # Drop when the system moves to 26.11.
+          systemd.user.services = {
+            "wayland-wm@" = {
+              restartIfChanged = false;
+              enableDefaultPath = false;
+            };
+            "wayland-session-bindpid@" = {
+              restartIfChanged = false;
+              enableDefaultPath = false;
+            };
+          };
         };
     };
 
