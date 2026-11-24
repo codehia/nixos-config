@@ -37,7 +37,6 @@
           den.aspects.rtsx-card-reader
           den.aspects.mullvad
           den.aspects.coolercontrol
-          den.aspects.crash-diagnostics
           den.aspects.ios-devices
           den.aspects.kanata
         ];
