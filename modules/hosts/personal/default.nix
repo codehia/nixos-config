@@ -27,10 +27,14 @@
       ];
 
       personal = {
-        nixos.imports = [
-          ./_hardware-configuration.nix
-          ./_disko-config.nix
-        ];
+        nixos = {
+          imports = [
+            ./_hardware-configuration.nix
+            ./_disko-config.nix
+          ];
+          # Memtest86+ entry in the systemd-boot menu.
+          boot.loader.systemd-boot.memtest86.enable = true;
+        };
 
         includes = [
           den.aspects.desktop-host
@@ -39,6 +43,7 @@
           den.aspects.coolercontrol
           den.aspects.ios-devices
           den.aspects.kanata
+          den.aspects.sensor-log
         ];
       };
     };
