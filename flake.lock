@@ -283,11 +283,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795541685,
-        "narHash": "sha256-b2Jd+nMmUKk7KI7TtemdqJPLUTE7vYp2s3QLI+VwEQc=",
+        "lastModified": 1795621027,
+        "narHash": "sha256-9xOF3pjZgyzsQYIXT5THUsIBFIsP2E4XiVwND4x+qhM=",
         "owner": "duxlabs-dev",
         "repo": "dux-greeter",
-        "rev": "d319bba8e179720f7e2790cded27814ebbacf06a",
+        "rev": "a25b9e594f937166b6b7978f8de6b3faec76863d",
         "type": "github"
       },
       "original": {
@@ -1186,11 +1186,11 @@
         "scenefx": "scenefx"
       },
       "locked": {
-        "lastModified": 1795585030,
-        "narHash": "sha256-sZ/rqKZ37p3/vmEm3ChgFahSSb29W9wfCZEgQxuVff4=",
+        "lastModified": 1795620409,
+        "narHash": "sha256-PhFc7w1Y+NthwWe2I5P42jDshIeQhbpJLbhV6TW6JAw=",
         "owner": "mangowm",
         "repo": "mango",
-        "rev": "469c4d6b0070b1fdab09256e54c9f9d9eff0e591",
+        "rev": "75fc5275a7679c72a29b239bd9c05cde69089789",
         "type": "github"
       },
       "original": {
