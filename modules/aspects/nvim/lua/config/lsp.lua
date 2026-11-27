@@ -204,9 +204,16 @@ M.setup = function()
   })
 
   vim.lsp.config('qmlls', {
-    cmd = { 'qmlls' },
+    cmd = { 'qmlls', '-E' }, -- -E: imports from QML_IMPORT_PATH (set per project, e.g. devenv)
     filetypes = { 'qml', 'qmljs' },
-    root_markers = { '.qmlls.ini', 'CMakeLists.txt', '.git' },
+    root_markers = { '.qmlls.ini', 'plugin.json', 'CMakeLists.txt', '.git' },
+    -- qmlls 6.12 sends broken semanticTokens/full/delta edits; force full requests
+    on_init = function(client)
+      local st = client.server_capabilities.semanticTokensProvider
+      if st and type(st.full) == 'table' then
+        st.full.delta = false
+      end
+    end,
   })
 
   vim.lsp.enable({
