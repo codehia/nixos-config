@@ -1,17 +1,13 @@
 # Greeter aspect: greetd session manager.
 # Hosts set settings.greetd.{user,session}. initial_session auto-logs `user` into
-# `session` (a binary name in /run/current-system/sw/bin, or an absolute command).
+# `session` (a command whose binary is in /run/current-system/sw/bin).
 { lib, ... }:
 let
   greetdConfig =
     { host }:
     let
       inherit (host.settings.greetd) user;
-      session =
-        if lib.hasPrefix "/" host.settings.greetd.session then
-          host.settings.greetd.session
-        else
-          "/run/current-system/sw/bin/${host.settings.greetd.session}";
+      session = "/run/current-system/sw/bin/${host.settings.greetd.session}";
     in
     {
       # default_session (the greeter after logout) comes from dms-greeter (dms.nix).
@@ -34,7 +30,7 @@ in
       };
       session = lib.mkOption {
         type = lib.types.str;
-        description = "Auto-login session: a binary in /run/current-system/sw/bin, or an absolute command.";
+        description = "Auto-login session: a command whose binary is in /run/current-system/sw/bin.";
       };
     };
 
