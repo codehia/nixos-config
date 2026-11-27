@@ -61,10 +61,6 @@
       url = "github:chrisgrieser/nvim-rulebook";
       flake = false;
     };
-    pam-fde-boot-pw = {
-      url = "git+https://git.sr.ht/~kennylevinsen/pam_fde_boot_pw";
-      flake = false;
-    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
