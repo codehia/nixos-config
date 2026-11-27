@@ -138,10 +138,7 @@ in
             package = lib.mkForce pkgs.adw-gtk3;
             name = lib.mkForce "adw-gtk3";
           };
-          iconTheme = {
-            package = lib.mkForce pkgs.tela-circle-icon-theme;
-            name = lib.mkForce "Tela-circle-dark";
-          };
+          # iconTheme: catppuccin.gtk.icon (on via catppuccin.enable) sets Papirus-Dark, Mocha folders.
         };
         # cursor already lives in ~/.local/share/icons (on XCURSOR_PATH); skip ~/.icons
         home.pointerCursor.dotIcons.enable = false;

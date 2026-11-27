@@ -15,8 +15,18 @@
         home.packages = with pkgs; [
           cowsay
           fortune
-          gearlever
         ];
+        # vim stays as a terminal fallback; hide its launcher entries.
+        xdg.desktopEntries = {
+          gvim = {
+            name = "GVim";
+            noDisplay = true;
+          };
+          vim = {
+            name = "Vim";
+            noDisplay = true;
+          };
+        };
       };
   };
 }

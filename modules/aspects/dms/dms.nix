@@ -421,6 +421,7 @@ in
             dank-material-shell = {
               enable = true;
               package = pkgs.unstable.dux-shell; # Hydra-cached; patch applied via DMS_SHELL_DIR
+              enableCalendarEvents = false; # defaults on and installs khal; DMS uses dcal
             };
             # Calendar backend for DMS (replaces khal). Unit ships in the package.
             dux-calendar = {
