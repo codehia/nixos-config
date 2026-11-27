@@ -1,4 +1,11 @@
 # Bluetooth — hardware config + WirePlumber auto-connect policy for audio profiles.
+let
+  audioProfiles = [
+    "hfp_hf"
+    "hsp_hs"
+    "a2dp_sink"
+  ];
+in
 {
   den.aspects.bluetooth = {
     nixos = {
@@ -19,16 +26,8 @@
       };
       services.pipewire.wireplumber.extraConfig.bluetoothPolicy = {
         "monitor.bluez.properties" = {
-          "bluez5.auto-connect" = [
-            "hfp_hf"
-            "hsp_hs"
-            "a2dp_sink"
-          ];
-          "bluez5.hw-volume" = [
-            "hfp_hf"
-            "hsp_hs"
-            "a2dp_sink"
-          ];
+          "bluez5.auto-connect" = audioProfiles;
+          "bluez5.hw-volume" = audioProfiles;
         };
       };
     };

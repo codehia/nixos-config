@@ -1,4 +1,9 @@
 # Desktop integration services — flatpak, appimage, default apps.
+{ lib, ... }:
+let
+  # Every listed MIME type opens with `app`.
+  openWith = app: types: lib.genAttrs types (_: app);
+in
 {
   den.aspects.desktop-services = {
     nixos = {
@@ -7,69 +12,74 @@
       xdg.mime.defaultApplications = {
         # Directories
         "inode/directory" = "org.gnome.Nautilus.desktop";
-
         # PDF
         "application/pdf" = "okularApplication_pdf.desktop";
-
-        # Markdown
-        "text/markdown" = "okularApplication_md.desktop";
-        "text/x-markdown" = "okularApplication_md.desktop";
-
-        # Writer — plain text, word docs
-        "text/plain" = "writer.desktop";
-        "text/rtf" = "writer.desktop";
-        "application/rtf" = "writer.desktop";
-        "application/msword" = "writer.desktop";
-        "application/vnd.ms-word" = "writer.desktop";
-        "application/vnd.ms-word.document.macroEnabled.12" = "writer.desktop";
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = "writer.desktop";
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.template" = "writer.desktop";
-        "application/vnd.oasis.opendocument.text" = "writer.desktop";
-
-        # Calc — spreadsheets
-        "application/vnd.ms-excel" = "calc.desktop";
-        "application/vnd.ms-excel.sheet.macroEnabled.12" = "calc.desktop";
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = "calc.desktop";
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.template" = "calc.desktop";
-        "application/vnd.oasis.opendocument.spreadsheet" = "calc.desktop";
-        "text/csv" = "calc.desktop";
-
-        # Impress — presentations
-        "application/mspowerpoint" = "impress.desktop";
-        "application/vnd.ms-powerpoint" = "impress.desktop";
-        "application/vnd.ms-powerpoint.presentation.macroEnabled.12" = "impress.desktop";
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation" = "impress.desktop";
-        "application/vnd.openxmlformats-officedocument.presentationml.slideshow" = "impress.desktop";
-        "application/vnd.oasis.opendocument.presentation" = "impress.desktop";
-
-        # Images — gwenview
-        "image/jpeg" = "org.kde.gwenview.desktop";
-        "image/png" = "org.kde.gwenview.desktop";
-        "image/gif" = "org.kde.gwenview.desktop";
-        "image/webp" = "org.kde.gwenview.desktop";
-        "image/x-webp" = "org.kde.gwenview.desktop";
-        "image/svg+xml" = "org.kde.gwenview.desktop";
-        "image/bmp" = "org.kde.gwenview.desktop";
-        "image/tiff" = "org.kde.gwenview.desktop";
-        "image/avif" = "org.kde.gwenview.desktop";
-        "image/heif" = "org.kde.gwenview.desktop";
-
-        # Ebooks — calibre viewer
-        "application/epub+zip" = "calibre-ebook-viewer.desktop";
-        "application/x-kobo-epub+zip" = "calibre-ebook-viewer.desktop";
-        "application/x-mobipocket-ebook" = "calibre-ebook-viewer.desktop";
-        "application/x-mobipocket-subscription" = "calibre-ebook-viewer.desktop";
-        "application/x-mobi8-ebook" = "calibre-ebook-viewer.desktop";
-        "application/x-sony-bbeb" = "calibre-ebook-viewer.desktop";
-        "application/ereader" = "calibre-ebook-viewer.desktop";
-        "application/oebps-package+xml" = "calibre-ebook-viewer.desktop";
-        "application/x-cb7" = "calibre-ebook-viewer.desktop";
-        "application/x-cbc" = "calibre-ebook-viewer.desktop";
-        "application/x-cbr" = "calibre-ebook-viewer.desktop";
-        "application/x-cbz" = "calibre-ebook-viewer.desktop";
-        "image/vnd.djvu" = "calibre-ebook-viewer.desktop";
-        "text/fb2+xml" = "calibre-ebook-viewer.desktop";
-      };
+      }
+      # Markdown
+      // openWith "okularApplication_md.desktop" [
+        "text/markdown"
+        "text/x-markdown"
+      ]
+      # Writer — plain text, word docs
+      // openWith "writer.desktop" [
+        "text/plain"
+        "text/rtf"
+        "application/rtf"
+        "application/msword"
+        "application/vnd.ms-word"
+        "application/vnd.ms-word.document.macroEnabled.12"
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.template"
+        "application/vnd.oasis.opendocument.text"
+      ]
+      # Calc — spreadsheets
+      // openWith "calc.desktop" [
+        "application/vnd.ms-excel"
+        "application/vnd.ms-excel.sheet.macroEnabled.12"
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.template"
+        "application/vnd.oasis.opendocument.spreadsheet"
+        "text/csv"
+      ]
+      # Impress — presentations
+      // openWith "impress.desktop" [
+        "application/mspowerpoint"
+        "application/vnd.ms-powerpoint"
+        "application/vnd.ms-powerpoint.presentation.macroEnabled.12"
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        "application/vnd.openxmlformats-officedocument.presentationml.slideshow"
+        "application/vnd.oasis.opendocument.presentation"
+      ]
+      # Images — gwenview
+      // openWith "org.kde.gwenview.desktop" [
+        "image/jpeg"
+        "image/png"
+        "image/gif"
+        "image/webp"
+        "image/x-webp"
+        "image/svg+xml"
+        "image/bmp"
+        "image/tiff"
+        "image/avif"
+        "image/heif"
+      ]
+      # Ebooks — calibre viewer
+      // openWith "calibre-ebook-viewer.desktop" [
+        "application/epub+zip"
+        "application/x-kobo-epub+zip"
+        "application/x-mobipocket-ebook"
+        "application/x-mobipocket-subscription"
+        "application/x-mobi8-ebook"
+        "application/x-sony-bbeb"
+        "application/ereader"
+        "application/oebps-package+xml"
+        "application/x-cb7"
+        "application/x-cbc"
+        "application/x-cbr"
+        "application/x-cbz"
+        "image/vnd.djvu"
+        "text/fb2+xml"
+      ];
     };
   };
 }

@@ -23,7 +23,16 @@ let
       homeManager =
         { pkgs, ... }:
         {
-          xdg.mimeApps = browser.mimeApps;
+          xdg.mimeApps = {
+            enable = true;
+            defaultApplications = lib.genAttrs [
+              "text/html"
+              "x-scheme-handler/http"
+              "x-scheme-handler/https"
+              "x-scheme-handler/about"
+              "x-scheme-handler/unknown"
+            ] (_: browser.desktop);
+          };
           home.sessionVariables.BROWSER = browser.command;
           home.packages = [
             (pkgs.writeShellScriptBin "default-browser" ''exec ${browser.command} "$@"'')
