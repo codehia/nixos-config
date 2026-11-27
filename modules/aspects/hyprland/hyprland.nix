@@ -9,7 +9,6 @@
 {
   den.aspects = {
     wm-configs.includes = [ den.aspects.hyprland ];
-
     wm-sessions = {
       nixos =
         {
@@ -46,15 +45,17 @@
         in
         {
           services.displayManager.sessionPackages = lib.mkBefore [ hyprlandSessions ];
-          programs.hyprland = {
-            enable = true;
-            withUWSM = true;
-            # nixpkgs-unstable release: cache.nixos.org, no separate hyprland nixpkgs copy
-            package = pkgs.unstable.hyprland;
-            portalPackage = pkgs.unstable.xdg-desktop-portal-hyprland;
+          programs = {
+            hyprland = {
+              enable = true;
+              withUWSM = true;
+              # nixpkgs-unstable release: cache.nixos.org, no separate hyprland nixpkgs copy
+              package = pkgs.unstable.hyprland;
+              portalPackage = pkgs.unstable.xdg-desktop-portal-hyprland;
+            };
+            # unstable hyprland's hyprland-uwsm.desktop points at unstable uwsm; match it (one uwsm)
+            uwsm.package = pkgs.unstable.uwsm;
           };
-          # unstable hyprland's hyprland-uwsm.desktop points at unstable uwsm; match it (one uwsm)
-          programs.uwsm.package = pkgs.unstable.uwsm;
           # uwsm prints its startup steps on the VT at every login; 1 hides them, warnings stay (man uwsm)
           environment.sessionVariables.UWSM_SILENT_START = "1";
           # Backport of nixpkgs #532275 (not in 26.05): a switch that restarts these ends the uwsm session.

@@ -12,8 +12,10 @@
         };
         browser.extra = [ "google-chrome" ];
       };
-      users.deus = { };
-      users.soumya = { };
+      users = {
+        deus = { };
+        soumya = { };
+      };
     };
 
     aspects.workstation = {

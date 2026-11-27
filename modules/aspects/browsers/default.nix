@@ -1,14 +1,10 @@
 { den, lib, ... }:
 let
-  extraBrowsersConfig =
-    { host, ... }:
-    {
-      homeManager =
-        { pkgs, ... }:
-        {
-          home.packages = map (name: pkgs.${name}) host.settings.browser.extra;
-        };
+  extraBrowsersConfig = { host, ... }: {
+    homeManager = { pkgs, ... }: {
+      home.packages = map (name: pkgs.${name}) host.settings.browser.extra;
     };
+  };
   zen = import ./_zen.nix;
   helium = import ./_helium.nix;
 
@@ -33,10 +29,12 @@ let
               "x-scheme-handler/unknown"
             ] (_: browser.desktop);
           };
-          home.sessionVariables.BROWSER = browser.command;
-          home.packages = [
-            (pkgs.writeShellScriptBin "default-browser" ''exec ${browser.command} "$@"'')
-          ];
+          home = {
+            sessionVariables.BROWSER = browser.command;
+            packages = [
+              (pkgs.writeShellScriptBin "default-browser" ''exec ${browser.command} "$@"'')
+            ];
+          };
         };
     };
 in

@@ -6,24 +6,24 @@
   };
 
   den.aspects.nix-tools = {
-    nixos =
-      { pkgs, ... }:
-      {
-        imports = [ inputs.nix-index-database.nixosModules.nix-index ];
-        programs.nix-index-database.comma.enable = true;
-        programs.nh = {
+    nixos = { pkgs, ... }: {
+      imports = [ inputs.nix-index-database.nixosModules.nix-index ];
+      programs = {
+        nix-index-database.comma.enable = true;
+        nh = {
           enable = true;
           clean = {
             enable = true;
             extraArgs = "--keep-since 7d --keep 5";
           };
         };
-        environment.systemPackages = with pkgs; [
-          nix-tree
-          manix
-          nix-output-monitor
-          nixfmt
-        ];
       };
+      environment.systemPackages = with pkgs; [
+        nix-tree
+        manix
+        nix-output-monitor
+        nixfmt
+      ];
+    };
   };
 }

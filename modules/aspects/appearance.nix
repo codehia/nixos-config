@@ -17,24 +17,25 @@ let
     );
 in
 {
-  flake-file.inputs.catppuccin = {
-    url = "github:catppuccin/nix/release-26.05";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-
-  flake-file.inputs.stylix = {
-    url = "github:nix-community/stylix/release-26.05";
-    inputs.nixpkgs.follows = "nixpkgs";
+  flake-file.inputs = {
+    catppuccin = {
+      url = "github:catppuccin/nix/release-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    stylix = {
+      url = "github:nix-community/stylix/release-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   den.aspects.appearance = {
     nixos = { pkgs, ... }: {
       imports = [ inputs.catppuccin.nixosModules.catppuccin ];
-      catppuccin.sources = catppuccinSources pkgs;
       # Mocha VT palette (console.colors) — the Linux console approximates all
       # colors to its 16-slot palette, so this is what makes named
       # colors on the TTY render as Catppuccin hues.
       catppuccin = {
+        sources = catppuccinSources pkgs;
         enable = true;
         flavor = "mocha";
         tty.enable = true;
@@ -57,9 +58,9 @@ in
         apple = inputs'.apple-fonts.packages;
       in
       {
-        imports = [
-          inputs.stylix.homeModules.stylix
-          inputs.catppuccin.homeModules.catppuccin
+        imports = with inputs; [
+          stylix.homeModules.stylix
+          catppuccin.homeModules.catppuccin
         ];
 
         catppuccin = {
@@ -132,35 +133,33 @@ in
 
         # GTK: adw-gtk3 without -dark follows gsettings color-scheme natively,
         # so the DMS dark mode toggle propagates correctly to Nautilus etc.
-        gtk.theme = {
-          package = lib.mkForce pkgs.adw-gtk3;
-          name = lib.mkForce "adw-gtk3";
+        gtk = {
+          theme = {
+            package = lib.mkForce pkgs.adw-gtk3;
+            name = lib.mkForce "adw-gtk3";
+          };
+          iconTheme = {
+            package = lib.mkForce pkgs.tela-circle-icon-theme;
+            name = lib.mkForce "Tela-circle-dark";
+          };
         };
-
         # cursor already lives in ~/.local/share/icons (on XCURSOR_PATH); skip ~/.icons
         home.pointerCursor.dotIcons.enable = false;
-
-        gtk.iconTheme = {
-          package = lib.mkForce pkgs.tela-circle-icon-theme;
-          name = lib.mkForce "Tela-circle-dark";
-        };
-
         # Default to dark; DMS toggle writes to this key at runtime.
         dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
-
-        xdg.systemDirs.data = [ "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}" ];
-
         # Qt: Kvantum platform theme; catppuccin.kvantum installs the Mocha theme files.
         qt = {
           enable = true;
           platformTheme.name = "kvantum";
           style.name = "kvantum";
         };
-
         # Kvantum Manager ships with the Kvantum style package; the theme is set by nix, so hide it.
-        xdg.desktopEntries.kvantummanager = {
-          name = "Kvantum Manager";
-          noDisplay = true;
+        xdg = {
+          systemDirs.data = [ "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}" ];
+          desktopEntries.kvantummanager = {
+            name = "Kvantum Manager";
+            noDisplay = true;
+          };
         };
       };
   };
