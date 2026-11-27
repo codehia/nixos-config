@@ -6,7 +6,6 @@
         programs.ghostty = {
           package = pkgs.unstable.ghostty;
           enable = true;
-          enableFishIntegration = true;
           installBatSyntax = true;
           systemd.enable = true;
           settings = {

@@ -7,10 +7,7 @@
         name = "Iosevka Nerd Font Mono";
         size = 14;
       };
-      shellIntegration = {
-        enableFishIntegration = true;
-        mode = "no-rc no-cursor";
-      };
+      shellIntegration.mode = "no-rc no-cursor";
       extraConfig = ''
         cursor #cccccc
         cursor_shape block

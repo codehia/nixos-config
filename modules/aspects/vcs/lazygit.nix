@@ -2,7 +2,6 @@
   den.aspects.vcs = {
     homeManager.programs.lazygit = {
       enable = true;
-      enableFishIntegration = true;
       settings = {
         disableStartupPopups = true;
         confirmOnQuit = false;
@@ -10,7 +9,8 @@
         git.diffRenderers = [
           {
             colorArg = "always";
-            command = "delta --paging=never --features='mellow-barbet' --syntax-theme='Catppuccin Mocha' --plus-style='syntax #1e3626' --minus-style='syntax #36201e' --plus-emph-style='syntax #2d5238' --minus-emph-style='syntax #5c3230'";
+            # Look comes from programs.delta.options (git.nix), read via git config.
+            command = "delta --paging=never";
           }
         ];
         gui = {

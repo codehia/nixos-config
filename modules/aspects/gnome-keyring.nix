@@ -39,18 +39,12 @@
         };
       in
       {
-        services = {
-          dbus.packages = with pkgs; [
-            gnome-keyring
-            gcr
-          ];
-          gnome.gnome-keyring.enable = true;
-        };
+        # Also registers the gnome-keyring + gcr D-Bus services and the `login` PAM hook.
+        services.gnome.gnome-keyring.enable = true;
 
         security.pam.services = {
           greetd.enableGnomeKeyring = true;
           greetd-password.enableGnomeKeyring = true;
-          login.enableGnomeKeyring = true;
           # Keep keyring password in sync when the login password changes.
           passwd.enableGnomeKeyring = true;
         };

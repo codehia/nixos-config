@@ -15,7 +15,7 @@
 
       # Editor / dev
       den.aspects.vcs
-      den.aspects.editor
+      den.aspects.nvim
       den.aspects.dev-tools
 
       # Browser

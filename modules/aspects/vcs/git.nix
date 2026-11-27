@@ -16,7 +16,7 @@
           delta = {
             enable = true;
             enableGitIntegration = true;
-            # Same look as lazygit's diff pane (lazygit.nix diffRenderers).
+            # lazygit's diff pane uses these too (lazygit.nix diffRenderers).
             options = {
               # mellow-barbet (themes.gitconfig) turns on side-by-side and line-numbers itself
               features = lib.mkForce "mellow-barbet";
