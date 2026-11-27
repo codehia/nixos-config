@@ -5,7 +5,6 @@
   den = {
     hosts.x86_64-linux.thinkpad = {
       settings = {
-        nix-config.nhClean = true;
         greetd = {
           user = "deus";
           session = "uwsm start hyprland-uwsm.desktop";

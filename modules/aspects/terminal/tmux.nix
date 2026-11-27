@@ -75,10 +75,6 @@
 
             # clear both screen and history
             bind -n C-l send-keys C-l \; run 'sleep 0.2' \; clear-history
-
-            # activity
-            set -g monitor-activity on
-            set -g visual-activity off
           '';
         };
       };

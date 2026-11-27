@@ -32,7 +32,6 @@
             enable = true;
             includes = [ { path = "~/.config/delta/themes.gitconfig"; } ];
             settings = {
-              core.editor = "vim";
               merge = {
                 tool = "delta";
                 conflictStyle = "zdiff3";

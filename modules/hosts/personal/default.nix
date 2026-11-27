@@ -5,7 +5,6 @@
   den = {
     hosts.x86_64-linux.personal = {
       settings = {
-        nix-config.nhClean = true;
         greetd = {
           user = "deus";
           # Starts the greeter's "Hyprland" entry (hyprland.nix); uwsm re-reads its args.

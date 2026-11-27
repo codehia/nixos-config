@@ -1,33 +1,5 @@
-{ lib, ... }:
-let
-  # GC policy: settings.nix-config.nhClean picks nh clean or the built-in nix.gc timer.
-  # Both are set from the one flag so they can never run together.
-  gcPolicy =
-    { host }:
-    let
-      inherit (host.settings.nix-config) nhClean;
-    in
-    {
-      nixos = {
-        programs.nh.clean.enable = nhClean;
-        nix.gc = {
-          automatic = !nhClean;
-          dates = "weekly";
-          options = "--delete-older-than 7d";
-        };
-      };
-    };
-in
 {
   den.aspects.nix-config = {
-    settings.nhClean = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "GC via nh clean (true) or the built-in nix.gc timer (false). Exactly one runs.";
-    };
-
-    includes = [ gcPolicy ];
-
     nixos =
       { pkgs, config, ... }:
       {

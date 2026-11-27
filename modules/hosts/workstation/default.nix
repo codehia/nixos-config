@@ -5,7 +5,6 @@
   den = {
     hosts.x86_64-linux.workstation = {
       settings = {
-        nix-config.nhClean = true;
         greetd = {
           user = "soumya";
           # Starts the greeter's "Hyprland" entry (hyprland.nix); uwsm re-reads its args.
