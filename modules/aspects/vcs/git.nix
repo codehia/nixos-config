@@ -20,8 +20,6 @@
             options = {
               # mellow-barbet (themes.gitconfig) turns on side-by-side and line-numbers itself
               features = lib.mkForce "mellow-barbet";
-
-              # features = lib.mkForce "side-by-side line-numbers";
               syntax-theme = "Catppuccin Mocha";
               plus-style = "syntax #1e3626";
               minus-style = "syntax #36201e";

@@ -273,8 +273,6 @@ return {
       require('gitsigns').setup({
         preview_config = { border = 'rounded' },
 
-        -- Option 1 (thin bar):
-        -- signs = { add={text='▎'}, change={text='▎'}, delete={text='▸'}, topdelete={text='▴'}, changedelete={text='▎'} }
         -- Option 2 (nerd font icons — plus-circle, pencil, minus-circle, minus-square, pencil-square):
         signs = {
           add = { text = '▌' },

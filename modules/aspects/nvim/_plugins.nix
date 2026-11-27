@@ -18,10 +18,6 @@ with pkgs.vimPlugins;
     data = snacks-nvim;
     lazy = false;
   };
-  # catppuccin = {
-  #   data = catppuccin-nvim;
-  #   lazy = false;
-  # };
   plenary = {
     data = plenary-nvim;
     lazy = false;

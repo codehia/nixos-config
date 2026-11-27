@@ -14,8 +14,7 @@ let
           "/run/current-system/sw/bin/${host.settings.greetd.session}";
     in
     {
-      # default_session (the greeter after logout) comes from dms-greeter (dms.nix);
-      # the tuigreet alternative is parked in _tuigreet.nix.
+      # default_session (the greeter after logout) comes from dms-greeter (dms.nix).
       nixos.services.greetd = {
         enable = true;
         # Autologin on boot.

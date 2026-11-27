@@ -32,8 +32,8 @@ in
       imports = [ inputs.catppuccin.nixosModules.catppuccin ];
       catppuccin.sources = catppuccinSources pkgs;
       # Mocha VT palette (console.colors) — the Linux console approximates all
-      # colors to its 16-slot palette, so this is what makes tuigreet's named
-      # theme colors render as Catppuccin hues.
+      # colors to its 16-slot palette, so this is what makes named
+      # colors on the TTY render as Catppuccin hues.
       catppuccin = {
         enable = true;
         flavor = "mocha";

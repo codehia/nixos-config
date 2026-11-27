@@ -32,6 +32,6 @@
     };
   };
 
-  # Only building for x86_64-linux (thinkpad). Add more systems here for other architectures.
+  # Only building for x86_64-linux. Add more systems here for other architectures.
   systems = [ "x86_64-linux" ];
 }

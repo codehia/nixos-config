@@ -54,9 +54,6 @@ clean:
 verify:
 	nix-store --verify --check-contents
 
-list-gens:
-	nix-env --list-generations
-
 repair:
 	sudo nixos-rebuild switch --repair
 
