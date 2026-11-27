@@ -446,7 +446,7 @@ in
       # Laptop-only DMS bits. Delivered to every user by den.aspects.laptop
       # (provides.to-users), so the laptop aspect stays the one source of truth.
       laptop.homeManager =
-        { pkgs, lib, ... }:
+        { pkgs, ... }:
         let
           # On PATH so hyprland.lua (static file) can bind it by name.
           batteryToggle = pkgs.writeShellScriptBin "battery-charge-toggle" ''
@@ -473,10 +473,6 @@ in
               }
               + "/DankBatteryAlerts";
             settings.warningThreshold = 15;
-          };
-
-          wayland.windowManager.sway.config.keybindings = lib.mkOptionDefault {
-            "Mod4+b" = "exec ${lib.getExe batteryToggle}";
           };
         };
     };

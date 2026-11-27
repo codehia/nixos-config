@@ -193,7 +193,7 @@
             # get PATH, XDG_DATA_DIRS, and other session variables.
             systemd = {
               variables = [ "--all" ];
-              xdgAutostart = true; # run XDG autostart entries (tailscale tray), as sway and uwsm do
+              xdgAutostart = true; # run XDG autostart entries (tailscale tray), as uwsm does
             };
 
             # Must be non-empty: the HM module only writes autostart.sh (and its

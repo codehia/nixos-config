@@ -253,7 +253,7 @@ end
 ------------------------------------------------------------------------------
 local exec = hl.dsp.exec_cmd
 
--- DMS (same binds as wayland/_dms-binds.nix, which mango and sway use — keep in sync)
+-- DMS (same binds as wayland/_dms-binds.nix, which mango uses — keep in sync)
 hl.bind('SUPER + space', exec('dms ipc launcher toggle'))
 hl.bind('F1', exec('dms ipc audio mute'))
 hl.bind('F2', exec('dms ipc audio decrement 5'))

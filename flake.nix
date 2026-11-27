@@ -65,10 +65,6 @@
       url = "git+https://git.sr.ht/~kennylevinsen/pam_fde_boot_pw";
       flake = false;
     };
-    persway = {
-      url = "github:johnae/persway";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -76,10 +72,6 @@
     stylix = {
       url = "github:nix-community/stylix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    sway-scratch = {
-      url = "github:aokellermann/sway-scratch";
-      flake = false;
     };
     wallpapers = {
       url = "git+https://codeberg.org/codehia/wallpapers";

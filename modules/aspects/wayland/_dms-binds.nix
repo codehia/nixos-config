@@ -1,4 +1,4 @@
-# DMS IPC keybinds shared by every WM (hyprland, swayfx, mango).
+# DMS IPC keybinds shared by every WM (hyprland, mango).
 # `_` prefix: not auto-imported; each WM file imports this and maps it to its own
 # bind syntax. mods: "none" | "super" | "super+shift". key: lowercase keysym.
 [
