@@ -25,10 +25,13 @@
       "deus@thinkpad".includes = [ den.aspects.gaming ];
 
       thinkpad = {
-        nixos.imports = [
-          ./_hardware-configuration.nix
-          ./_disko-config.nix
-        ];
+        nixos = {
+          imports = [
+            ./_hardware-configuration.nix
+            ./_disko-config.nix
+          ];
+          networking.networkmanager.wifi.powersave = false;
+        };
 
         includes = [
           den.aspects.desktop-host
