@@ -1018,11 +1018,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795571991,
-        "narHash": "sha256-W+UhoGCyIzGyNkrpqTmW99WaIfoqlqhzw1+gNh+1w78=",
+        "lastModified": 1795700783,
+        "narHash": "sha256-l2GfuCRk7sZ5Dh0u7iDYQno/KnaNay6WjbwP5Ps638A=",
         "owner": "AlvaroParker",
         "repo": "helium-nix",
-        "rev": "0031dbf86e15fb011e7445cb39d77df330dcd465",
+        "rev": "594612ec7fca31c49ea8aacb9d77b166bbf3fb0f",
         "type": "github"
       },
       "original": {
@@ -1186,11 +1186,11 @@
         "scenefx": "scenefx"
       },
       "locked": {
-        "lastModified": 1795620409,
-        "narHash": "sha256-PhFc7w1Y+NthwWe2I5P42jDshIeQhbpJLbhV6TW6JAw=",
+        "lastModified": 1795762277,
+        "narHash": "sha256-WZ+/oz5ynSaEkkANj0mkXM+GPrk/bp43Tz29c4iNsaY=",
         "owner": "mangowm",
         "repo": "mango",
-        "rev": "75fc5275a7679c72a29b239bd9c05cde69089789",
+        "rev": "d457b3088a052af7023738385974485790903e95",
         "type": "github"
       },
       "original": {
@@ -2310,11 +2310,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795577370,
-        "narHash": "sha256-kbm3rhM5/EX5AJEPV9Svkcdk9f1RTqfX+YWQvROKX8w=",
+        "lastModified": 1795762905,
+        "narHash": "sha256-tQ5YNz44fWJ7VWWia5ivfr5ZTlPR6GAxJkna4Z8j2bY=",
         "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "rev": "6c4d107744ba0760c5176a3993115b9842c19249",
+        "rev": "8fff5095fe8dcf614c2a4bec4ca346a800910e11",
         "type": "github"
       },
       "original": {
