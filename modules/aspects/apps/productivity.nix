@@ -17,6 +17,7 @@
         bitwarden-cli
         ente-auth
         obsidian
+        sioyek
       ];
     };
   };
